@@ -7,17 +7,22 @@ class User{
         $this->pdo = $pdo;
     }
 
-    public function findByEmail($email)
-    {
+
+    public function findByEmail($email){
         $stmt = $this->pdo->prepare("SELECT * FROM users WHERE email = ?");
         $stmt->execute([$email]);
         return $stmt->fetch();
     }
-    public function findById($id)
-    {
+    public function findById($id) {
         $stmt = $this->pdo->prepare("SELECT * FROM users WHERE id = ?");
         $stmt->execute([$id]);
         return $stmt->fetch();
+    }
+
+    public function findByFamilyId($famid) {
+        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE fam_id = ?");
+        $stmt->execute([$famid]);
+        return $stmt->fetchAll();
     }
 
     public function createUser($firstname, $lastname, $email, $pw_hash) {

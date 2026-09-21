@@ -43,5 +43,31 @@ if (isset($_POST['familynameBtn'])) {
     if (!$validator->required($familyname)) {
         $errors['familyname'] = 'Familienname ist erforderlich!';
     }
+
+    if(!empty($errors)) {
+        $_SESSION['errors'] = $errors;
+        header("Location: CreateFamily.php");
+        exit();
+    }
+
+    $db = new Database;
+    $pdo = $db->connect();
+
+    $family = new Family($pdo);
+    $user = new User($pdo);
+
+    // Korrektur: Methode gehoert zu $family; das Ergebnis (neue Familien-Id) wird in $famId gespeichert
+    $famId = $family->createFamily($familyname);
+
+    // Korrektur: $fam_id/$id sind nur die Namen in der Klasse - hier kommen die eigenen Werte:
+    // erst die neue Familien-Id, dann die Id des eingeloggten Users aus der Session
+    $user->setFamily($famId, $_SESSION['uid']);
+
+    $_SESSION['fam_id'] = $famId;
+
+    header("Location: Dashboard.php");
+    exit();
+
+
 }
 ?>

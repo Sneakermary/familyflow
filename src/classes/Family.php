@@ -13,6 +13,12 @@ class Family{
         $stmt->execute([$name]);
         return $this->pdo->lastInsertId();
     }
+
+    public function findById($id) {
+        $stmt = $this->pdo->prepare("SELECT * FROM families WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch();
+    }
 }
 
 ?>
