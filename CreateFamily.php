@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/src/classes/Database.php';
-require_once __DIR__ . '/src/classes/User.php';
+// Korrektur: User.php wird hier nicht mehr gebraucht (Mitgliedschaft läuft jetzt über Family::addMember)
 require_once __DIR__ . '/src/classes/Family.php';
 require_once __DIR__ . '/src/classes/Validator.php';
 
@@ -12,10 +12,8 @@ if (!isset($_SESSION['uid'])) {
     exit();
 }
 
-if (isset($_SESSION['fam_id'])) {
-    header("Location: Dashboard.php");
-    exit();
-}
+// Korrektur: Der frühere Check "hat schon eine Familie -> zurück zum Dashboard" ist entfernt.
+// Eine Person darf jetzt in mehreren Familien sein und jederzeit eine weitere Familie anlegen.
 ?>
 
 <h3>Erstelle eine Familie</h3>
@@ -54,15 +52,15 @@ if (isset($_POST['familynameBtn'])) {
     $pdo = $db->connect();
 
     $family = new Family($pdo);
-    $user = new User($pdo);
 
-    // Korrektur: Methode gehoert zu $family; das Ergebnis (neue Familien-Id) wird in $famId gespeichert
+    // Familie anlegen; das Ergebnis (neue Familien-Id) wird in $famId gespeichert
     $famId = $family->createFamily($familyname);
 
-    // Korrektur: $fam_id/$id sind nur die Namen in der Klasse - hier kommen die eigenen Werte:
-    // erst die neue Familien-Id, dann die Id des eingeloggten Users aus der Session
-    $user->setFamily($famId, $_SESSION['uid']);
+    // Korrektur: statt User::setFamily (schrieb die alte Spalte users.fam_id) trägt addMember die Person
+    // in die Zwischentabelle family_members ein. Reihenfolge: erst der User, dann die Familie
+    $family->addMember($_SESSION['uid'], $famId);
 
+    // Ab jetzt ist die neue Familie die aktuell gewählte Familie
     $_SESSION['fam_id'] = $famId;
 
     header("Location: Dashboard.php");

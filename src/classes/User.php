@@ -19,9 +19,14 @@ class User{
         return $stmt->fetch();
     }
 
-    public function findByFamilyId($famid) {
-        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE fam_id = ?");
-        $stmt->execute([$famid]);
+    public function findUserByFamilyId($famId) {
+        // Korrektur: Die Familie steht nicht mehr in users.fam_id, sondern in der Zwischentabelle family_members.
+        // JOIN verbindet users.id mit family_members.user_id, gefiltert wird ueber family_members.fam_id.
+        // users.* liefert nur die Spalten des Users (id, firstname, lastname, ...), nicht die der Zwischentabelle.
+        $stmt = $this->pdo->prepare("SELECT users.* FROM users
+            JOIN family_members ON users.id = family_members.user_id
+            WHERE family_members.fam_id = ?");
+        $stmt->execute([$famId]);
         return $stmt->fetchAll();
     }
 
@@ -33,6 +38,12 @@ class User{
     public function setFamily($fam_id, $id) {
         $stmt = $this->pdo->prepare("UPDATE users SET fam_id = ? WHERE id = ?");
         $stmt->execute([$fam_id, $id]);
+    }
+
+    public function findFamiliesByUserId($userId) {
+        $stmt = $this->pdo->prepare("SELECT * FROM families WHERE user_id = ?");
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll();
     }
 }
 ?>

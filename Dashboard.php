@@ -22,7 +22,7 @@ $family = new Family($pdo);
 $user = new User($pdo);
 
 $familyData = $family->findById($_SESSION['fam_id']);
-$members = $user->findByFamilyId($_SESSION['fam_id']);
+$members = $user->findUserByFamilyId($_SESSION['fam_id']);
 ?>
 
 <h2>Dashboard</h2>

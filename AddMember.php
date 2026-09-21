@@ -1,24 +1,34 @@
 <?php
-require_once __DIR__ . '/src/classes/Database.php';
-require_once __DIR__ . '/src/classes/User.php';
+require_once __DIR__ .'/src/classes/Database.php';
+require_once __DIR__ .'/src/classes/User.php';
+require_once __DIR__ .'/src/classes/Family.php';
 session_start();
 
 $errors = $_SESSION['errors'] ?? [];
+
+if(!isset($_SESSION['uid'])) {
+header("Location: UserLogin.php");
+exit();
+}
+
+if(!isset($_SESSION['fam_id'])) {
+    header("Location: CreateFamily.php");
+    exit();
+}
 ?>
 
 <div class="contentcontainer">
     <form action="" class="frontform" method="POST">
-        <h3>Registrieren</h3>
+        <h3>Familien Mitglied hinzufügen</h3>
 
         <input type="text" name="firstname" placeholder="Vorname" required>
         <input type="text" name="lastname" placeholder="Nachname" required>
         <input type="email" name="email" placeholder="E-Mail" required>
         <input type="password" name="pw" placeholder="Passwort" minlength="8" required>
         <input type="password" name="pwConfirm" placeholder="Passwort bestätigen" required>
-        <button type="submit" name="registerBtn">Registrieren</button>
+        <button type="submit" name="addMemberBtn">Hinzufügen</button>
     </form>
 </div>
-
 
 <?php
 
@@ -77,7 +87,7 @@ if (isset($_POST['registerBtn'])) {
 
     if(!empty($errors)){
         $_SESSION['errors'] = $errors;
-        header("Location: UserRegister.php");
+        header("Location: AddMember.php");
         exit();
     }
 
@@ -85,7 +95,7 @@ if (isset($_POST['registerBtn'])) {
 
     $user->createUser($firstname, $lastname, $email, $pw_hash);
 
-    header("Location: UserLogin.php");
+    header("Location: Dashboard.php");
     exit();
 }
 ?>
