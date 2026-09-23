@@ -3,7 +3,7 @@
 
 class Database {
     public function connect() {
-       $config = include __DIR__ . '/../config/bdconfig.php';
+       $config = include __DIR__ . '/../config/dbconfig.php';
 
         try {
             $dsn = "mysql:host=" .$config['dbhost'].";dbname=" .$config['dbname'];

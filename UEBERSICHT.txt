@@ -4,7 +4,7 @@ FAMILYFLOW - DATEI-UEBERSICHT
 KLASSEN (src/classes/) - machen die Datenbank-Arbeit
 ------------------------------------------------------
 Database.php
-  - connect() baut die PDO-Verbindung auf, liest Zugangsdaten aus src/config/bdconfig.php
+  - connect() baut die PDO-Verbindung auf, liest Zugangsdaten aus src/config/dbconfig.php
 
 User.php  (Tabelle: users)
   - findByEmail($email)       -> ein User per Email (fuer Login, Duplikat-Check)
