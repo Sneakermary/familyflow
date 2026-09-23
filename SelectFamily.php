@@ -1,12 +1,10 @@
 <?php
 require_once __DIR__ .'/src/classes/Database.php';
 require_once __DIR__ .'/src/classes/Family.php';
-session_start();
 
-if(!isset($_SESSION['uid'])) {
-    header("Location: UserLogin.php");
-    exit();
-}
+// guard.php: session_start() + Login-Pflicht (kein HTML) - kein fam_id-Check hier,
+// diese Seite entscheidet ja gerade erst, welche Familie aktuell ist
+require_once __DIR__ . '/src/components/guard.php';
 
 $db = new Database;
 $pdo = $db->connect();
@@ -29,6 +27,10 @@ if(isset($_GET['fam_id'])) {
 }
 
 $families = $family->findFamiliesByUserId($_SESSION['uid']);
+
+// Ab hier nur noch Anzeige, keine Redirects mehr moeglich
+include_once __DIR__ . '/src/components/head.php';
+include_once __DIR__ . '/src/components/navbar.php';
 ?>
 
 <h2>Meine Familien</h2>
@@ -36,3 +38,5 @@ $families = $family->findFamiliesByUserId($_SESSION['uid']);
 <?php foreach($families as $fam): ?>
     <p><a href="?fam_id=<?= $fam->id ?>"><?= htmlspecialchars($fam->name) ?></a></p>
 <?php endforeach; ?>
+
+<?php include_once __DIR__ . '/src/components/footer.php'; ?>

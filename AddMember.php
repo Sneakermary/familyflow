@@ -2,41 +2,19 @@
 require_once __DIR__ .'/src/classes/Database.php';
 require_once __DIR__ .'/src/classes/User.php';
 require_once __DIR__ .'/src/classes/Family.php';
-session_start();
 
-$errors = $_SESSION['errors'] ?? [];
+// guard.php: session_start() + Login-Pflicht (kein HTML)
+require_once __DIR__ . '/src/components/guard.php';
 
-if(!isset($_SESSION['uid'])) {
-header("Location: UserLogin.php");
-exit();
-}
-
+// Zweiter Check nur hier noetig (nicht alle Seiten brauchen ihn), auch noch vor jedem HTML
 if(!isset($_SESSION['fam_id'])) {
     header("Location: CreateFamily.php");
     exit();
 }
-?>
 
-<div class="contentcontainer">
-    <form action="" class="frontform" method="POST">
-        <h3>Familien Mitglied hinzufügen</h3>
+$errors = $_SESSION['errors'] ?? [];
 
-        <input type="text" name="firstname" placeholder="Vorname" required>
-        <input type="text" name="lastname" placeholder="Nachname" required>
-        <input type="email" name="email" placeholder="E-Mail" required>
-        <input type="password" name="pw" placeholder="Passwort" minlength="8" required>
-        <input type="password" name="pwConfirm" placeholder="Passwort bestätigen" required>
-        <button type="submit" name="addMemberBtn">Hinzufügen</button>
-    </form>
-</div>
-
-<?php
-
-foreach($errors as $error){
-    echo '<p>' . $error . '</p>';
-}
-unset($_SESSION['errors']);
-
+// POST-Verarbeitung ZUERST (kann noch redirecten), erst danach kommt HTML
 if (isset($_POST['addMemberBtn'])) {
     require_once __DIR__. '/src/classes/Validator.php';
     $email = trim($_POST['email'] ?? '');
@@ -104,4 +82,30 @@ if (isset($_POST['addMemberBtn'])) {
     header("Location: Dashboard.php");
     exit();
 }
+
+// Ab hier nur noch Anzeige, keine Redirects mehr moeglich
+include_once __DIR__ . '/src/components/head.php';
+include_once __DIR__ . '/src/components/navbar.php';
 ?>
+
+<div class="contentcontainer">
+    <form action="" class="frontform" method="POST">
+        <h3>Familien Mitglied hinzufügen</h3>
+
+        <input type="text" name="firstname" placeholder="Vorname" required>
+        <input type="text" name="lastname" placeholder="Nachname" required>
+        <input type="email" name="email" placeholder="E-Mail" required>
+        <input type="password" name="pw" placeholder="Passwort" minlength="8" required>
+        <input type="password" name="pwConfirm" placeholder="Passwort bestätigen" required>
+        <button type="submit" name="addMemberBtn">Hinzufügen</button>
+    </form>
+</div>
+
+<?php
+foreach($errors as $error){
+    echo '<p>' . $error . '</p>';
+}
+unset($_SESSION['errors']);
+?>
+
+<?php include_once __DIR__ . '/src/components/footer.php'; ?>

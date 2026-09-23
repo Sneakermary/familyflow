@@ -4,34 +4,15 @@ require_once __DIR__ . '/src/classes/Database.php';
 require_once __DIR__ . '/src/classes/Family.php';
 require_once __DIR__ . '/src/classes/Validator.php';
 
-session_start();
-$errors = $_SESSION['errors'] ?? [];
-
-if (!isset($_SESSION['uid'])) {
-    header("Location: UserLogin.php");
-    exit();
-}
+// guard.php: session_start() + Login-Pflicht (kein HTML)
+require_once __DIR__ . '/src/components/guard.php';
 
 // Korrektur: Der frühere Check "hat schon eine Familie -> zurück zum Dashboard" ist entfernt.
 // Eine Person darf jetzt in mehreren Familien sein und jederzeit eine weitere Familie anlegen.
-?>
 
-<h3>Erstelle eine Familie</h3>
+$errors = $_SESSION['errors'] ?? [];
 
-<div class="CreateFamilyContainer">
-    <form action="" method="POST">
-        <input type="text" name="familyname" placeholder="Familie" required>
-        <button type="submit" name="familynameBtn">Familie erstellen</button>
-    </form>
-</div>
-
-<?php
-
-foreach ($errors as $error) {
-    echo '<p>' . $error . '</p>';
-}
-unset($_SESSION['errors']);
-
+// POST-Verarbeitung ZUERST (kann noch redirecten), erst danach kommt HTML
 if (isset($_POST['familynameBtn'])) {
     $familyname = trim($_POST['familyname'] ?? '');
 
@@ -65,7 +46,27 @@ if (isset($_POST['familynameBtn'])) {
 
     header("Location: Dashboard.php");
     exit();
-
-
 }
+
+// Ab hier nur noch Anzeige, keine Redirects mehr moeglich
+include_once __DIR__ . '/src/components/head.php';
+include_once __DIR__ . '/src/components/navbar.php';
 ?>
+
+<h3>Erstelle eine Familie</h3>
+
+<?php
+foreach ($errors as $error) {
+    echo '<p>' . $error . '</p>';
+}
+unset($_SESSION['errors']);
+?>
+
+<div class="CreateFamilyContainer">
+    <form action="" method="POST">
+        <input type="text" name="familyname" placeholder="Familie" required>
+        <button type="submit" name="familynameBtn">Familie erstellen</button>
+    </form>
+</div>
+
+<?php include_once __DIR__ . '/src/components/footer.php'; ?>
