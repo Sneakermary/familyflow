@@ -1,23 +1,148 @@
+/* Farbpalette: ruhig/modern, Blau als Hauptfarbe, Gruen als Akzent */
+:root {
+    --primary: #2c5f8a;
+    --primary-dark: #1f4666;
+    --accent: #4caf82;
+    --bg: #f4f6f8;
+    --text: #2b2b2b;
+    --border: #d5dce1;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h2, h3 {
+    color: var(--primary-dark);
+}
+
 .navbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 20px;
-    background: #333;
+    padding: 12px 24px;
+    background: var(--primary-dark);
     color: white;
 }
 
-#menuList{
+.navbar a {
+    color: white;
+}
+
+#menuBtn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+#menuBtn:hover {
+    opacity: 0.9;
+}
+
+#menuList {
     position: absolute;
-    top: 50px;
-    right: 20px;
+    top: 55px;
+    right: 24px;
     background: white;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+}
+
+#menuList a {
+    color: var(--text);
+    padding: 10px 16px;
+}
+
+#menuList a:hover {
+    background: var(--bg);
+    text-decoration: none;
 }
 
 #menuList.hidden {
     display: none;
-    
 }
+
+/* Formulare (Login, Registrierung, Mitglied hinzufuegen, Familie erstellen) */
+.contentcontainer,
+.CreateFamilyContainer,
+main {
+    max-width: 420px;
+    margin: 40px auto;
+    padding: 24px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+input {
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+button {
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background: var(--primary);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+button:hover {
+    background: var(--primary-dark);
+}
+
+/* Alles, was direkt im body liegt (nicht in .contentcontainer/.CreateFamilyContainer
+   verpackt ist, z.B. Dashboard-Inhalt, Familienliste, einzelne Ueberschriften) -
+   zentriert und auf Lesebreite begrenzt. Die Navbar bleibt bewusst aussen vor,
+   die soll ueber die volle Breite gehen. */
+body > h2,
+body > h3,
+body > p,
+body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
