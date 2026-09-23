@@ -34,5 +34,6 @@ $members = $user->findUserByFamilyId($_SESSION['fam_id']);
 <?php endforeach; ?>
 
 
-<a href="UserLogout.php">Logout</a>
+<p><a href="UserLogout.php">Logout</a></p>
+<p><a href="SelectFamily.php">Familie wechseln</a></p>
 

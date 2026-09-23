@@ -5,11 +5,11 @@ Wird Schritt für Schritt gemeinsam erarbeitet (Übung für die LAP) – kein fe
 
 ## MVP-Umfang
 
-- [~] Familien-Account mit mehreren Nutzern (Login pro Person) – Familien und Mitglieder gibt es, Umbau auf mehrere Familien pro Person läuft
+- [x] Familien-Account mit mehreren Nutzern (Login pro Person), inkl. mehrere Familien pro Person (n:m über `family_members`)
 - [x] Registrierung (nur User; Familie wird danach separat erstellt)
-- [ ] Weitere Familienmitglieder hinzufügen – `AddMember.php` hat nur das Formular, Logik fehlt (neu anlegen + bestehende Person hinzufügen)
-- [x] Login-System (personenbezogen) – muss auf Familien-Auswahl umgestellt werden
-- [~] Dashboard: Familienname und Mitglieder werden angezeigt; Avatare und Platzhalter-Kacheln (Kalender, Listen, Essensplaner, Budget) fehlen
+- [x] Weitere Familienmitglieder hinzufügen – `AddMember.php` fertig: neuer User wird direkt der aktuellen Familie zugeordnet. Bestehende Person per Email hinzufügen fehlt noch
+- [x] Login-System (personenbezogen) – leitet jetzt zu `SelectFamily.php`, setzt selbst kein `fam_id` mehr
+- [~] Dashboard: Familienname und Mitglieder werden angezeigt; Avatare und Platzhalter-Kacheln (Kalender, Listen, Essensplaner, Budget) fehlen; Link zurück zu `SelectFamily.php` (Familie wechseln) fehlt noch
 
 ## Datenbank
 
@@ -49,14 +49,17 @@ Eine Person soll in mehreren Familien sein können. Deshalb wandert die Zuordnun
 
 `users.fam_id` und `users.role` fallen danach weg (erst **am Ende** entfernen, wenn aller Code umgestellt ist).
 
-**Neuer Ablauf:** Login → `FamilySelect.php` (Liste der eigenen Familien + "Neue Familie erstellen") → Wahl setzt `$_SESSION['fam_id']` (= aktuell gewählte Familie, vorher in der DB auf Mitgliedschaft geprüft) → Dashboard. Dashboard ohne gewählte Familie → `FamilySelect.php`. Familienwechsel per Link im Dashboard.
+**Ablauf (fertig, Stand 2026-09-23):** Login (setzt nur `uid`) → `SelectFamily.php` (Liste der eigenen Familien via `Family::findFamiliesByUserId` + Link pro Familie) → Klick prüft mit `isMember()` die Mitgliedschaft, setzt erst dann `$_SESSION['fam_id']` → Redirect zum Dashboard. Kompletter Ablauf im Browser getestet (eigene Familie wählen funktioniert, fremde Id in der URL wird von `isMember()` abgelehnt).
 
 **Umbau-Reihenfolge:**
 1. ~~Zwischentabelle in HeidiSQL anlegen (mit FKs + UNIQUE)~~ – erledigt (2026-09-21): `family_members` mit `fk_members_family`, `kf_members_user` (Tippfehler im Namen, harmlos), `uq_user_family` UNIQUE (`user_id`, `fam_id`), `idx_fam_id` (KEY) für den FK, `role` NOT NULL Default `'member'`
 2. ~~Testdaten umziehen (`INSERT ... SELECT` aus `users`)~~ – erledigt: hanna → Familie 2, herbert → Familie 1
-3. Klassen: `Family::findByUser`, `Family::addMember`, `Family::isMember`, `User::findByFamilyId` als JOIN, `createFamily` legt Mitgliedschaft an
-4. Seiten: `FamilySelect.php` (neu), Login-Redirect, `CreateFamily.php` (Guard "hat schon Familie" entfällt), Dashboard-Guard, `AddMember.php`
-5. Spalten `users.fam_id`/`users.role` entfernen
+3. ~~Klassen: `Family::findByUser`, `Family::addMember`, `Family::isMember`, `User::findByFamilyId` als JOIN, `createFamily` legt Mitgliedschaft an~~ – erledigt (2026-09-21/22)
+4. ~~Seiten: `SelectFamily.php` (neu), Login-Redirect, `CreateFamily.php` (Guard "hat schon Familie" entfällt), Dashboard-Guard, `AddMember.php`~~ – erledigt (2026-09-23), Dashboard-Guard war schon vorher richtig (prüft nur `isset`)
+5. Spalten `users.fam_id`/`users.role` entfernen – **noch offen**, siehe Aufräumliste unten
+6. **Neu offen:** Wechsel-Link im Dashboard zurück zu `SelectFamily.php`
+7. **Neu offen:** Bei genau EINER Familie automatisch durchleiten (kein Klick auf der Auswahlseite nötig) – aktuell landet man immer erst auf `SelectFamily.php`, auch mit nur einer Familie
+8. **Neu (2026-09-23):** `Data.txt` mit Demo-Zugangsdaten für die Lehrer-Vorführung angelegt (4 Demo-Familien, 7 Demo-User, Passwort `123456543`, über die echten Klassen `createUser`/`createFamily`/`addMember` eingefügt – nicht per Hand-SQL). Lisa und Sara sind bewusst in je zwei Familien, um `SelectFamily.php` vorzuführen. **Nicht committen/pushen** – enthält Klartext-Passwort, gehört nicht ins Repo
 
 ## Bausteine (Reihenfolge)
 
@@ -103,4 +106,6 @@ Orientiert an zwei früheren Projekten:
 - 2026-09-21 (Tagesabschluss): Aufgeräumt: `tests/dbTest.php` entfernt (das Skript rief `connect()` nie auf und meldete trotzdem "funktioniert", getestet wird im Browser). PLAN.md auf Stand gebracht. **Zwischenstand:** Login und Dashboard arbeiten noch mit der alten Spalte `users.fam_id`, `CreateFamily.php` schreibt schon in `family_members`. Wer eine Familie erstellt und sich neu einloggt, landet wieder bei "Familie erstellen", bis die Auswahlseite steht. `User::findUserByFamilyId` liest schon über die Zwischentabelle.
   - **Aufräumliste offen:** `bdconfig.example.php` als Vorlage anlegen; `User::setFamily()` löschen (keine Aufrufer mehr); FK-Name `kf_members_user` → `fk_members_user` (kosmetisch); nach der Auswahlseite alte Spalten `users.fam_id`/`users.role` entfernen; doppelten Validierungscode aus `UserRegister.php`/`AddMember.php` zusammenführen; Ordnerstruktur (siehe Notiz oben)
   - **Nächster Schritt:** `FamilySelect.php`
+- 2026-09-22: `AddMember.php` fertiggebaut (war unfertig kopiert, Button-Check zeigte auf falschen Namen, `createUser()` gab keine Id zurück). `createUser()` gibt jetzt per `lastInsertId()` die neue Id zurück, `AddMember.php` trägt den neuen User direkt per `Family::addMember()` in die aktuelle Familie ein. Tote/kaputte Kopie von `findFamiliesByUserId` in `User.php` gelöscht. `UEBERSICHT.txt` angelegt (kurze Datei-Referenz: was macht was, woher kommen die Daten) – gleiche Idee auch für das Projekt `temperatur2209` erstellt.
+- 2026-09-23: `SelectFamily.php` gebaut (Name bewusst so, nicht `FamilySelect.php` – passt zu `CreateFamily.php`). Zeigt Familien der Person (`findFamiliesByUserId`), Klick prüft `isMember()` und setzt erst dann `$_SESSION['fam_id']`, dann Redirect zum Dashboard. `UserLogin.php` setzt kein `fam_id` mehr selbst, leitet zu `SelectFamily.php`. Login-Link auf `index.php` ergänzt (fehlte). Kompletter Ablauf (Login → Familie wählen → Dashboard) im Browser getestet, inkl. Sicherheitscheck (fremde Familien-Id in der URL wird abgelehnt). Nächster Schritt: Wechsel-Link im Dashboard zu `SelectFamily.php`, danach Aufräumliste (siehe 2026-09-21).
 - 2026-09-19: `role = 'child'` kurz diskutiert und wieder verworfen (siehe oben). gameshop-Vorlage (vom Lehrer) als Referenz für Validierung entdeckt. `Validation`-Klasse (`src/classes/Validation.php`) mit `required()`, `email()`, `minlength()`, `matches()` fertig nachgebaut. Nächster Schritt: `User::findByEmail()` ergänzen, dann `UserRegister.php` auf Fehler-Array + Post/Redirect/Get umbauen, danach Login.
