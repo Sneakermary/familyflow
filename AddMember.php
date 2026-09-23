@@ -37,7 +37,7 @@ foreach($errors as $error){
 }
 unset($_SESSION['errors']);
 
-if (isset($_POST['registerBtn'])) {
+if (isset($_POST['addMemberBtn'])) {
     require_once __DIR__. '/src/classes/Validator.php';
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['pw'] ?? '';
@@ -93,7 +93,13 @@ if (isset($_POST['registerBtn'])) {
 
     $pw_hash = password_hash($password, PASSWORD_DEFAULT);
 
-    $user->createUser($firstname, $lastname, $email, $pw_hash);
+
+    // Neue User-Id auffangen (createUser gibt sie jetzt zurück)
+    $newUserId = $user->createUser($firstname, $lastname, $email, $pw_hash);
+
+    // Neuen User als Mitglied der aktuellen Familie eintragen
+    $family = new Family($pdo);
+    $family->addMember($newUserId, $_SESSION['fam_id']);
 
     header("Location: Dashboard.php");
     exit();

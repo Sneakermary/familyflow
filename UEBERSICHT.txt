@@ -1,0 +1,74 @@
+FAMILYFLOW - DATEI-UEBERSICHT
+==============================
+
+KLASSEN (src/classes/) - machen die Datenbank-Arbeit
+------------------------------------------------------
+Database.php
+  - connect() baut die PDO-Verbindung auf, liest Zugangsdaten aus src/config/bdconfig.php
+
+User.php  (Tabelle: users)
+  - findByEmail($email)       -> ein User per Email (fuer Login, Duplikat-Check)
+  - findById($id)             -> ein User per Id
+  - findUserByFamilyId($famId) -> alle User einer Familie (JOIN mit family_members)
+  - createUser(...)           -> legt neuen User an, gibt neue User-Id zurueck
+  - setFamily(...)            -> ALT/unbenutzt, aus altem Modell (users.fam_id)
+
+Family.php  (Tabellen: families, family_members)
+  - createFamily($name)              -> legt neue Familie an, gibt neue Familien-Id zurueck
+  - findById($id)                    -> eine Familie per Id
+  - findFamiliesByUserId($userId)    -> alle Familien einer Person (JOIN mit family_members)
+  - addMember($userId, $famId)       -> traegt Person als Mitglied einer Familie ein
+  - isMember($userId, $famId)        -> prueft, ob Person wirklich Mitglied ist (Sicherheit)
+
+Validator.php
+  - required(), email(), minlength(), matches() -> einzelne Formular-Checks, kein DB-Zugriff
+
+
+SEITEN (Formular + Logik in einer Datei) - im Projekt-Root
+------------------------------------------------------------
+index.php
+  - Startseite, nur ein Link zur Registrierung
+
+UserRegister.php
+  - Formular: Vorname, Nachname, Email, Passwort
+  - legt User an (User::createUser), OHNE Familie (fam_id bleibt NULL)
+  - Quelle Fehleranzeige: $_SESSION['errors']
+
+UserLogin.php
+  - Formular: Email, Passwort
+  - prueft gegen User::findByEmail() + password_verify()
+  - setzt bei Erfolg $_SESSION['uid']
+  - TODO (naechster Schritt): soll KEIN fam_id mehr setzen, nur noch uid
+
+UserLogout.php
+  - beendet die Session, kein Formular
+
+CreateFamily.php
+  - Formular: Familienname
+  - legt Familie an (Family::createFamily) + traegt Ersteller als Mitglied ein (Family::addMember)
+  - setzt $_SESSION['fam_id'] auf die neue Familie
+  - Zugriff nur mit $_SESSION['uid']
+
+AddMember.php
+  - Formular: Vorname, Nachname, Email, Passwort (fuer eine ANDERE Person)
+  - legt neuen User an (User::createUser) + traegt ihn in die AKTUELLE Familie ein (Family::addMember)
+  - braucht $_SESSION['uid'] UND $_SESSION['fam_id']
+
+Dashboard.php
+  - zeigt Familienname (Family::findById) + Mitgliederliste (User::findUserByFamilyId)
+  - braucht $_SESSION['uid'] UND $_SESSION['fam_id']
+  - Logout-Link
+
+
+NOCH ZU BAUEN
+--------------
+FamilySelect.php  (existiert noch nicht)
+  - soll nach dem Login zeigen: eigene Familien (Family::findFamiliesByUserId) + "neue Familie erstellen"
+  - setzt nach Auswahl (mit Family::isMember-Check!) $_SESSION['fam_id']
+
+
+WICHTIGSTE SESSION-WERTE
+--------------------------
+$_SESSION['uid']     -> wer ist eingeloggt (User-Id)
+$_SESSION['fam_id']  -> welche Familie ist gerade "ausgewaehlt" (wird JETZT noch falsch gesetzt, siehe TODO oben)
+$_SESSION['errors']  -> Fehlermeldungen fuer die naechste Seite (Post/Redirect/Get)

@@ -33,17 +33,13 @@ class User{
     public function createUser($firstname, $lastname, $email, $pw_hash) {
         $stmt = $this->pdo->prepare("INSERT INTO users (firstname, lastname, email, pw_hash, fam_id, role) VALUES (?, ?, ?, ?, NULL, 'member')");
         $stmt->execute([$firstname, $lastname, $email, $pw_hash]);
+        // Neue User-Id zurückgeben, wie bei Family::createFamily
+        return $this->pdo->lastInsertId();
     }
 
     public function setFamily($fam_id, $id) {
         $stmt = $this->pdo->prepare("UPDATE users SET fam_id = ? WHERE id = ?");
         $stmt->execute([$fam_id, $id]);
-    }
-
-    public function findFamiliesByUserId($userId) {
-        $stmt = $this->pdo->prepare("SELECT * FROM families WHERE user_id = ?");
-        $stmt->execute([$userId]);
-        return $stmt->fetchAll();
     }
 }
 ?>
