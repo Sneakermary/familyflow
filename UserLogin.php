@@ -39,7 +39,7 @@ if (isset($_POST['loginBtn'])) {
     if ($found && password_verify($pw, $found->pw_hash)) {
         $_SESSION['uid'] = $found->id;
         $_SESSION['fam_id'] = $found->fam_id;
-        header("Location: Dashboard.php");
+        header("Location: SelectFamily.php");
         exit();
     }
     else {
