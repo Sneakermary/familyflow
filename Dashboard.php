@@ -34,3 +34,14 @@ include_once __DIR__ . '/src/components/navbar.php';
 <?php endforeach; ?>
 
 <?php include_once __DIR__ . '/src/components/footer.php'; ?>
+
+<div class="tile">
+    <div class="tile_icon">
+        📋
+        <div class="tile_title">
+            <div class="tile_subtext">
+                Noch keine Listen
+            </div>
+        </div>
+    </div>
+</div>
