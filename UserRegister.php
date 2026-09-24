@@ -4,29 +4,8 @@ require_once __DIR__ . '/src/classes/User.php';
 session_start();
 
 $errors = $_SESSION['errors'] ?? [];
-?>
 
-<div class="contentcontainer">
-    <form action="" class="frontform" method="POST">
-        <h3>Registrieren</h3>
-
-        <input type="text" name="firstname" placeholder="Vorname" required>
-        <input type="text" name="lastname" placeholder="Nachname" required>
-        <input type="email" name="email" placeholder="E-Mail" required>
-        <input type="password" name="pw" placeholder="Passwort" minlength="8" required>
-        <input type="password" name="pwConfirm" placeholder="Passwort bestätigen" required>
-        <button type="submit" name="registerBtn">Registrieren</button>
-    </form>
-</div>
-
-
-<?php
-
-foreach($errors as $error){
-    echo '<p>' . $error . '</p>';
-}
-unset($_SESSION['errors']);
-
+// POST-Verarbeitung ZUERST (kann noch redirecten), erst danach kommt HTML
 if (isset($_POST['registerBtn'])) {
     require_once __DIR__. '/src/classes/Validator.php';
     $email = trim($_POST['email'] ?? '');
@@ -88,4 +67,27 @@ if (isset($_POST['registerBtn'])) {
     header("Location: UserLogin.php");
     exit();
 }
+
+// Ab hier nur noch Anzeige, keine Redirects mehr moeglich
+include_once __DIR__ . '/src/components/head.php';
+
+foreach($errors as $error){
+    echo '<p>' . $error . '</p>';
+}
+unset($_SESSION['errors']);
 ?>
+
+<div class="contentcontainer">
+    <form action="" class="frontform" method="POST">
+        <h3>Registrieren</h3>
+
+        <input type="text" name="firstname" placeholder="Vorname" required>
+        <input type="text" name="lastname" placeholder="Nachname" required>
+        <input type="email" name="email" placeholder="E-Mail" required>
+        <input type="password" name="pw" placeholder="Passwort" minlength="8" required>
+        <input type="password" name="pwConfirm" placeholder="Passwort bestätigen" required>
+        <button type="submit" name="registerBtn">Registrieren</button>
+    </form>
+</div>
+
+<?php include_once __DIR__ . '/src/components/footer.php'; ?>

@@ -40,10 +40,32 @@ h2, h3 {
     padding: 12px 24px;
     background: var(--primary-dark);
     color: white;
+    flex-wrap: wrap;
 }
 
 .navbar a {
     color: white;
+}
+
+/* Avatar-Kreis und "FamilyFlow"-Text nebeneinander statt untereinander */
+.navbarLogo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Initialen-Avatar: Quadrat mit border-radius:50% wird zum Kreis, flex zentriert den Text */
+.avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
 }
 
 #menuBtn {
@@ -135,6 +157,7 @@ button:hover {
    verpackt ist, z.B. Dashboard-Inhalt, Familienliste, einzelne Ueberschriften) -
    zentriert und auf Lesebreite begrenzt. Die Navbar bleibt bewusst aussen vor,
    die soll ueber die volle Breite gehen. */
+body > h1,
 body > h2,
 body > h3,
 body > p,
