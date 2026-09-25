@@ -81,5 +81,3 @@ unset($_SESSION['errors']);
 ?>
 
 <?php include_once __DIR__ . '/src/components/footer.php'; ?>
-
-Kacheln, Avatar-Klick, Responsive Design, Aufraeumliste" -m "- Dashboard-Kacheln (2x2-Grid): Listen, Kalender, Meine Familie, Rezepte" -m "- Neue Seite MyFamily.php: Familienname + Mitgliederliste mit Avatar" -m "- Avatar (Initialen) ersetzt Menue-Button in der Navbar, oeffnet das Dropdown" -m "- initials() nach src/functions.php ausgelagert (DRY)" -m "- Viewport-Meta-Tag + flex-wrap fuer mobile Ansicht ergaenzt" -m "- UserLogin/UserRegister/index.php gestylt (head.php/footer.php)" -m "- Aufraeumliste komplett: dbconfig.example.php, User::setFamily() geloescht, alte Spalten users.fam_id/role entfernt, doppelte Validierung in Validator::validateRegistrationFields() zusammengefuehrt" -m "- Alles mit PHPs Testserver durchgetestet"
