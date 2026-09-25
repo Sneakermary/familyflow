@@ -23,37 +23,9 @@ if (isset($_POST['addMemberBtn'])) {
     $firstname = trim($_POST['firstname'] ?? '');
     $lastname = trim($_POST['lastname'] ?? '');
 
-    $errors = [];
     $validator = new Validator;
+    $errors = $validator->validateRegistrationFields($firstname, $lastname, $email, $password, $pwConfirm);
 
-    if(!$validator->required($email)) {
-        $errors['email'] = 'E-Mail ist erforderlich!';
-    }
-    elseif(!$validator->email($email)){
-        $errors['email'] = 'Bitte gib eine gültige E-Mail ein!';
-    }
-
-    if(!$validator->required($password)){
-        $errors['password'] = 'Passwort ist erforderlich!';
-    } 
-    elseif(!$validator->minlength($password, 8)){
-        $errors['password'] = 'Passwort muss mindestens 8 Zeichen lang sein.';
-    }
-
-    if(!$validator->required($pwConfirm)){
-        $errors['pwConfirm'] = 'Bitte Passwort wiederholen!';
-    }
-    elseif(!$validator->matches($password, $pwConfirm)) {
-        $errors['pwConfirm'] = 'Die Passwörter stimmen nicht überein!';
-    }
-
-    if(!$validator->required($firstname)){
-        $errors['firstname'] = 'Vorname ist erforderlich!';
-    }
-    
-    if(!$validator->required($lastname)){
-        $errors['lastname'] = 'Nachname ist erforderlich!';
-    }
 
     $db = new Database;
     $pdo = $db->connect();

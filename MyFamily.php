@@ -1,0 +1,39 @@
+<?php
+require_once __DIR__ . '/src/classes/Database.php';
+require_once __DIR__ . '/src/classes/User.php';
+require_once __DIR__ . '/src/classes/Family.php';
+require_once __DIR__ . '/src/functions.php';
+
+require_once __DIR__ . '/src/components/guard.php';
+
+// Zweiter Check nur hier noetig (nicht alle Seiten brauchen ihn), auch noch vor jedem HTML
+if (!isset($_SESSION['fam_id'])) {
+    header("Location: CreateFamily.php");
+    exit();
+}
+
+$db = new Database;
+$pdo = $db->connect();
+$family = new Family($pdo);
+$user = new User($pdo);
+
+$familyData = $family->findById($_SESSION['fam_id']);
+$members = $user->findUserByFamilyId($_SESSION['fam_id']);
+
+// Ab hier darf HTML ausgegeben werden, alle Redirects sind durch
+include_once __DIR__ . '/src/components/head.php';
+include_once __DIR__ . '/src/components/navbar.php';
+?>
+
+<h2>Meine Familie</h2>
+<h3><?= htmlspecialchars($familyData->name) ?></h3>
+
+<?php foreach ($members as $member): ?>
+    <div class="member">
+        <span class="avatar"><?= htmlspecialchars(initials($member->firstname, $member->lastname)) ?></span>
+        <span><?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?></span>
+    </div>
+<?php endforeach; ?>
+
+
+<?php include_once __DIR__ . '/src/components/footer.php'; ?>

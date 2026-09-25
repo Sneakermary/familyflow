@@ -37,8 +37,7 @@ if (isset($_POST['familynameBtn'])) {
     // Familie anlegen; das Ergebnis (neue Familien-Id) wird in $famId gespeichert
     $famId = $family->createFamily($familyname);
 
-    // Korrektur: statt User::setFamily (schrieb die alte Spalte users.fam_id) trägt addMember die Person
-    // in die Zwischentabelle family_members ein. Reihenfolge: erst der User, dann die Familie
+    // addMember traegt die Person in die Zwischentabelle family_members ein. Reihenfolge: erst der User, dann die Familie
     $family->addMember($_SESSION['uid'], $famId);
 
     // Ab jetzt ist die neue Familie die aktuell gewählte Familie

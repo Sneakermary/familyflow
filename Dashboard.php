@@ -1,13 +1,14 @@
 <?php
-require_once __DIR__ .'/src/classes/Database.php';
-require_once __DIR__ .'/src/classes/User.php';
-require_once __DIR__ .'/src/classes/Family.php';
+require_once __DIR__ . '/src/classes/Database.php';
+require_once __DIR__ . '/src/classes/User.php';
+require_once __DIR__ . '/src/classes/Family.php';
+require_once __DIR__ . '/src/functions.php';
 
 // guard.php: session_start() + Login-Pflicht (kein HTML, darf also zuerst kommen)
 require_once __DIR__ . '/src/components/guard.php';
 
 // Zweiter Check nur hier noetig (nicht alle Seiten brauchen ihn), auch noch vor jedem HTML
-if(!isset($_SESSION['fam_id'])) {
+if (!isset($_SESSION['fam_id'])) {
     header("Location: CreateFamily.php");
     exit();
 }
@@ -26,22 +27,39 @@ include_once __DIR__ . '/src/components/navbar.php';
 ?>
 
 <h2>Dashboard</h2>
-<h3><?= htmlspecialchars($familyData->name) ?></h3>
 
-<?php foreach($members as $member): ?>
-    <p> <?= htmlspecialchars($member->firstname) ?>
-        <?= htmlspecialchars($member->lastname) ?> </p>
-<?php endforeach; ?>
-
-<?php include_once __DIR__ . '/src/components/footer.php'; ?>
-
-<div class="tile">
-    <div class="tile_icon">
-        📋
-        <div class="tile_title">
-            <div class="tile_subtext">
-                Noch keine Listen
-            </div>
+<div class="tiles">
+<!-- LISTEN -->
+    <div class="tile">
+        <div class="tile_icon">📋</div>
+        <div class="tile_title">Listen</div>
+        <div class="tile_subtext">
+            Noch keine Listen
+        </div>
+    </div>
+    <div class="tile">
+<!-- KALENDER -->
+        <div class="tile_icon">📅</div>
+        <div class="tile_title">Kalender</div>
+        <div class="tile_subtext">
+            Noch keine Termine
+        </div>
+    </div>
+<!-- FAMILIE -->
+<div class="tile" data-href="MyFamily.php">
+        <div class="tile_icon">👨‍👩‍👧‍👦</div>
+        <div class="tile_title">Meine Familie</div>
+        <div class="tile_subtext">
+            Familie verwalten
+        </div>
+    </div>
+    <div class="tile">
+<!-- REZEPTE -->
+        <div class="tile_icon">🍽️</div>
+        <div class="tile_title">Rezepte</div>
+        <div class="tile_subtext">
+            Noch keine Rezepte
         </div>
     </div>
 </div>
+<?php include_once __DIR__ . '/src/components/footer.php'; ?>

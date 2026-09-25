@@ -20,6 +20,38 @@ class Validator {
     {
         return $value1 === $value2;
     }
+
+    public function validateRegistrationFields($firstname, $lastname, $email, $password, $pwConfirm) {
+        $errors = [];
+
+        if (!$this->required($email)) {
+            $errors['email'] = 'E-Mail ist erforderlich!';
+        } elseif (!$this->email($email)) {
+            $errors['email'] = 'Bitte gib eine gültige E-Mail ein!';
+        }
+
+        if (!$this->required($password)) {
+            $errors['password'] = 'Passwort ist erforderlich!';
+        } elseif (!$this->minlength($password, 8)) {
+            $errors['password'] = 'Passwort muss mindestens 8 Zeichen lang sein.';
+        }
+
+        if (!$this->required($pwConfirm)) {
+            $errors['pwConfirm'] = 'Bitte Passwort wiederholen!';
+        } elseif (!$this->matches($password, $pwConfirm)) {
+            $errors['pwConfirm'] = 'Die Passwörter stimmen nicht überein!';
+        }
+
+        if (!$this->required($firstname)) {
+            $errors['firstname'] = 'Vorname ist erforderlich!';
+        }
+
+        if (!$this->required($lastname)) {
+            $errors['lastname'] = 'Nachname ist erforderlich!';
+        }
+
+        return $errors;
+    }
 }
 
 ?>

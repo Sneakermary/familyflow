@@ -6,6 +6,7 @@
     --bg: #f4f6f8;
     --text: #2b2b2b;
     --border: #d5dce1;
+    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 * {
@@ -43,6 +44,7 @@ h2, h3 {
     flex-wrap: wrap;
 }
 
+
 .navbar a {
     color: white;
 }
@@ -53,8 +55,12 @@ h2, h3 {
     align-items: center;
     gap: 10px;
 }
+.navbarLogo h3 {
+    color: white;
+}
 
-/* Initialen-Avatar: Quadrat mit border-radius:50% wird zum Kreis, flex zentriert den Text */
+/* Initialen-Avatar: Quadrat mit border-radius:50% wird zum Kreis, flex zentriert den Text.
+   Ist gleichzeitig #menuBtn (siehe navbar.php) - klickbar, oeffnet das Dropdown. */
 .avatar {
     display: flex;
     align-items: center;
@@ -66,19 +72,10 @@ h2, h3 {
     color: white;
     font-weight: bold;
     font-size: 1rem;
-}
-
-#menuBtn {
-    background: var(--accent);
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
     cursor: pointer;
-    font-size: 1rem;
 }
 
-#menuBtn:hover {
+.avatar:hover {
     opacity: 0.9;
 }
 
@@ -118,7 +115,7 @@ main {
     padding: 24px;
     background: white;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--box-shadow);
 }
 
 form {
@@ -168,4 +165,25 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
     padding-left: 24px;
     padding-right: 24px;
 }
-
+/* KACHELN */
+.tiles {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+ .tile {
+    background: white;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow:var(--box-shadow);
+ }
+ .tile_icon {
+    font-size: x-large;
+ }
+ .tile_title {
+    font-weight: bold;
+ }
+ .tile_subtext {
+    font-size: 0.85rem;
+    color: #666;
+ }
