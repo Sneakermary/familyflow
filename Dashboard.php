@@ -30,7 +30,7 @@ include_once __DIR__ . '/src/components/navbar.php';
 
 <div class="tiles">
 <!-- LISTEN -->
-    <div class="tile">
+    <div class="tile" data-href="Lists.php">
         <div class="tile_icon">📋</div>
         <div class="tile_title">Listen</div>
         <div class="tile_subtext">

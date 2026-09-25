@@ -1,14 +1,10 @@
 <?php
+require_once __DIR__ . '/src/classes/FamilyList.php';
 require_once __DIR__ . '/src/classes/Database.php';
-// Korrektur: User.php wird hier nicht mehr gebraucht (Mitgliedschaft läuft jetzt über Family::addMember)
 require_once __DIR__ . '/src/classes/Family.php';
 require_once __DIR__ . '/src/classes/Validator.php';
-
 // guard.php: session_start() + Login-Pflicht (kein HTML)
 require_once __DIR__ . '/src/components/guard.php';
-
-// Korrektur: Der frühere Check "hat schon eine Familie -> zurück zum Dashboard" ist entfernt.
-// Eine Person darf jetzt in mehreren Familien sein und jederzeit eine weitere Familie anlegen.
 
 $errors = $_SESSION['errors'] ?? [];
 
@@ -23,7 +19,7 @@ if (isset($_POST['familynameBtn'])) {
         $errors['familyname'] = 'Familienname ist erforderlich!';
     }
 
-    if(!empty($errors)) {
+    if (!empty($errors)) {
         $_SESSION['errors'] = $errors;
         header("Location: CreateFamily.php");
         exit();
@@ -39,6 +35,14 @@ if (isset($_POST['familynameBtn'])) {
 
     // addMember traegt die Person in die Zwischentabelle family_members ein. Reihenfolge: erst der User, dann die Familie
     $family->addMember($_SESSION['uid'], $famId);
+    $lists = new FamilyList($pdo);
+
+    $einkaufenId = $lists->createList($famId, $_SESSION['uid'], 'Einkaufen');
+    $lists->addAccess($einkaufenId, $_SESSION['uid']);
+
+    $todoId = $lists->createList($famId, $_SESSION['uid'], 'To-Dos');
+    $lists->addAccess($todoId, $_SESSION['uid']);
+
 
     // Ab jetzt ist die neue Familie die aktuell gewählte Familie
     $_SESSION['fam_id'] = $famId;
