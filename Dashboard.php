@@ -63,3 +63,4 @@ include_once __DIR__ . '/src/components/navbar.php';
     </div>
 </div>
 <?php include_once __DIR__ . '/src/components/footer.php'; ?>
+
