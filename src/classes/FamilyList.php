@@ -63,9 +63,25 @@ class FamilyList {
         $stmt->execute([$itemId]);
     }
 
+    // Liste umbenennen
     public function renameList($listId, $newName) {
         $stmt = $this->pdo->prepare("UPDATE lists SET name = ? WHERE id = ?");
         $stmt->execute([$newName, $listId]);
+    }
+    // Liste löschen
+    public function deleteList($listId) {
+        $stmt = $this->pdo->prepare("DELETE FROM lists WHERE id = ?");
+        $stmt->execute([$listId]);
+    }
+
+    public function getAccessUserIds($listId) {
+        $stmt = $this->pdo->prepare("SELECT user_id FROM list_access WHERE list_id = ?");
+        $stmt->execute([$listId]);
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+    public function removeAccess($listId, $userId) {
+        $stmt = $this->pdo->prepare("DELETE FROM list_access WHERE list_id = ? AND user_id = ?");
+        $stmt->execute([$listId, $userId]);
     }
 }
 

@@ -45,12 +45,14 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
+<a href="/list/Lists.php" class="backLink">&larr;</a>
+
 <div class="listHeader">
     <h2><?= htmlspecialchars($list->name) ?></h2>
     <span id="listMenuBtn" class="dots">⋮</span>
     <div id="listMenuList" class="hidden">
-        <a href="/list/RenameList.php?id=<?= $listId ?>">Umbenennen</a>
-        <a href="/list/DeleteList.php?id=<?= $listId ?>">Löschen</a>
+        <a href="#" onclick="var name = prompt('Neuer Name:'); if(name) {window.location.href='/list/RenameList.php?id=<?= $listId ?>&name=' + encodeURIComponent(name); } return false;">Umbenennen</a>
+        <a href="/list/DeleteList.php?id=<?= $listId ?>" onclick="return confirm('Liste wirklich löschen?')">Liste Löschen</a>
         <a href="/list/ManageAccess.php?id=<?= $listId ?>">Zugriff verwalten</a>
         <a href="#" id="hideDoneBtn">Erledigte ausblenden</a>
     </div>

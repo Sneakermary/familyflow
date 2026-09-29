@@ -16,5 +16,6 @@ if (hideDoneBtn) {
     hideDoneBtn.addEventListener('click', function (event) {
         event.preventDefault(); // verhindert, dass der Link-Klick die Seite neu laedt
         document.body.classList.toggle('hideDone');
+        listMenuList.classList.add('hidden');
     });
 }

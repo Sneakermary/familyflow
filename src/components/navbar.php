@@ -8,13 +8,15 @@ $pdo = $db->connect();
 $user = new User($pdo);
 $currentUser = $user->findById($_SESSION['uid']);
 
-    // hier werden die Initialen vom user geholt und groß geschrieben
+// hier werden die Initialen vom user geholt und groß geschrieben
 $initials = initials($currentUser->firstname, $currentUser->lastname);
 
 ?>
 <div class="navbar">
     <div class="navbarLogo">
-        <h3>FamilyFlow</h3>
+        <a href="/family/SelectFamily.php">
+            <h3>FamilyFlow</h3>
+        </a>
     </div>
     <span id="menuBtn" class="avatar"><?= htmlspecialchars($initials) ?></span>
     <div id="menuList" class="hidden">

@@ -198,6 +198,15 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
     padding: 0 24px;
  }
 
+ .backLink {
+    display: inline-block;
+    font-size: 3rem;
+    line-height: 1;
+    text-decoration: none;
+    padding: 4px 10px;
+    margin-left: 24px;
+ }
+
  .dots {
     cursor: pointer;
     font-size: 1.5rem;
@@ -235,3 +244,4 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
  body.hideDone .member.done {
     display: none;
  }
+
