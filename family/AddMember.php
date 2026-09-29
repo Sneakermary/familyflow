@@ -1,14 +1,14 @@
 <?php
-require_once __DIR__ .'/src/classes/Database.php';
-require_once __DIR__ .'/src/classes/User.php';
-require_once __DIR__ .'/src/classes/Family.php';
+require_once __DIR__ .'/../src/classes/Database.php';
+require_once __DIR__ .'/../src/classes/User.php';
+require_once __DIR__ .'/../src/classes/Family.php';
 
 // guard.php: session_start() + Login-Pflicht (kein HTML)
-require_once __DIR__ . '/src/components/guard.php';
+require_once __DIR__ . '/../src/components/guard.php';
 
 // Zweiter Check nur hier noetig (nicht alle Seiten brauchen ihn), auch noch vor jedem HTML
 if(!isset($_SESSION['fam_id'])) {
-    header("Location: CreateFamily.php");
+    header("Location: /family/CreateFamily.php");
     exit();
 }
 
@@ -16,7 +16,7 @@ $errors = $_SESSION['errors'] ?? [];
 
 // POST-Verarbeitung ZUERST (kann noch redirecten), erst danach kommt HTML
 if (isset($_POST['addMemberBtn'])) {
-    require_once __DIR__. '/src/classes/Validator.php';
+    require_once __DIR__. '/../src/classes/Validator.php';
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['pw'] ?? '';
     $pwConfirm = $_POST['pwConfirm'] ?? '';
@@ -37,7 +37,7 @@ if (isset($_POST['addMemberBtn'])) {
 
     if(!empty($errors)){
         $_SESSION['errors'] = $errors;
-        header("Location: AddMember.php");
+        header("Location: /family/AddMember.php");
         exit();
     }
 
@@ -51,13 +51,13 @@ if (isset($_POST['addMemberBtn'])) {
     $family = new Family($pdo);
     $family->addMember($newUserId, $_SESSION['fam_id']);
 
-    header("Location: Dashboard.php");
+    header("Location: /Dashboard.php");
     exit();
 }
 
 // Ab hier nur noch Anzeige, keine Redirects mehr moeglich
-include_once __DIR__ . '/src/components/head.php';
-include_once __DIR__ . '/src/components/navbar.php';
+include_once __DIR__ . '/../src/components/head.php';
+include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
 <div class="contentcontainer">
@@ -80,4 +80,4 @@ foreach($errors as $error){
 unset($_SESSION['errors']);
 ?>
 
-<?php include_once __DIR__ . '/src/components/footer.php'; ?>
+<?php include_once __DIR__ . '/../src/components/footer.php'; ?>

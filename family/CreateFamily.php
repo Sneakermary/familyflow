@@ -1,10 +1,10 @@
 <?php
-require_once __DIR__ . '/src/classes/FamilyList.php';
-require_once __DIR__ . '/src/classes/Database.php';
-require_once __DIR__ . '/src/classes/Family.php';
-require_once __DIR__ . '/src/classes/Validator.php';
+require_once __DIR__ . '/../src/classes/FamilyList.php';
+require_once __DIR__ . '/../src/classes/Database.php';
+require_once __DIR__ . '/../src/classes/Family.php';
+require_once __DIR__ . '/../src/classes/Validator.php';
 // guard.php: session_start() + Login-Pflicht (kein HTML)
-require_once __DIR__ . '/src/components/guard.php';
+require_once __DIR__ . '/../src/components/guard.php';
 
 $errors = $_SESSION['errors'] ?? [];
 
@@ -21,7 +21,7 @@ if (isset($_POST['familynameBtn'])) {
 
     if (!empty($errors)) {
         $_SESSION['errors'] = $errors;
-        header("Location: CreateFamily.php");
+        header("Location: /family/CreateFamily.php");
         exit();
     }
 
@@ -47,13 +47,13 @@ if (isset($_POST['familynameBtn'])) {
     // Ab jetzt ist die neue Familie die aktuell gewählte Familie
     $_SESSION['fam_id'] = $famId;
 
-    header("Location: Dashboard.php");
+    header("Location: /Dashboard.php");
     exit();
 }
 
 // Ab hier nur noch Anzeige, keine Redirects mehr moeglich
-include_once __DIR__ . '/src/components/head.php';
-include_once __DIR__ . '/src/components/navbar.php';
+include_once __DIR__ . '/../src/components/head.php';
+include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
 <h3>Erstelle eine Familie</h3>
@@ -72,4 +72,4 @@ unset($_SESSION['errors']);
     </form>
 </div>
 
-<?php include_once __DIR__ . '/src/components/footer.php'; ?>
+<?php include_once __DIR__ . '/../src/components/footer.php'; ?>

@@ -1,10 +1,10 @@
 <?php
-require_once __DIR__ .'/src/classes/Database.php';
-require_once __DIR__ .'/src/classes/Family.php';
+require_once __DIR__ .'/../src/classes/Database.php';
+require_once __DIR__ .'/../src/classes/Family.php';
 
 // guard.php: session_start() + Login-Pflicht (kein HTML) - kein fam_id-Check hier,
 // diese Seite entscheidet ja gerade erst, welche Familie aktuell ist
-require_once __DIR__ . '/src/components/guard.php';
+require_once __DIR__ . '/../src/components/guard.php';
 
 $db = new Database;
 $pdo = $db->connect();
@@ -19,7 +19,7 @@ if(isset($_GET['fam_id'])) {
         // Auswahl ist erlaubt: die gewaehlte Familie wird zur "aktuellen" Familie in der Session
         $_SESSION['fam_id'] = $_GET['fam_id'];
         // Weiter zum Dashboard, exit() stoppt den Rest des Skripts (u.a. die Anzeige der Liste unten)
-        header("Location: Dashboard.php");
+        header("Location: /Dashboard.php");
         exit();
     }
     // Kein else noetig: war die Auswahl ungueltig (isMember == false), läuft der Code einfach weiter
@@ -29,8 +29,8 @@ if(isset($_GET['fam_id'])) {
 $families = $family->findFamiliesByUserId($_SESSION['uid']);
 
 // Ab hier nur noch Anzeige, keine Redirects mehr moeglich
-include_once __DIR__ . '/src/components/head.php';
-include_once __DIR__ . '/src/components/navbar.php';
+include_once __DIR__ . '/../src/components/head.php';
+include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
 <h2>Meine Familien</h2>
@@ -39,4 +39,4 @@ include_once __DIR__ . '/src/components/navbar.php';
     <p><a href="?fam_id=<?= $fam->id ?>"><?= htmlspecialchars($fam->name) ?></a></p>
 <?php endforeach; ?>
 
-<?php include_once __DIR__ . '/src/components/footer.php'; ?>
+<?php include_once __DIR__ . '/../src/components/footer.php'; ?>

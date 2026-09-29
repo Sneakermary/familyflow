@@ -9,7 +9,7 @@ require_once __DIR__ . '/src/components/guard.php';
 
 // Zweiter Check nur hier noetig (nicht alle Seiten brauchen ihn), auch noch vor jedem HTML
 if (!isset($_SESSION['fam_id'])) {
-    header("Location: CreateFamily.php");
+    header("Location: /family/CreateFamily.php");
     exit();
 }
 
@@ -30,7 +30,7 @@ include_once __DIR__ . '/src/components/navbar.php';
 
 <div class="tiles">
 <!-- LISTEN -->
-    <div class="tile" data-href="Lists.php">
+    <div class="tile" data-href="/list/Lists.php">
         <div class="tile_icon">📋</div>
         <div class="tile_title">Listen</div>
         <div class="tile_subtext">
@@ -46,7 +46,7 @@ include_once __DIR__ . '/src/components/navbar.php';
         </div>
     </div>
 <!-- FAMILIE -->
-<div class="tile" data-href="MyFamily.php">
+<div class="tile" data-href="/family/MyFamily.php">
         <div class="tile_icon">👨‍👩‍👧‍👦</div>
         <div class="tile_title">Meine Familie</div>
         <div class="tile_subtext">

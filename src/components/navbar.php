@@ -18,9 +18,9 @@ $initials = initials($currentUser->firstname, $currentUser->lastname);
     </div>
     <span id="menuBtn" class="avatar"><?= htmlspecialchars($initials) ?></span>
     <div id="menuList" class="hidden">
-        <a href="SelectFamily.php">Familie wechseln</a>
-        <a href="CreateFamily.php">Familie erstellen</a>
-        <a href="AddMember.php">Mitglied hinzufügen</a>
-        <a href="UserLogout.php">Logout</a>
+        <a href="/family/SelectFamily.php">Familie wechseln</a>
+        <a href="/family/CreateFamily.php">Familie erstellen</a>
+        <a href="/family/AddMember.php">Mitglied hinzufügen</a>
+        <a href="/user/UserLogout.php">Logout</a>
     </div>
 </div>

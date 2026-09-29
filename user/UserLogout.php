@@ -3,6 +3,6 @@ session_start();
 
 session_unset();
 session_destroy();
-header("Location: UserLogin.php");
+header("Location: /user/UserLogin.php");
 exit();
 ?>

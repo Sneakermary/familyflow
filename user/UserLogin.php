@@ -5,8 +5,8 @@ $errors = $_SESSION['errors'] ?? [];
 
 
 if (isset($_POST['loginBtn'])) {
-    require_once __DIR__ . '/src/classes/Database.php';
-    require_once __DIR__ . '/src/classes/User.php';
+    require_once __DIR__ . '/../src/classes/Database.php';
+    require_once __DIR__ . '/../src/classes/User.php';
 
     $email = trim($_POST['email'] ?? '');
     $pw = $_POST['pw'] ?? '';
@@ -20,18 +20,18 @@ if (isset($_POST['loginBtn'])) {
 
     if ($found && password_verify($pw, $found->pw_hash)) {
         $_SESSION['uid'] = $found->id;
-        header("Location: SelectFamily.php");
+        header("Location: /family/SelectFamily.php");
         exit();
     }
     else {
        $_SESSION['errors'] = ['login' => 'E-Mail oder Passwort ist falsch!'];
-       header("Location: UserLogin.php");
+       header("Location: /user/UserLogin.php");
        exit();
     }
     
 }
 
-include_once __DIR__ . '/src/components/head.php';
+include_once __DIR__ . '/../src/components/head.php';
 
 foreach($errors as $error) {
     echo '<p>' . $error . '</p>';
@@ -47,7 +47,7 @@ unset($_SESSION['errors']);
         <input type="password" name="pw" placeholder="Passwort" required>
         <button type="submit" name="loginBtn">Login</button>
     </form>
-    <p>Noch kein Konto? <a href="UserRegister.php">Hier registrieren</a></p>
+    <p>Noch kein Konto? <a href="/user/UserRegister.php">Hier registrieren</a></p>
 </div>
 
-<?php include_once __DIR__ . '/src/components/footer.php'; ?>
+<?php include_once __DIR__ . '/../src/components/footer.php'; ?>

@@ -1,13 +1,13 @@
 <?php
-require_once __DIR__ . '/src/classes/Database.php';
-require_once __DIR__ . '/src/classes/User.php';
+require_once __DIR__ . '/../src/classes/Database.php';
+require_once __DIR__ . '/../src/classes/User.php';
 session_start();
 
 $errors = $_SESSION['errors'] ?? [];
 
 // POST-Verarbeitung ZUERST (kann noch redirecten), erst danach kommt HTML
 if (isset($_POST['registerBtn'])) {
-    require_once __DIR__. '/src/classes/Validator.php';
+    require_once __DIR__. '/../src/classes/Validator.php';
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['pw'] ?? '';
     $pwConfirm = $_POST['pwConfirm'] ?? '';
@@ -28,7 +28,7 @@ if (isset($_POST['registerBtn'])) {
 
     if(!empty($errors)){
         $_SESSION['errors'] = $errors;
-        header("Location: UserRegister.php");
+        header("Location: /user/UserRegister.php");
         exit();
     }
 
@@ -36,12 +36,12 @@ if (isset($_POST['registerBtn'])) {
 
     $user->createUser($firstname, $lastname, $email, $pw_hash);
 
-    header("Location: UserLogin.php");
+    header("Location: /user/UserLogin.php");
     exit();
 }
 
 // Ab hier nur noch Anzeige, keine Redirects mehr moeglich
-include_once __DIR__ . '/src/components/head.php';
+include_once __DIR__ . '/../src/components/head.php';
 
 foreach($errors as $error){
     echo '<p>' . $error . '</p>';
@@ -62,4 +62,4 @@ unset($_SESSION['errors']);
     </form>
 </div>
 
-<?php include_once __DIR__ . '/src/components/footer.php'; ?>
+<?php include_once __DIR__ . '/../src/components/footer.php'; ?>

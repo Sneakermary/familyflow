@@ -3,6 +3,6 @@
 session_start();
 
 if (!isset($_SESSION['uid'])) {
-    header("Location: UserLogin.php");
+    header("Location: /user/UserLogin.php");
     exit();
 }

@@ -62,6 +62,11 @@ class FamilyList {
         $stmt = $this->pdo->prepare("UPDATE list_items SET done = NOT done WHERE id = ?");
         $stmt->execute([$itemId]);
     }
+
+    public function renameList($listId, $newName) {
+        $stmt = $this->pdo->prepare("UPDATE lists SET name = ? WHERE id = ?");
+        $stmt->execute([$newName, $listId]);
+    }
 }
 
 ?>

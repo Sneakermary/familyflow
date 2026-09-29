@@ -1,11 +1,11 @@
 <?php
-require_once __DIR__ . '/src/classes/Database.php';
-require_once __DIR__ . '/src/classes/FamilyList.php';
+require_once __DIR__ . '/../src/classes/Database.php';
+require_once __DIR__ . '/../src/classes/FamilyList.php';
 
-require_once __DIR__ . '/src/components/guard.php';
+require_once __DIR__ . '/../src/components/guard.php';
 
 if (!isset($_SESSION['fam_id'])) {
-    header("Location: CreateFamily.php");
+    header("Location: /family/CreateFamily.php");
     exit();
 }
 
@@ -15,15 +15,15 @@ $lists = new FamilyList($pdo);
 
 $myLists = $lists->getListsForUser($_SESSION['uid']);
 
-include_once __DIR__ . '/src/components/head.php';
-include_once __DIR__ . '/src/components/navbar.php';
+include_once __DIR__ . '/../src/components/head.php';
+include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
 <h2>Listen</h2>
 
 <div class="tiles">
 <?php foreach ($myLists as $list): ?>
-    <div class="tile" data-href="ListDetail.php?id=<?= $list->id ?>">
+    <div class="tile" data-href="/list/ListDetail.php?id=<?= $list->id ?>">
         <div class="tile_icon">📋</div>
         <div class="tile_title"><?= htmlspecialchars($list->name) ?></div>
         <div class="tile_subtext">
@@ -36,4 +36,6 @@ include_once __DIR__ . '/src/components/navbar.php';
 <?php endforeach; ?>
 </div>
 
-<?php include_once __DIR__ . '/src/components/footer.php'; ?>
+<p><a href="/list/CreateList.php">+ Neue Liste</a></p>
+
+<?php include_once __DIR__ . '/../src/components/footer.php'; ?>
