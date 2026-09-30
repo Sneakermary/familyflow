@@ -245,3 +245,140 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
     display: none;
  }
 
+ /*CALENDAR*/
+ .calendarHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 16px 24px;
+ }
+
+ .calendarHeader a {
+    font-size: 1.5rem;
+    line-height: 1;
+    padding: 4px 10px;
+ }
+
+ .calendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 24px;
+ }
+
+ .calendarWeekday {
+    text-align: center;
+    font-weight: bold;
+    color: var(--primary-dark);
+    padding: 8px 0;
+ }
+
+ .calendarDay {
+    display: block;
+    min-height: 70px;
+    padding: 6px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    text-decoration: none;
+ }
+
+ .calendarDay:hover {
+    background: var(--bg);
+    text-decoration: none;
+ }
+
+ .calendarDay.empty {
+    background: transparent;
+    border: none;
+ }
+
+ .calendarDayNumber {
+    display: block;
+    font-weight: bold;
+ }
+
+ .calendarEventBar {
+    display: block;
+    font-size: 0.7rem;
+    background: var(--accent);
+    color: white;
+    border-radius: 3px;
+    padding: 1px 4px;
+    margin-top: 2px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+ }
+ /*MONATSANSICHT*/
+ .yearHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 16px 24px;
+ }
+
+ .yearHeader a {
+    font-size: 1.5rem;
+    line-height: 1;
+    padding: 4px 10px;
+}
+
+.yearGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 24px;
+}
+
+.miniMonth {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+}
+
+.miniMonthTitle {
+    display: block;
+    text-align: center;
+    font-weight: bold;
+    color: var(--primary-dark);
+    margin-bottom: 8px;
+}
+
+.miniMonthGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.miniWeekday {
+    text-align: center;
+    font-size: 0.7rem;
+    color: #666;
+}
+
+.miniDay {
+    text-align: center;
+    font-size: 0.75rem;
+    padding: 2px 0;
+}
+
+#timeFields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.hidden {
+    display: none;
+}

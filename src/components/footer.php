@@ -2,5 +2,6 @@
 <script src="/assets/js/navbar.js"></script>
 <script src="/assets/js/tiles.js"></script>
 <script src="/assets/js/listMenu.js"></script>
+<script src="/assets/js/eventForm.js"></script>
 </body>
 </html>

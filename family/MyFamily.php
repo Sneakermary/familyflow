@@ -25,6 +25,8 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
+<a href="/Dashboard.php" class="backLink">&larr;</a>
+
 <h2>Meine Familie</h2>
 <h3><?= htmlspecialchars($familyData->name) ?></h3>
 

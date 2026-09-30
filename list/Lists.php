@@ -19,6 +19,8 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
+<a href="/Dashboard.php" class="backLink">&larr;</a>
+
 <h2>Listen</h2>
 
 <div class="tiles">

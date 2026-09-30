@@ -29,7 +29,7 @@ include_once __DIR__ . '/src/components/navbar.php';
 <h2>Dashboard</h2>
 
 <div class="tiles">
-<!-- LISTEN -->
+    <!-- LISTEN -->
     <div class="tile" data-href="/list/Lists.php">
         <div class="tile_icon">📋</div>
         <div class="tile_title">Listen</div>
@@ -37,24 +37,27 @@ include_once __DIR__ . '/src/components/navbar.php';
             Noch keine Listen
         </div>
     </div>
-    <div class="tile">
-<!-- KALENDER -->
+
+    <div class="tile" data-href="/calendar/Calendar.php">
+        <!-- KALENDER -->
         <div class="tile_icon">📅</div>
         <div class="tile_title">Kalender</div>
         <div class="tile_subtext">
             Noch keine Termine
         </div>
     </div>
-<!-- FAMILIE -->
-<div class="tile" data-href="/family/MyFamily.php">
+
+    <!-- FAMILIE -->
+    <div class="tile" data-href="/family/MyFamily.php">
         <div class="tile_icon">👨‍👩‍👧‍👦</div>
         <div class="tile_title">Meine Familie</div>
         <div class="tile_subtext">
             Familie verwalten
         </div>
     </div>
+
     <div class="tile">
-<!-- REZEPTE -->
+        <!-- REZEPTE -->
         <div class="tile_icon">🍽️</div>
         <div class="tile_title">Rezepte</div>
         <div class="tile_subtext">
@@ -63,4 +66,3 @@ include_once __DIR__ . '/src/components/navbar.php';
     </div>
 </div>
 <?php include_once __DIR__ . '/src/components/footer.php'; ?>
-

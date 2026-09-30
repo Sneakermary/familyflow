@@ -56,6 +56,8 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
+<a href="/Dashboard.php" class="backLink">&larr;</a>
+
 <h3>Erstelle eine Familie</h3>
 
 <?php

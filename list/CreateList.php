@@ -54,6 +54,8 @@ include_once __DIR__ . '/../src/components/navbar.php';
 
 ?>
 
+<a href="/list/Lists.php" class="backLink">&larr;</a>
+
 <h2>Neue Liste</h2>
 
 <?php foreach ($errors as $error): ?>
