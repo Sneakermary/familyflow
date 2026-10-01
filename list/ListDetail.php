@@ -67,7 +67,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
 
 <div class="contentcontainer">
     <form action="" method="POST">
-        <input type="text" name="content" placeholder="Neuer Eintrag" required>
+        <input type="text" name="content" placeholder="Neuer Eintrag" required autofocus>
         <button type="submit" name="addItemBtn">Hinzufügen</button>
     </form>
 </div>
