@@ -124,14 +124,14 @@ form {
     gap: 12px;
 }
 
-input {
+input, textarea, select {
     padding: 10px;
     border: 1px solid var(--border);
     border-radius: 4px;
     font-size: 1rem;
 }
 
-input:focus {
+input:focus, textarea:focus, select:focus {
     outline: none;
     border-color: var(--primary);
 }
@@ -381,4 +381,29 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
 
 .hidden {
     display: none;
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+#stepsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.recipePhoto {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.recipePhotoPreview {
+    max-width: 150px;
+    display: block;
+    border-radius: 8px;
+    margin-bottom: 8px;
 }

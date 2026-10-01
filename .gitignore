@@ -1,2 +1,4 @@
 src/config/dbconfig.php
 Data.txt
+uploads/recipes/*
+!uploads/recipes/.gitkeep

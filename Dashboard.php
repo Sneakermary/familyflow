@@ -56,7 +56,7 @@ include_once __DIR__ . '/src/components/navbar.php';
         </div>
     </div>
 
-    <div class="tile">
+    <div class="tile" data-href="/recipe/Recipes.php">
         <!-- REZEPTE -->
         <div class="tile_icon">🍽️</div>
         <div class="tile_title">Rezepte</div>

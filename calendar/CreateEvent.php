@@ -121,6 +121,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
         <label> Teilen mit:
             <select name="shared_with">
                 <option value="">Alle</option>
+                <option value="<?= $_SESSION['uid'] ?>">Nur ich (privat)</option>
                 <?php foreach($members as $member): ?>
                     <?php if($member->id != $_SESSION['uid']): ?>
                         <option value="<?= $member->id ?>"><?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?></option>
