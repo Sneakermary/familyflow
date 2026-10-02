@@ -12,6 +12,7 @@ if (!isset($_SESSION['fam_id'])) {
 }
 
 $errors = $_SESSION['errors'] ?? [];
+$prefilledDate = $_GET['date'] ?? '';
 
 if(isset($_POST['createEventBtn'])) {
     $title = trim($_POST['title'] ?? '');
@@ -107,12 +108,12 @@ include_once __DIR__ . '/../src/components/navbar.php';
             Ganztägig
         </label>
         <div id="timeFields">
-            <label>Start: <input type="datetime-local" name="start_at"></label>
-            <label>Ende: <input type="datetime-local" name="end_at"></label>
+            <label>Start: <input type="datetime-local" name="start_at" value="<?= $prefilledDate ? htmlspecialchars($prefilledDate) . 'T09:00' : '' ?>"></label>
+            <label>Ende: <input type="datetime-local" name="end_at" value="<?= $prefilledDate ? htmlspecialchars($prefilledDate) . 'T10:00' : '' ?>"></label>
         </div>
 
         <div id="dateField" class="hidden">
-            <label>Datum: <input type="date" name="event_date"></label>
+            <label>Datum: <input type="date" name="event_date" value="<?= htmlspecialchars($prefilledDate) ?>"></label>
         </div>
 
         <input type="text" name="location" placeholder="Ort">

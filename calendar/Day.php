@@ -50,6 +50,6 @@ include_once __DIR__ . '/../src/components/navbar.php';
     <?php endif; ?>
 </div>
 
-<p><a href="/calendar/CreateEvent.php">+ Neuer Termin</a></p>
+<p><a href="/calendar/CreateEvent.php?date=<?= sprintf('%04d-%02d-%02d', $year, $month, $day) ?>">+ Neuer Termin</a></p>
 
 <?php include_once __DIR__ . '/../src/components/footer.php'; ?>

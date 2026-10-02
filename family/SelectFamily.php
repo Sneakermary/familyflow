@@ -36,7 +36,11 @@ include_once __DIR__ . '/../src/components/navbar.php';
 <h2>Meine Familien</h2>
 
 <?php foreach($families as $fam): ?>
-    <p><a href="?fam_id=<?= $fam->id ?>"><?= htmlspecialchars($fam->name) ?></a></p>
+    <p>
+        <a href="?fam_id=<?= $fam->id ?>"><?= htmlspecialchars($fam->name) ?></a>
+        <a href="/family/EditFamily.php?id=<?= $fam->id ?>">⚙️</a>
+    </p>
 <?php endforeach; ?>
+
 
 <?php include_once __DIR__ . '/../src/components/footer.php'; ?>

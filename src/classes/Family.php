@@ -40,6 +40,19 @@ class Family{
         return $stmt->fetch();
     }
 
+        // Familiennamen aendern
+    public function renameFamily($famId, $newName) {
+        $stmt = $this->pdo->prepare("UPDATE families SET name = ? WHERE id = ?");
+        $stmt->execute([$newName, $famId]);
+    }
+
+    // Familie loeschen (Listen, Termine, Rezepte, Mitgliedschaften verschwinden per CASCADE automatisch mit)
+    public function deleteFamily($famId) {
+        $stmt = $this->pdo->prepare("DELETE FROM families WHERE id = ?");
+        $stmt->execute([$famId]);
+    }
+
+
 }
 
 ?>
