@@ -4,6 +4,7 @@ require_once __DIR__ . '/../src/classes/Recipe.php';
 require_once __DIR__ . '/../src/classes/RecipeFolder.php';
 require_once __DIR__ . '/../src/classes/User.php';
 require_once __DIR__ . '/../src/classes/Validator.php';
+require_once __DIR__ . '/../src/classes/Notification.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
 
@@ -78,6 +79,7 @@ if (isset($_POST['createRecipeBtn'])) {
     $db = new Database;
     $pdo = $db->connect();
     $recipe = new Recipe($pdo);
+    $user = new User($pdo);
 
     $sharedWithId = $sharedWith !== '' ? (int) $sharedWith : null;
 
@@ -85,6 +87,30 @@ if (isset($_POST['createRecipeBtn'])) {
 
     foreach ($steps as $i => $step) {
         $recipe->addStep($recipeId, $i + 1, $step);
+    }
+
+    // Benachrichtigung an alle, die das Rezept sehen duerfen (ausser einem selbst)
+    $notificationClass = new Notification($pdo);
+    $fromUser = $user->findById($_SESSION['uid']);
+    $recipeLink = '/recipe/RecipeDetail.php?id=' . $recipeId;
+
+    if ($sharedWithId === null) {
+        $members = $user->findUserByFamilyId($_SESSION['fam_id']);
+        foreach ($members as $member) {
+            if ($member->id != $_SESSION['uid']) {
+                $notificationClass->notify(
+                    $member->id,
+                    $fromUser->firstname . ' ' . $fromUser->lastname . ' hat ein Rezept erstellt: ' . $title,
+                    $recipeLink
+                );
+            }
+        }
+    } elseif ($sharedWithId != $_SESSION['uid']) {
+        $notificationClass->notify(
+            $sharedWithId,
+            $fromUser->firstname . ' ' . $fromUser->lastname . ' hat ein Rezept erstellt: ' . $title,
+            $recipeLink
+        );
     }
 
     header("Location: /recipe/Recipes.php");

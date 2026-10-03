@@ -3,6 +3,7 @@ require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/Event.php';
 require_once __DIR__ . '/../src/classes/User.php';
 require_once __DIR__ . '/../src/classes/Validator.php';
+require_once __DIR__ . '/../src/classes/Notification.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
 
@@ -62,6 +63,7 @@ if(isset($_POST['createEventBtn'])) {
     $db = new Database;
     $pdo = $db->connect();
     $eventClass = new Event($pdo);
+    $user = new User($pdo);
 
     $sharedWithId = $sharedWith !== '' ? (int) $sharedWith : null;
 
@@ -76,6 +78,31 @@ if(isset($_POST['createEventBtn'])) {
         $sharedWithId,
         $allDay
     );
+
+    // Benachrichtigung an alle, die den Termin sehen duerfen (ausser einem selbst)
+    $notificationClass = new Notification($pdo);
+    $fromUser = $user->findById($_SESSION['uid']);
+    $dayTimestamp = strtotime($startAtForDb);
+    $eventLink = '/calendar/Day.php?year=' . date('Y', $dayTimestamp) . '&month=' . (int) date('n', $dayTimestamp) . '&day=' . (int) date('j', $dayTimestamp);
+
+    if ($sharedWithId === null) {
+        $members = $user->findUserByFamilyId($_SESSION['fam_id']);
+        foreach ($members as $member) {
+            if ($member->id != $_SESSION['uid']) {
+                $notificationClass->notify(
+                    $member->id,
+                    $fromUser->firstname . ' ' . $fromUser->lastname . ' hat einen Termin erstellt: ' . $title,
+                    $eventLink
+                );
+            }
+        }
+    } elseif ($sharedWithId != $_SESSION['uid']) {
+        $notificationClass->notify(
+            $sharedWithId,
+            $fromUser->firstname . ' ' . $fromUser->lastname . ' hat einen Termin erstellt: ' . $title,
+            $eventLink
+        );
+    }
 
     header("Location: /calendar/Calendar.php");
     exit();

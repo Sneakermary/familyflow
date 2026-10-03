@@ -3,6 +3,7 @@ require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/FamilyList.php';
 require_once __DIR__ . '/../src/classes/User.php';
 require_once __DIR__ . '/../src/classes/Validator.php';
+require_once __DIR__ . '/../src/classes/Notification.php';
 require_once __DIR__ . '/../src/components/guard.php';
 
 
@@ -30,6 +31,7 @@ if (isset($_POST['createListBtn'])) {
     $db = new Database;
     $pdo = $db->connect();
     $lists = new FamilyList($pdo);
+    $user = new User($pdo);
 
     $listId = $lists->createList($_SESSION['fam_id'], $_SESSION['uid'], $name);
     $lists->addAccess($listId, $_SESSION['uid']);
@@ -38,6 +40,19 @@ if (isset($_POST['createListBtn'])) {
     $sharedWith = $_POST['sharedWith'] ?? [];
     foreach ($sharedWith as $memberid) {
         $lists->addAccess($listId, $memberid);
+    }
+
+    // Benachrichtigung an alle, mit denen die Liste geteilt wurde
+    $notificationClass = new Notification($pdo);
+    $fromUser = $user->findById($_SESSION['uid']);
+    $listLink = '/list/ListDetail.php?id=' . $listId;
+
+    foreach ($sharedWith as $memberid) {
+        $notificationClass->notify(
+            $memberid,
+            $fromUser->firstname . ' ' . $fromUser->lastname . ' hat eine Liste mit dir geteilt: ' . $name,
+            $listLink
+        );
     }
 
     header("Location: /list/Lists.php");

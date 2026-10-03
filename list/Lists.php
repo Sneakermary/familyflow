@@ -13,7 +13,7 @@ $db = new Database;
 $pdo = $db->connect();
 $lists = new FamilyList($pdo);
 
-$myLists = $lists->getListsForUser($_SESSION['uid']);
+$myLists = $lists->getListsForUser($_SESSION['uid'], $_SESSION['fam_id']);
 
 include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';

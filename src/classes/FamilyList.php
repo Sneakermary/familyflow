@@ -27,12 +27,12 @@ class FamilyList {
         return $stmt->fetch();
         }
 
-    // Alle Listen, auf die eine Person Zugriff hat (JOIN mit list_access, wie Family::findFamiliesByUserId)
-    public function getListsForUser($userId) {
+    // Alle Listen, auf die eine Person Zugriff hat, nur innerhalb der aktuell ausgewaehlten Familie
+    public function getListsForUser($userId, $famId) {
         $stmt = $this->pdo->prepare("SELECT lists.* FROM lists
             JOIN list_access ON lists.id = list_access.list_id
-            WHERE list_access.user_id = ?");
-        $stmt->execute([$userId]);
+            WHERE list_access.user_id = ? AND lists.fam_id = ?");
+        $stmt->execute([$userId, $famId]);
         return $stmt->fetchAll();
     }
 
