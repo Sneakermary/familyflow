@@ -35,12 +35,15 @@ include_once __DIR__ . '/../src/components/navbar.php';
 
 <h2>Meine Familien</h2>
 
-<?php foreach($families as $fam): ?>
-    <p>
-        <a href="?fam_id=<?= $fam->id ?>"><?= htmlspecialchars($fam->name) ?></a>
-        <a href="/family/EditFamily.php?id=<?= $fam->id ?>">⚙️</a>
-    </p>
-<?php endforeach; ?>
+<div class="tiles">
+    <?php foreach($families as $fam): ?>
+        <div class="tile" data-href="?fam_id=<?= $fam->id ?>">
+            <a class="tile_icon tile_icon_small" href="/family/EditFamily.php?id=<?= $fam->id ?>" onclick="event.stopPropagation()">⚙️</a>
+            <div class="tile_title"><?= htmlspecialchars($fam->name) ?></div>
+            <div class="tile_subtext">Familie öffnen</div>
+        </div>
+    <?php endforeach; ?>
+</div>
 
 
 <?php include_once __DIR__ . '/../src/components/footer.php'; ?>

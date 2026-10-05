@@ -25,7 +25,7 @@ $nextYear = date('Y', $nextTimestamp);
 $nextMonth = date('n', $nextTimestamp);
 
 $monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-$weekdays = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
+$weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 
 $db = new Database;
 $pdo = $db->connect();
@@ -46,7 +46,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
 
 <a href="/Dashboard.php" class="backLink">&larr;</a>
 
-<div class="calendarHead">
+<div class="calendarHeader">
     <a href="?year=<?= $prevYear ?>&month=<?= $prevMonth ?>">&larr;</a>
     <h2><?= $monthNames[$month - 1] ?> <a href="/calendar/Year.php?year=<?= $year ?>"><?= $year ?></a></h2>
     <a href="?year=<?= $nextYear ?>&month=<?= $nextMonth ?>">&rarr;</a>

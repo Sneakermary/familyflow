@@ -6,7 +6,15 @@
     --bg: #f4f6f8;
     --text: #2b2b2b;
     --border: #d5dce1;
-    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --card: #ffffff;
+    --avatar-bg: #4caf82;
+    --tile: #ffffff;
+    --text-muted: #6b7280;
+    --avatar-text: #ffffff;
+    --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    --radius: 14px;
+    --radius-small: 8px;
+    --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
 * {
@@ -16,7 +24,10 @@
 body {
     margin: 0;
     font-family: system-ui, Arial, sans-serif;
-    background: var(--bg);
+    background-color: var(--bg);
+    background-image: var(--bg-image, none);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
     color: var(--text);
     line-height: 1.5;
 }
@@ -31,7 +42,7 @@ a:hover {
 }
 
 h2, h3 {
-    color: var(--primary-dark);
+    color: var(--heading, var(--primary-dark));
 }
 
 .navbar {
@@ -39,7 +50,7 @@ h2, h3 {
     align-items: center;
     justify-content: space-between;
     padding: 12px 24px;
-    background: var(--primary-dark);
+    background: var(--navbar-bg, var(--primary-dark));
     color: white;
     flex-wrap: wrap;
 }
@@ -68,11 +79,12 @@ h2, h3 {
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    background: var(--accent);
-    color: white;
+    background: var(--avatar-bg);
+    color: var(--avatar-text);
     font-weight: bold;
     font-size: 1rem;
     cursor: pointer;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85);
 }
 
 .avatar:hover {
@@ -83,10 +95,11 @@ h2, h3 {
     position: absolute;
     top: 55px;
     right: 24px;
-    background: white;
+    z-index: 10;
+    background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    border-radius: var(--radius-small);
+    box-shadow: var(--shadow-soft);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -113,8 +126,8 @@ main {
     max-width: 420px;
     margin: 40px auto;
     padding: 24px;
-    background: white;
-    border-radius: 8px;
+    background: var(--card);
+    border-radius: var(--radius);
     box-shadow: var(--box-shadow);
 }
 
@@ -129,9 +142,11 @@ form + form {
 }
 
 input, textarea, select {
+    background: var(--card);
+    color: var(--text);
     padding: 10px;
     border: 1px solid var(--border);
-    border-radius: 4px;
+    border-radius: var(--radius-small);
     font-size: 1rem;
 }
 
@@ -143,7 +158,7 @@ input:focus, textarea:focus, select:focus {
 button {
     padding: 10px;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--radius-small);
     background: var(--primary);
     color: white;
     font-size: 1rem;
@@ -176,20 +191,32 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
     gap: 16px;
 }
  .tile {
-    background: white;
-    padding: 24px;
-    border-radius: 8px;
-    box-shadow:var(--box-shadow);
+    position: relative;
+    background: var(--tile-bg, var(--tile));
+    min-height: 120px;
+    padding: 20px 20px 56px;
+    border-radius: var(--radius);
+    box-shadow: var(--box-shadow);
  }
  .tile_icon {
-    font-size: x-large;
+    position: absolute;
+    right: 16px;
+    bottom: 12px;
+    font-size: 2.4rem;
+ }
+ .tile_icon_small {
+    font-size: 1.4rem;
  }
  .tile_title {
     font-weight: bold;
+    font-size: 1.2rem;
+    color: var(--text);
  }
  .tile_subtext {
-    font-size: 0.85rem;
-    color: #666;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+    padding-right: 48px;
  }
 
  .listHeader {
@@ -221,10 +248,10 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
     position: absolute;
     top: 100%;
     right: 24px;
-    background: white;
+    background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    border-radius: var(--radius-small);
+    box-shadow: var(--shadow-soft);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -267,17 +294,38 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
 
  .calendarGrid {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 4px;
     max-width: 700px;
     margin: 0 auto;
     padding: 0 24px;
  }
 
+@media (max-width: 600px) {
+    .calendarGrid {
+        padding: 0 8px;
+        gap: 3px;
+    }
+
+    .calendarDay {
+        min-height: 52px;
+        padding: 4px;
+    }
+
+    .calendarHeader {
+        padding: 12px 8px;
+    }
+
+    .yearGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding: 0 12px 24px;
+    }
+}
+
  .calendarWeekday {
     text-align: center;
     font-weight: bold;
-    color: var(--primary-dark);
+    color: var(--heading, var(--primary-dark));
     padding: 8px 0;
  }
 
@@ -285,9 +333,9 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
     display: block;
     min-height: 70px;
     padding: 6px;
-    background: white;
+    background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: var(--radius-small);
     color: var(--text);
     text-decoration: none;
  }
@@ -345,9 +393,9 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
 }
 
 .miniMonth {
-    background: white;
+    background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: var(--radius);
     padding: 12px;
 }
 
@@ -355,7 +403,7 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
     display: block;
     text-align: center;
     font-weight: bold;
-    color: var(--primary-dark);
+    color: var(--heading, var(--primary-dark));
     margin-bottom: 8px;
 }
 
@@ -368,7 +416,7 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
 .miniWeekday {
     text-align: center;
     font-size: 0.7rem;
-    color: #666;
+    color: var(--text-muted);
 }
 
 .miniDay {
@@ -405,20 +453,23 @@ textarea {
 
 .recipePhoto {
     max-width: 100%;
-    border-radius: 8px;
+    border-radius: var(--radius-small);
     margin-bottom: 16px;
 }
 
 .recipePhotoPreview {
     max-width: 150px;
     display: block;
-    border-radius: 8px;
+    border-radius: var(--radius-small);
     margin-bottom: 8px;
 }
 
 .bellLink {
     position: relative;
-    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 16px;
     text-decoration: none;
     padding: 4px 8px;
 }
@@ -454,8 +505,158 @@ textarea {
 
 .notificationDate {
     font-size: 0.75rem;
-    color: #666;
+    color: var(--text-muted);
     font-weight: normal;
     white-space: nowrap;
     margin-left: 12px;
+}
+body.theme-halloween {
+    --primary: #e8730c;
+    --primary-dark: #7a2e0b;
+    --accent: #6a1b9a;
+    --bg: #1f1a14;
+    --bg-image: radial-gradient(circle at 15% 10%, #7a2e0b 0%, transparent 45%), radial-gradient(circle at 85% 90%, #3b1a4d 0%, transparent 50%);
+    --text: #f5e6d3;
+    --heading: #ff9f43;
+    --border: #4a3b2c;
+    --card: #2a221a;
+    --avatar-bg: #6a1b9a;
+    --avatar-text: #ffffff;
+    --tile: #2a221a;
+    --tile-bg: linear-gradient(160deg, #3d2c1a, #2a221a);
+    --navbar-bg: linear-gradient(90deg, #7a2e0b, #3b1a4d);
+    --text-muted: #b8a58f;
+}
+
+body.theme-weihnachten {
+    --avatar-bg: #2e7d32;
+    --avatar-text: #ffffff;
+    --primary: #b71c1c;
+    --primary-dark: #7f0000;
+    --accent: #2e7d32;
+    --bg: #f4f8f4;
+    --bg-image: radial-gradient(circle at 15% 10%, #c8e6c9 0%, transparent 45%), radial-gradient(circle at 85% 90%, #ffcdd2 0%, transparent 50%);
+    --text: #1b2e1b;
+    --border: #c8d6c8;
+    --tile: #dcebdc;
+    --tile-bg: linear-gradient(160deg, #eaf5ea, #c9e3c9);
+    --navbar-bg: linear-gradient(90deg, #7f0000, #2e7d32);
+}
+
+body.theme-valentinstag {
+    --avatar-bg: #c2185b;
+    --avatar-text: #ffffff;
+    --primary: #c2185b;
+    --primary-dark: #880e4f;
+    --accent: #f48fb1;
+    --bg: #fdf2f5;
+    --bg-image: radial-gradient(circle at 15% 10%, #f8bbd0 0%, transparent 45%), radial-gradient(circle at 85% 90%, #f48fb1 0%, transparent 50%);
+    --text: #3a1020;
+    --border: #f0c4d4;
+    --tile: #f8d7e3;
+    --tile-bg: linear-gradient(160deg, #fbe3ec, #f8b8cf);
+    --navbar-bg: linear-gradient(90deg, #880e4f, #c2185b);
+}
+
+body.theme-kirschbluete {
+    --primary: #d63384;
+    --primary-dark: #6b2d8f;
+    --accent: #d63384;
+    --bg: #fff6e9;
+    --bg-image: radial-gradient(circle at 15% 10%, #f48fb1 0%, transparent 45%), radial-gradient(circle at 85% 90%, #ffc678 0%, transparent 50%);
+    --text: #3a1f4a;
+    --border: #ffd1e8;
+    --card: #ffffff;
+    --tile: #ffd1e8;
+    --tile-bg: linear-gradient(160deg, #ffd1e8, #ffc678);
+    --text-muted: #6b4a6e;
+    --avatar-bg: #d63384;
+    --avatar-text: #ffffff;
+    --navbar-bg: linear-gradient(90deg, #6b2d8f, #d63384);
+}
+
+body.theme-meerjungfrau {
+    --primary: #6473ca;
+    --primary-dark: #2b74a9;
+    --accent: #6473ca;
+    --bg: #f7f0fd;
+    --bg-image: radial-gradient(circle at 15% 10%, #e8a2f5 0%, transparent 45%), radial-gradient(circle at 85% 90%, #9ec8ea 0%, transparent 50%);
+    --text: #2b2350;
+    --border: #d9c8f0;
+    --card: #ffffff;
+    --tile: #fec4c6;
+    --tile-bg: linear-gradient(160deg, #fec4c6, #e8a2f5);
+    --text-muted: #5a4e7a;
+    --avatar-bg: #9c79f4;
+    --avatar-text: #ffffff;
+    --navbar-bg: linear-gradient(90deg, #2b74a9, #6473ca, #9c79f4);
+}
+
+body.theme-drachenfrucht {
+    --primary: #e11c8a;
+    --primary-dark: #68367f;
+    --accent: #e11c8a;
+    --bg: #fff7f3;
+    --bg-image: radial-gradient(circle at 15% 10%, #fdb3b4 0%, transparent 45%), radial-gradient(circle at 85% 90%, #fcd27a 0%, transparent 50%);
+    --text: #3d2046;
+    --border: #f9d9c8;
+    --card: #ffffff;
+    --tile: #fd777a;
+    --tile-bg: linear-gradient(160deg, #fd777a, #f9af08);
+    --text-muted: #6e4b6e;
+    --avatar-bg: #f06707;
+    --avatar-text: #ffffff;
+    --navbar-bg: linear-gradient(90deg, #68367f, #e11c8a, #f06707);
+}
+
+body.theme-zuckerwatte {
+    --primary: #f74d7d;
+    --primary-dark: #6b5ba8;
+    --accent: #3bbf9a;
+    --bg: #fffbf5;
+    --bg-image: radial-gradient(circle at 15% 10%, #f9b8d0 0%, transparent 45%), radial-gradient(circle at 85% 90%, #f8e88a 0%, transparent 50%);
+    --text: #3a2a4a;
+    --border: #f3d7e3;
+    --card: #ffffff;
+    --tile: #f9b8d0;
+    --tile-bg: linear-gradient(160deg, #f9b8d0, #f8e88a);
+    --text-muted: #7a5e78;
+    --avatar-bg: #a090cc;
+    --avatar-text: #ffffff;
+    --navbar-bg: linear-gradient(90deg, #6b5ba8, #f74d7d);
+}
+
+body.theme-gerbera {
+    --primary: #a00957;
+    --primary-dark: #7a0744;
+    --accent: #0891a8;
+    --bg: #fff8fb;
+    --bg-image: radial-gradient(circle at 15% 10%, #f9c4de 0%, transparent 45%), radial-gradient(circle at 85% 90%, #7fd9e8 0%, transparent 50%);
+    --text: #3a0a24;
+    --border: #f5c2dd;
+    --card: #ffffff;
+    --tile: #f9c4de;
+    --tile-bg: linear-gradient(160deg, #f9c4de, #b6dc00);
+    --text-muted: #7a3a5e;
+    --avatar-bg: #0891a8;
+    --avatar-text: #ffffff;
+    --navbar-bg: linear-gradient(90deg, #7a0744, #a00957, #0891a8);
+}
+
+body.theme-velvetaurora {
+    --primary: #a0126e;
+    --primary-dark: #0b0b0f;
+    --accent: #0aa39a;
+    --bg: #0b0b0f;
+    --bg-image: radial-gradient(circle at 15% 10%, #5b0f6e 0%, transparent 45%), radial-gradient(circle at 85% 90%, #0c3a3c 0%, transparent 50%);
+    --text: #f3e9ff;
+    --heading: #e7a8ff;
+    --border: #3a1a44;
+    --card: #1a1126;
+    --tile: #2a0a2e;
+    --tile-bg: linear-gradient(135deg, #5b0f6e, #0c3a3c);
+    --text-muted: #c3a8d6;
+    --avatar-bg: #0aa39a;
+    --avatar-text: #ffffff;
+    --navbar-bg: linear-gradient(90deg, #5b0f6e, #a0126e, #0c3a3c);
 }
