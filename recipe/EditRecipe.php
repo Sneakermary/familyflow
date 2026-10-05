@@ -41,9 +41,9 @@ $errors = $_SESSION['errors'] ?? [];
 
 if (isset($_POST['editRecipeBtn'])) {
     $title = trim($_POST['title'] ?? '');
-    $mode = $_POST['mode'] ?? 'photo';
     $folderId = $_POST['folder_id'] !== '' ? (int) $_POST['folder_id'] : null;
     $sharedWith = $_POST['shared_with'] ?? '';
+    $removePhoto = isset($_POST['removePhoto']);
 
     $validator = new Validator;
 
@@ -51,45 +51,45 @@ if (isset($_POST['editRecipeBtn'])) {
         $errors['title'] = 'Rezeptname ist erforderlich';
     }
 
-    $photoFilename = null;
-    $ingredients = null;
-    $steps = [];
+    // Foto: neues hochladen, behalten, oder entfernen - unabhaengig von Zutaten/Schritten
+    $photoFilename = $r->photo;
 
-    if ($mode === 'photo') {
-        if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-            $allowedTypes = [
-                'image/jpeg' => 'jpg',
-                'image/png' => 'png',
-                'image/webp' => 'webp',
-            ];
+    if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+        $allowedTypes = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+        ];
 
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mimeType = finfo_file($finfo, $_FILES['photo']['tmp_name']);
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $_FILES['photo']['tmp_name']);
 
-            $maxSize = 5 * 1024 * 1024; // 5 MB
+        $maxSize = 5 * 1024 * 1024; // 5 MB
 
-            if (!isset($allowedTypes[$mimeType])) {
-                $errors['photo'] = 'Nur JPG, PNG oder WebP erlaubt';
-            } elseif ($_FILES['photo']['size'] > $maxSize) {
-                $errors['photo'] = 'Foto ist zu groß (max. 5 MB)';
-            } else {
-                $extension = $allowedTypes[$mimeType];
-                $photoFilename = uniqid('recipe_', true) . '.' . $extension;
-                $targetPath = __DIR__ . '/../uploads/recipes/' . $photoFilename;
-                move_uploaded_file($_FILES['photo']['tmp_name'], $targetPath);
-            }
+        if (!isset($allowedTypes[$mimeType])) {
+            $errors['photo'] = 'Nur JPG, PNG oder WebP erlaubt';
+        } elseif ($_FILES['photo']['size'] > $maxSize) {
+            $errors['photo'] = 'Foto ist zu groß (max. 5 MB)';
         } else {
-            // kein neues Foto hochgeladen -> das alte behalten
-            $photoFilename = $r->photo;
+            $extension = $allowedTypes[$mimeType];
+            $photoFilename = uniqid('recipe_', true) . '.' . $extension;
+            $targetPath = __DIR__ . '/../uploads/recipes/' . $photoFilename;
+            move_uploaded_file($_FILES['photo']['tmp_name'], $targetPath);
         }
-    } else {
-        $ingredients = trim($_POST['ingredients'] ?? '');
-        $rawSteps = $_POST['steps'] ?? [];
-        foreach ($rawSteps as $step) {
-            $step = trim($step);
-            if ($step !== '') {
-                $steps[] = $step;
-            }
+    } elseif ($removePhoto) {
+        $photoFilename = null;
+    }
+
+    // Zutaten/Schritte: immer aus dem Formular lesen, unabhaengig vom Foto
+    $ingredients = trim($_POST['ingredients'] ?? '');
+    $ingredients = $ingredients !== '' ? $ingredients : null;
+
+    $steps = [];
+    $rawSteps = $_POST['steps'] ?? [];
+    foreach ($rawSteps as $step) {
+        $step = trim($step);
+        if ($step !== '') {
+            $steps[] = $step;
         }
     }
 
@@ -144,33 +144,26 @@ include_once __DIR__ . '/../src/components/navbar.php';
             </select>
         </label>
 
-        <div>
-            <label><input type="radio" name="mode" value="photo" id="modePhoto" <?= $r->photo ? 'checked' : '' ?>> Mit Foto</label>
-            <label><input type="radio" name="mode" value="written" id="modeWritten" <?= !$r->photo ? 'checked' : '' ?>> Geschrieben</label>
-        </div>
-
-        <div id="photoFields" class="<?= $r->photo ? '' : 'hidden' ?>">
-            <?php if ($r->photo): ?>
-                <img src="/uploads/recipes/<?= htmlspecialchars($r->photo) ?>" alt="Aktuelles Foto" class="recipePhotoPreview">
-                <p>Neues Foto hochladen, um das aktuelle zu ersetzen (optional):</p>
-            <?php endif; ?>
+        <?php if ($r->photo): ?>
+            <img src="/uploads/recipes/<?= htmlspecialchars($r->photo) ?>" alt="Aktuelles Foto" class="recipePhotoPreview">
+            <label><input type="checkbox" name="removePhoto"> Foto entfernen</label>
+        <?php endif; ?>
+        <label>Foto <?= $r->photo ? 'ersetzen' : 'hinzufügen' ?> (optional):
             <input type="file" name="photo" accept="image/*">
-        </div>
+        </label>
 
-        <div id="writtenFields" class="<?= $r->photo ? 'hidden' : '' ?>">
-            <textarea name="ingredients" placeholder="Zutaten"><?= htmlspecialchars($r->ingredients ?? '') ?></textarea>
+        <textarea name="ingredients" placeholder="Zutaten (optional)"><?= htmlspecialchars($r->ingredients ?? '') ?></textarea>
 
-            <div id="stepsContainer">
-                <?php if (empty($steps)): ?>
-                    <input type="text" name="steps[]" placeholder="Schritt 1">
-                <?php else: ?>
-                    <?php foreach ($steps as $i => $step): ?>
-                        <input type="text" name="steps[]" placeholder="Schritt <?= $i + 1 ?>" value="<?= htmlspecialchars($step->instruction) ?>">
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-            <button type="button" id="addStepBtn">+ Schritt hinzufügen</button>
+        <div id="stepsContainer">
+            <?php if (empty($steps)): ?>
+                <input type="text" name="steps[]" placeholder="Schritt 1">
+            <?php else: ?>
+                <?php foreach ($steps as $i => $step): ?>
+                    <input type="text" name="steps[]" placeholder="Schritt <?= $i + 1 ?>" value="<?= htmlspecialchars($step->instruction) ?>">
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
+        <button type="button" id="addStepBtn">+ Schritt hinzufügen</button>
 
         <label>Teilen mit:
             <select name="shared_with">

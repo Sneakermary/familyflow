@@ -25,11 +25,15 @@ if (isset($_POST['loginBtn'])) {
     }
     else {
        $_SESSION['errors'] = ['login' => 'E-Mail oder Passwort ist falsch!'];
+       $_SESSION['oldEmail'] = $email;
        header("Location: /user/UserLogin.php");
        exit();
     }
-    
+
 }
+
+$oldEmail = $_SESSION['oldEmail'] ?? '';
+unset($_SESSION['oldEmail']);
 
 include_once __DIR__ . '/../src/components/head.php';
 
@@ -43,7 +47,7 @@ unset($_SESSION['errors']);
     <form action="" class="frontform" method="POST">
         <h3>Login</h3>
 
-        <input type="email" name="email" placeholder="E-Mail" required>
+        <input type="email" name="email" placeholder="E-Mail" value="<?= htmlspecialchars($oldEmail) ?>" required>
         <input type="password" name="pw" placeholder="Passwort" required>
         <button type="submit" name="loginBtn">Login</button>
     </form>
