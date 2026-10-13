@@ -4,7 +4,7 @@ require_once __DIR__ . '/../src/classes/FamilyList.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
 
-$listId = $_GET['id'] ?? null;
+$listId = isset($_GET['id']) ? (int) $_GET['id'] : null;
 
 if ($listId === null) {
     header("Location: /list/Lists.php");
@@ -33,7 +33,7 @@ if (isset($_POST['addItemBtn'])) {
 
 // Eintrag abhaken/wieder oeffnen
 if (isset($_GET['toggle'])) {
-    $lists->toggleItem($_GET['toggle']);
+    $lists->toggleItem((int) $_GET['toggle'], $listId);
     header("Location: /list/ListDetail.php?id=" . $listId);
     exit();
 }

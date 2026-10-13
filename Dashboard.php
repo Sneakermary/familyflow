@@ -64,5 +64,14 @@ include_once __DIR__ . '/src/components/navbar.php';
             Noch keine Rezepte
         </div>
     </div>
+
+    <!-- ÄMTLI -->
+    <div class="tile" data-href="/chore/Chores.php">
+        <div class="tile_icon">🧹</div>
+        <div class="tile_title">Ämtli</div>
+        <div class="tile_subtext">
+            Aufgaben verwalten
+        </div>
+    </div>
 </div>
 <?php include_once __DIR__ . '/src/components/footer.php'; ?>

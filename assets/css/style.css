@@ -204,6 +204,12 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
     bottom: 12px;
     font-size: 2.4rem;
  }
+ .tile_edit {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 1.2rem;
+ }
  .tile_icon_small {
     font-size: 1.4rem;
  }
@@ -270,6 +276,56 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
 
  #listMenuList.hidden {
     display: none;
+ }
+
+ .member {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--tile-bg, var(--tile));
+    border-radius: var(--radius-small);
+    box-shadow: var(--box-shadow);
+    padding-top: 14px;
+    padding-bottom: 14px;
+    margin-bottom: 10px;
+ }
+
+ .member input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--card);
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+ }
+
+ .member input[type="checkbox"]::before {
+    content: "";
+    width: 12px;
+    height: 12px;
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+    background: white;
+    transform: scale(0);
+    transition: transform 0.12s ease-in-out;
+ }
+
+ .member input[type="checkbox"]:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+ }
+
+ .member input[type="checkbox"]:checked::before {
+    transform: scale(1);
+ }
+
+ .member input[type="checkbox"]:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
  }
 
  body.hideDone .member.done {

@@ -57,10 +57,11 @@ class FamilyList {
         return $this->pdo->lastInsertId();
     }
 
-    // Abhaken/wieder-oeffnen umschalten
-    public function toggleItem($itemId) {
-        $stmt = $this->pdo->prepare("UPDATE list_items SET done = NOT done WHERE id = ?");
-        $stmt->execute([$itemId]);
+    // Abhaken/wieder-oeffnen umschalten. listId muss mitgegeben werden, sonst koennte
+    // jemand mit Zugriff auf eine eigene Liste per erratener Id Eintraege fremder Listen umschalten.
+    public function toggleItem($itemId, $listId) {
+        $stmt = $this->pdo->prepare("UPDATE list_items SET done = NOT done WHERE id = ? AND list_id = ?");
+        $stmt->execute([$itemId, $listId]);
     }
 
     // Liste umbenennen
