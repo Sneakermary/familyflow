@@ -12,7 +12,7 @@ if (!isset($_SESSION['fam_id'])) {
     exit();
 }
 
-$recipeId = $_GET['id'] ?? null;
+$recipeId = isset($_GET['id']) ? (int) $_GET['id'] : null;
 
 if ($recipeId === null) {
     header("Location: /recipe/Recipes.php");
