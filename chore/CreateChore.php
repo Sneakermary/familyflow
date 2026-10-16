@@ -4,6 +4,7 @@ require_once __DIR__ . '/../src/classes/Chore.php';
 require_once __DIR__ . '/../src/classes/User.php';
 require_once __DIR__ . '/../src/classes/Validator.php';
 require_once __DIR__ . '/../src/classes/Notification.php';
+require_once __DIR__ . '/../src/functions.php';
 require_once __DIR__ . '/../src/components/guard.php';
 
 if (!isset($_SESSION['fam_id'])) {
@@ -17,6 +18,11 @@ $validVisibilities = ['owner', 'selected', 'assignee', 'all'];
 $errors = $_SESSION['errors'] ?? [];
 
 if (isset($_POST['createChoreBtn'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        header("Location: /chore/CreateChore.php");
+        exit();
+    }
+
     $name = trim($_POST['name'] ?? '');
     $rotation = $_POST['rotation'] ?? 'none';
     $visibility = $_POST['visibility'] ?? 'owner';
@@ -171,6 +177,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
             <?php endforeach; ?>
         </div>
 
+        <?= csrfField() ?>
         <button type="submit" name="createChoreBtn">Ämtli erstellen</button>
     </form>
 </div>

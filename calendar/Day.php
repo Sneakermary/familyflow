@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/Event.php';
+require_once __DIR__ . '/../src/functions.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
 
@@ -34,21 +35,23 @@ include_once __DIR__ . '/../src/components/navbar.php';
 
 <h2><?= $weekdayNames[$weekdayNumber - 1] ?> – <?= $day ?>. <?= $monthNames[$month - 1] ?> <?= $year ?></h2>
 
-<div class="contentcontainer">
-    <?php if (empty($events)): ?>
-        <p>Keine Termine an diesem Tag.</p>
-    <?php else: ?>
-        <?php foreach ($events as $event): ?>
-            <div class="dayEvent">
-                <strong><?= htmlspecialchars($event->title) ?></strong>
-                <span><?= date('H:i', strtotime($event->start_at)) ?> – <?= date('H:i', strtotime($event->end_at)) ?></span>
-                <?php if ($event->location): ?>
-                    <p><?= htmlspecialchars($event->location) ?></p>
-                <?php endif; ?>
+<?php if (empty($events)): ?>
+    <p>Keine Termine an diesem Tag.</p>
+<?php else: ?>
+    <?php foreach ($events as $event): ?>
+        <div class="eventTile">
+            <div class="tile_title"><?= htmlspecialchars($event->title) ?></div>
+            <div class="tile_subtext">
+                <?= date('H:i', strtotime($event->start_at)) ?> – <?= date('H:i', strtotime($event->end_at)) ?>
+                <?php if ($event->location): ?><br><?= htmlspecialchars($event->location) ?><?php endif; ?>
             </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
-</div>
+            <div class="eventMenu hidden">
+                <a href="/calendar/EditEvent.php?id=<?= $event->id ?>">Bearbeiten</a>
+                <a href="/calendar/DeleteEvent.php?id=<?= $event->id ?>&csrf_token=<?= urlencode(csrfToken()) ?>" onclick="return confirm('Termin wirklich löschen?')">Löschen</a>
+            </div>
+        </div>
+    <?php endforeach; ?>
+<?php endif; ?>
 
 <p><a href="/calendar/CreateEvent.php?date=<?= sprintf('%04d-%02d-%02d', $year, $month, $day) ?>">+ Neuer Termin</a></p>
 

@@ -5,6 +5,7 @@ require_once __DIR__ . '/../src/classes/Family.php';
 require_once __DIR__ . '/../src/classes/FamilyInvite.php';
 require_once __DIR__ . '/../src/classes/Notification.php';
 require_once __DIR__ . '/../src/classes/Validator.php';
+require_once __DIR__ . '/../src/functions.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
 
@@ -16,6 +17,11 @@ if (!isset($_SESSION['fam_id'])) {
 $errors = $_SESSION['errors'] ?? [];
 
 if (isset($_POST['inviteBtn'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        header("Location: /family/InviteMember.php");
+        exit();
+    }
+
     $email = trim($_POST['email'] ?? '');
     $selectedFamId = $_POST['fam_id'] ?? '';
 
@@ -107,6 +113,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
             </select>
         </label>
 
+        <?= csrfField() ?>
         <button type="submit" name="inviteBtn">Einladen</button>
     </form>
 </div>

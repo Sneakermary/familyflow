@@ -5,6 +5,7 @@ require_once __DIR__ . '/../src/classes/RecipeFolder.php';
 require_once __DIR__ . '/../src/classes/User.php';
 require_once __DIR__ . '/../src/classes/Validator.php';
 require_once __DIR__ . '/../src/classes/Notification.php';
+require_once __DIR__ . '/../src/functions.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
 
@@ -16,6 +17,11 @@ if (!isset($_SESSION['fam_id'])) {
 $errors = $_SESSION['errors'] ?? [];
 
 if (isset($_POST['createRecipeBtn'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        header("Location: /recipe/CreateRecipe.php");
+        exit();
+    }
+
     $title = trim($_POST['title'] ?? '');
     $mode = $_POST['mode'] ?? 'photo';
     $folderId = $_POST['folder_id'] !== '' ? (int) $_POST['folder_id'] : null;
@@ -180,6 +186,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
             </select>
         </label>
 
+        <?= csrfField() ?>
         <button type="submit" name="createRecipeBtn">Rezept erstellen</button>
     </form>
 </div>

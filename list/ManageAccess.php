@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/FamilyList.php';
 require_once __DIR__ . '/../src/classes/User.php';
+require_once __DIR__ . '/../src/functions.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
 
@@ -27,6 +28,11 @@ $user = new User($pdo);
 $members = $user->findUserByFamilyId($list->fam_id);
 
 if (isset($_POST['saveAccessBtn'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        header("Location: /list/ManageAccess.php?id=" . $listId);
+        exit();
+    }
+
     $checked = $_POST['access'] ?? [];
     foreach ($members as $member) {
         if ($member->id == $list->owner_id) {
@@ -65,6 +71,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
             <?php endif; ?>
             <?php endforeach; ?>
 
+            <?= csrfField() ?>
             <button type="submit" name="saveAccessBtn">Speichern</button>
     </form>
 </div>

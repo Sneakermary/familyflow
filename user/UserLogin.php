@@ -1,10 +1,16 @@
 <?php
 
 session_start();
+require_once __DIR__ . '/../src/functions.php';
 $errors = $_SESSION['errors'] ?? [];
 
 
 if (isset($_POST['loginBtn'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        header("Location: /user/UserLogin.php");
+        exit();
+    }
+
     require_once __DIR__ . '/../src/classes/Database.php';
     require_once __DIR__ . '/../src/classes/User.php';
 
@@ -19,6 +25,9 @@ if (isset($_POST['loginBtn'])) {
     $found = $user->findByEmail($email);
 
     if ($found && password_verify($pw, $found->pw_hash)) {
+        // Neue Session-Id nach dem Login, damit eine evtl. vorher bekannte Session-Id
+        // (z.B. aus einer URL oder einem offenen WLAN) danach nicht mehr gueltig ist.
+        session_regenerate_id(true);
         $_SESSION['uid'] = $found->id;
         header("Location: /family/SelectFamily.php");
         exit();
@@ -49,6 +58,7 @@ unset($_SESSION['errors']);
 
         <input type="email" name="email" placeholder="E-Mail" value="<?= htmlspecialchars($oldEmail) ?>" required>
         <input type="password" name="pw" placeholder="Passwort" required>
+        <?= csrfField() ?>
         <button type="submit" name="loginBtn">Login</button>
     </form>
     <p>Noch kein Konto? <a href="/user/UserRegister.php">Hier registrieren</a></p>

@@ -2,6 +2,9 @@
 require_once __DIR__ . '/src/classes/Database.php';
 require_once __DIR__ . '/src/classes/User.php';
 require_once __DIR__ . '/src/classes/Family.php';
+require_once __DIR__ . '/src/classes/FamilyList.php';
+require_once __DIR__ . '/src/classes/Event.php';
+require_once __DIR__ . '/src/classes/Recipe.php';
 require_once __DIR__ . '/src/functions.php';
 
 // guard.php: session_start() + Login-Pflicht (kein HTML, darf also zuerst kommen)
@@ -21,6 +24,15 @@ $user = new User($pdo);
 $familyData = $family->findById($_SESSION['fam_id']);
 $members = $user->findUserByFamilyId($_SESSION['fam_id']);
 
+$lists = new FamilyList($pdo);
+$listCount = count($lists->getListsForUser($_SESSION['uid'], $_SESSION['fam_id']));
+
+$eventClass = new Event($pdo);
+$eventCount = count($eventClass->getEventForUsers($_SESSION['uid'], $_SESSION['fam_id']));
+
+$recipeClass = new Recipe($pdo);
+$recipeCount = count($recipeClass->getRecipesForUser($_SESSION['uid'], $_SESSION['fam_id']));
+
 // Ab hier darf HTML ausgegeben werden, alle Redirects sind durch
 include_once __DIR__ . '/src/components/head.php';
 include_once __DIR__ . '/src/components/navbar.php';
@@ -34,7 +46,7 @@ include_once __DIR__ . '/src/components/navbar.php';
         <div class="tile_icon">📋</div>
         <div class="tile_title">Listen</div>
         <div class="tile_subtext">
-            Noch keine Listen
+            <?= $listCount > 0 ? $listCount . ' ' . ($listCount === 1 ? 'Liste' : 'Listen') : 'Noch keine Listen' ?>
         </div>
     </div>
 
@@ -43,7 +55,7 @@ include_once __DIR__ . '/src/components/navbar.php';
         <div class="tile_icon">📅</div>
         <div class="tile_title">Kalender</div>
         <div class="tile_subtext">
-            Noch keine Termine
+            <?= $eventCount > 0 ? $eventCount . ' ' . ($eventCount === 1 ? 'Termin' : 'Termine') : 'Noch keine Termine' ?>
         </div>
     </div>
 
@@ -61,7 +73,7 @@ include_once __DIR__ . '/src/components/navbar.php';
         <div class="tile_icon">🍽️</div>
         <div class="tile_title">Rezepte</div>
         <div class="tile_subtext">
-            Noch keine Rezepte
+            <?= $recipeCount > 0 ? $recipeCount . ' ' . ($recipeCount === 1 ? 'Rezept' : 'Rezepte') : 'Noch keine Rezepte' ?>
         </div>
     </div>
 

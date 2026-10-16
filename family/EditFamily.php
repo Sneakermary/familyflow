@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/Family.php';
 require_once __DIR__ . '/../src/classes/Validator.php';
+require_once __DIR__ . '/../src/functions.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
 
@@ -25,6 +26,11 @@ if (!$family->isMember($_SESSION['uid'], $famId)) {
 $errors = $_SESSION['errors'] ?? [];
 
 if (isset($_POST['saveFamilyBtn'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        header("Location: /family/EditFamily.php?id=" . $famId);
+        exit();
+    }
+
     $name = trim($_POST['name'] ?? '');
     $validator = new Validator;
 
@@ -44,6 +50,11 @@ if (isset($_POST['saveFamilyBtn'])) {
 }
 
 if (isset($_POST['deleteFamilyBtn'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        header("Location: /family/EditFamily.php?id=" . $famId);
+        exit();
+    }
+
     $family->deleteFamily($famId);
 
     // war das gerade die aktive Familie? dann aus der Session entfernen
@@ -73,10 +84,12 @@ include_once __DIR__ . '/../src/components/navbar.php';
 <div class="contentcontainer">
     <form action="" method="POST">
         <input type="text" name="name" value="<?= htmlspecialchars($familyData->name) ?>" required>
+        <?= csrfField() ?>
         <button type="submit" name="saveFamilyBtn">Speichern</button>
     </form>
 
     <form action="" method="POST" onsubmit="return confirm('Familie wirklich löschen? Alle Listen, Termine, Rezepte und Mitgliedschaften dieser Familie werden unwiderruflich gelöscht!')">
+        <?= csrfField() ?>
         <button type="submit" name="deleteFamilyBtn">Familie löschen</button>
     </form>
 </div>

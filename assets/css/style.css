@@ -278,13 +278,64 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
     display: none;
  }
 
- .member {
+ .eventTile {
+    cursor: pointer;
+    flex-direction: column;
+    align-items: flex-start;
+ }
+
+ .choreTile {
+    cursor: pointer;
+    flex-direction: column;
+    align-items: flex-start;
+ }
+
+ .eventTile .tile_subtext,
+ .choreTile .tile_subtext {
+    padding-right: 0;
+ }
+
+ .eventMenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-small);
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 10;
+    min-width: 140px;
+ }
+
+ .eventMenu a {
+    color: var(--text);
+    padding: 10px 16px;
+ }
+
+ .eventMenu a:hover {
+    background: var(--bg);
+    text-decoration: none;
+ }
+
+ .eventMenu.hidden {
+    display: none;
+ }
+
+ .member,
+ .eventTile,
+ .choreTile {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 12px;
     background: var(--tile-bg, var(--tile));
+    border-left: 4px solid var(--primary);
     border-radius: var(--radius-small);
-    box-shadow: var(--box-shadow);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
     padding-top: 14px;
     padding-bottom: 14px;
     margin-bottom: 10px;

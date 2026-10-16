@@ -57,6 +57,12 @@ class FamilyList {
         return $this->pdo->lastInsertId();
     }
 
+    // Alle erledigten Eintraege einer Liste entfernen
+    public function deleteDoneItems($listId) {
+        $stmt = $this->pdo->prepare("DELETE FROM list_items WHERE list_id = ? AND done = 1");
+        $stmt->execute([$listId]);
+    }
+
     // Abhaken/wieder-oeffnen umschalten. listId muss mitgegeben werden, sonst koennte
     // jemand mit Zugriff auf eine eigene Liste per erratener Id Eintraege fremder Listen umschalten.
     public function toggleItem($itemId, $listId) {

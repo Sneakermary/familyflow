@@ -4,6 +4,7 @@ require_once __DIR__ . '/../src/classes/FamilyList.php';
 require_once __DIR__ . '/../src/classes/User.php';
 require_once __DIR__ . '/../src/classes/Validator.php';
 require_once __DIR__ . '/../src/classes/Notification.php';
+require_once __DIR__ . '/../src/functions.php';
 require_once __DIR__ . '/../src/components/guard.php';
 
 
@@ -15,6 +16,11 @@ if (!isset($_SESSION['fam_id'])) {
 $errors = $_SESSION['errors'] ?? [];
 
 if (isset($_POST['createListBtn'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        header("Location: /list/CreateList.php");
+        exit();
+    }
+
     $name = trim($_POST['name'] ?? '');
     $validator = new Validator;
 
@@ -91,6 +97,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
             <?php endif; ?>
         <?php endforeach; ?>
 
+        <?= csrfField() ?>
         <button type="submit" name="createListBtn">Liste erstellen</button>
     </form>
 </div>

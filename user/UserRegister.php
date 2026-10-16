@@ -1,12 +1,18 @@
 <?php
 require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/User.php';
+require_once __DIR__ . '/../src/functions.php';
 session_start();
 
 $errors = $_SESSION['errors'] ?? [];
 
 // POST-Verarbeitung ZUERST (kann noch redirecten), erst danach kommt HTML
 if (isset($_POST['registerBtn'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        header("Location: /user/UserRegister.php");
+        exit();
+    }
+
     require_once __DIR__. '/../src/classes/Validator.php';
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['pw'] ?? '';
@@ -58,6 +64,7 @@ unset($_SESSION['errors']);
         <input type="email" name="email" placeholder="E-Mail" required>
         <input type="password" name="pw" placeholder="Passwort" minlength="8" required>
         <input type="password" name="pwConfirm" placeholder="Passwort bestätigen" required>
+        <?= csrfField() ?>
         <button type="submit" name="registerBtn">Registrieren</button>
     </form>
 </div>

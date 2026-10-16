@@ -4,6 +4,7 @@ require_once __DIR__ . '/../src/classes/Recipe.php';
 require_once __DIR__ . '/../src/classes/RecipeFolder.php';
 require_once __DIR__ . '/../src/classes/User.php';
 require_once __DIR__ . '/../src/classes/Validator.php';
+require_once __DIR__ . '/../src/functions.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
 
@@ -40,6 +41,11 @@ if (!$darfSehen) {
 $errors = $_SESSION['errors'] ?? [];
 
 if (isset($_POST['editRecipeBtn'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        header("Location: /recipe/EditRecipe.php?id=" . $recipeId);
+        exit();
+    }
+
     $title = trim($_POST['title'] ?? '');
     $folderId = $_POST['folder_id'] !== '' ? (int) $_POST['folder_id'] : null;
     $sharedWith = $_POST['shared_with'] ?? '';
@@ -177,6 +183,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
             </select>
         </label>
 
+        <?= csrfField() ?>
         <button type="submit" name="editRecipeBtn">Speichern</button>
     </form>
 </div>

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../src/classes/Database.php';
+require_once __DIR__ . '/../src/functions.php';
 require_once __DIR__ . '/../src/components/guard.php';
 
 $themeGroups = [
@@ -23,6 +24,11 @@ $themes = array_merge(...array_values($themeGroups));
 
 $db = new Database;
 $pdo = $db->connect();
+
+if (isset($_POST['themeBtn']) && !verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+    header("Location: /user/Theme.php");
+    exit();
+}
 
 if (isset($_POST['themeBtn']) && isset($themes[$_POST['theme'] ?? ''])) {
     $stmt = $pdo->prepare("UPDATE users SET theme = ? WHERE id = ?");
@@ -60,6 +66,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
                 <?php endif; ?>
             <?php endforeach; ?>
         </select>
+        <?= csrfField() ?>
         <button type="submit" name="themeBtn">Speichern</button>
     </form>
 </div>

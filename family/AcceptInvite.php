@@ -4,6 +4,7 @@ require_once __DIR__ . '/../src/classes/User.php';
 require_once __DIR__ . '/../src/classes/Family.php';
 require_once __DIR__ . '/../src/classes/FamilyInvite.php';
 require_once __DIR__ . '/../src/classes/Notification.php';
+require_once __DIR__ . '/../src/functions.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
 
@@ -30,6 +31,11 @@ if (!$invite || $invite->to_user_id != $_SESSION['uid'] || $invite->status !== '
 
 $notificationClass = new Notification($pdo);
 $toUser = $user->findById($_SESSION['uid']);
+
+if ((isset($_POST['acceptBtn']) || isset($_POST['declineBtn'])) && !verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+    header("Location: /family/AcceptInvite.php?id=" . $inviteId);
+    exit();
+}
 
 if (isset($_POST['acceptBtn'])) {
     $family->addMember($_SESSION['uid'], $invite->fam_id);
@@ -73,6 +79,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
     <p><?= htmlspecialchars($fromUser->firstname) ?> <?= htmlspecialchars($fromUser->lastname) ?> hat dich zur Familie "<?= htmlspecialchars($familyData->name) ?>" eingeladen.</p>
 
     <form action="" method="POST">
+        <?= csrfField() ?>
         <button type="submit" name="acceptBtn">Annehmen</button>
         <button type="submit" name="declineBtn">Ablehnen</button>
     </form>

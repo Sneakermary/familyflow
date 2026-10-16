@@ -3,6 +3,7 @@ require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/Chore.php';
 require_once __DIR__ . '/../src/classes/User.php';
 require_once __DIR__ . '/../src/classes/Validator.php';
+require_once __DIR__ . '/../src/functions.php';
 require_once __DIR__ . '/../src/components/guard.php';
 
 if (!isset($_SESSION['fam_id'])) {
@@ -35,6 +36,11 @@ $validVisibilities = ['owner', 'selected', 'assignee', 'all'];
 $errors = $_SESSION['errors'] ?? [];
 
 if (isset($_POST['saveChoreBtn'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        header("Location: /chore/EditChore.php?id=" . $choreId);
+        exit();
+    }
+
     $name = trim($_POST['name'] ?? '');
     $rotation = $_POST['rotation'] ?? 'none';
     $visibility = $_POST['visibility'] ?? 'owner';
@@ -83,6 +89,11 @@ if (isset($_POST['saveChoreBtn'])) {
 }
 
 if (isset($_POST['deleteChoreBtn'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        header("Location: /chore/EditChore.php?id=" . $choreId);
+        exit();
+    }
+
     $choreClass->deleteChore($choreId);
     header("Location: /chore/Chores.php");
     exit();
@@ -161,10 +172,12 @@ include_once __DIR__ . '/../src/components/navbar.php';
             <?php endforeach; ?>
         </div>
 
+        <?= csrfField() ?>
         <button type="submit" name="saveChoreBtn">Speichern</button>
     </form>
 
     <form action="" method="POST" onsubmit="return confirm('Ämtli wirklich löschen?')">
+        <?= csrfField() ?>
         <button type="submit" name="deleteChoreBtn">Ämtli löschen</button>
     </form>
 </div>

@@ -5,6 +5,7 @@
 <script src="/assets/js/eventForm.js"></script>
 <script src="/assets/js/recipeForm.js"></script>
 <script src="/assets/js/choreForm.js"></script>
+<script src="/assets/js/eventMenu.js"></script>
 
 </body>
 </html>

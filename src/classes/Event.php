@@ -35,6 +35,19 @@ class Event
         return $stmt->fetch();
     }
 
+    // Termin aktualisieren (gleiche Felder wie beim Anlegen)
+    public function updateEvent($eventId, $title, $startAt, $endAt, $location, $description, $sharedWith, $allDay)
+    {
+        $stmt = $this->pdo->prepare("UPDATE events SET title = ?, start_at = ?, end_at = ?, location = ?, description = ?, shared_with = ?, all_day = ? WHERE id = ?");
+        $stmt->execute([$title, $startAt, $endAt, $location, $description, $sharedWith, $allDay, $eventId]);
+    }
+
+    public function deleteEvent($eventId)
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM events WHERE id = ?");
+        $stmt->execute([$eventId]);
+    }
+
     // Alle Termine einer Person fuer einen bestimmten Monat (fuers Monats-Raster)
     public function getEventsForUserInMonth($userId, $famId, $year, $month)
     {

@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/FamilyList.php';
+require_once __DIR__ . '/../src/functions.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
 
@@ -23,6 +24,11 @@ if (!$lists->hasAccess($listId, $_SESSION['uid'])) {
 
 // Neuen Eintrag hinzufuegen (POST-Verarbeitung vor jedem HTML)
 if (isset($_POST['addItemBtn'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        header("Location: /list/ListDetail.php?id=" . $listId);
+        exit();
+    }
+
     $content = trim($_POST['content'] ?? '');
     if ($content !== '') {
         $lists->addItem($listId, $content);
@@ -33,7 +39,24 @@ if (isset($_POST['addItemBtn'])) {
 
 // Eintrag abhaken/wieder oeffnen
 if (isset($_GET['toggle'])) {
+    if (!verifyCsrfToken($_GET['csrf_token'] ?? '')) {
+        header("Location: /list/ListDetail.php?id=" . $listId);
+        exit();
+    }
+
     $lists->toggleItem((int) $_GET['toggle'], $listId);
+    header("Location: /list/ListDetail.php?id=" . $listId);
+    exit();
+}
+
+// Alle erledigten Eintraege loeschen
+if (isset($_GET['deleteDone'])) {
+    if (!verifyCsrfToken($_GET['csrf_token'] ?? '')) {
+        header("Location: /list/ListDetail.php?id=" . $listId);
+        exit();
+    }
+
+    $lists->deleteDoneItems($listId);
     header("Location: /list/ListDetail.php?id=" . $listId);
     exit();
 }
@@ -51,16 +74,17 @@ include_once __DIR__ . '/../src/components/navbar.php';
     <h2><?= htmlspecialchars($list->name) ?></h2>
     <span id="listMenuBtn" class="dots">⋮</span>
     <div id="listMenuList" class="hidden">
-        <a href="#" onclick="var name = prompt('Neuer Name:'); if(name) {window.location.href='/list/RenameList.php?id=<?= $listId ?>&name=' + encodeURIComponent(name); } return false;">Umbenennen</a>
-        <a href="/list/DeleteList.php?id=<?= $listId ?>" onclick="return confirm('Liste wirklich löschen?')">Liste Löschen</a>
+        <a href="#" onclick="var name = prompt('Neuer Name:'); if(name) {window.location.href='/list/RenameList.php?id=<?= $listId ?>&name=' + encodeURIComponent(name) + '&csrf_token=<?= urlencode(csrfToken()) ?>'; } return false;">Umbenennen</a>
+        <a href="/list/DeleteList.php?id=<?= $listId ?>&csrf_token=<?= urlencode(csrfToken()) ?>" onclick="return confirm('Liste wirklich löschen?')">Liste Löschen</a>
         <a href="/list/ManageAccess.php?id=<?= $listId ?>">Zugriff verwalten</a>
         <a href="#" id="hideDoneBtn">Erledigte ausblenden</a>
+        <a href="/list/ListDetail.php?id=<?= $listId ?>&deleteDone=1&csrf_token=<?= urlencode(csrfToken()) ?>" onclick="return confirm('Alle erledigten Einträge wirklich löschen?')">Erledigte löschen</a>
     </div>
 </div>
 
 <?php foreach ($items as $item): ?>
     <div class="member <?= $item->done ? 'done' : '' ?>">
-        <input type="checkbox" onclick="window.location.href='/list/ListDetail.php?id=<?= $listId ?>&toggle=<?= $item->id ?>'" <?= $item->done ? 'checked' : '' ?>>
+        <input type="checkbox" onclick="window.location.href='/list/ListDetail.php?id=<?= $listId ?>&toggle=<?= $item->id ?>&csrf_token=<?= urlencode(csrfToken()) ?>'" <?= $item->done ? 'checked' : '' ?>>
         <span><?= htmlspecialchars($item->content) ?></span>
     </div>
 <?php endforeach; ?>
@@ -68,6 +92,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
 <div class="contentcontainer">
     <form action="" method="POST">
         <input type="text" name="content" placeholder="Neuer Eintrag" required autofocus>
+        <?= csrfField() ?>
         <button type="submit" name="addItemBtn">Hinzufügen</button>
     </form>
 </div>

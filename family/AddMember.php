@@ -2,6 +2,7 @@
 require_once __DIR__ .'/../src/classes/Database.php';
 require_once __DIR__ .'/../src/classes/User.php';
 require_once __DIR__ .'/../src/classes/Family.php';
+require_once __DIR__ . '/../src/functions.php';
 
 // guard.php: session_start() + Login-Pflicht (kein HTML)
 require_once __DIR__ . '/../src/components/guard.php';
@@ -16,6 +17,11 @@ $errors = $_SESSION['errors'] ?? [];
 
 // POST-Verarbeitung ZUERST (kann noch redirecten), erst danach kommt HTML
 if (isset($_POST['addMemberBtn'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        header("Location: /family/AddMember.php");
+        exit();
+    }
+
     require_once __DIR__. '/../src/classes/Validator.php';
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['pw'] ?? '';
@@ -69,6 +75,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
         <input type="email" name="email" placeholder="E-Mail" required>
         <input type="password" name="pw" placeholder="Passwort" minlength="8" required>
         <input type="password" name="pwConfirm" placeholder="Passwort bestätigen" required>
+        <?= csrfField() ?>
         <button type="submit" name="addMemberBtn">Hinzufügen</button>
     </form>
 </div>

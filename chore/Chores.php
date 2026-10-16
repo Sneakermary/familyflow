@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/Chore.php';
 require_once __DIR__ . '/../src/classes/User.php';
+require_once __DIR__ . '/../src/functions.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
 
@@ -15,9 +16,14 @@ $pdo = $db->connect();
 $choreClass = new Chore($pdo);
 $user = new User($pdo);
 
-// Erledigt-Haken setzen (POST/Redirect/Get, Sicherheitscheck: Choreid muss zur aktuellen Familie gehoeren)
-if (isset($_POST['markDoneBtn'])) {
-    $choreId = (int) ($_POST['choreId'] ?? 0);
+// Erledigt-Haken setzen (Sicherheitscheck: Choreid muss zur aktuellen Familie gehoeren und sichtbar sein)
+if (isset($_GET['markDone'])) {
+    if (!verifyCsrfToken($_GET['csrf_token'] ?? '')) {
+        header("Location: /chore/Chores.php");
+        exit();
+    }
+
+    $choreId = (int) $_GET['markDone'];
     $chore = $choreClass->getChoreById($choreId);
     if ($chore && $chore->fam_id == $_SESSION['fam_id'] && $choreClass->isVisibleToUser($chore, $_SESSION['uid'])) {
         $choreClass->markDone($choreId, $_SESSION['uid']);
@@ -52,32 +58,28 @@ include_once __DIR__ . '/../src/components/navbar.php';
 
 <h2>Ämtli</h2>
 
-<div class="tiles">
 <?php foreach ($myChores as $chore): ?>
     <?php
         $assigneeId = $choreClass->getCurrentAssigneeId($chore);
         $assigneeName = $assigneeId ? ($memberNames[$assigneeId] ?? 'Unbekannt') : 'Noch niemand zugeteilt';
         $done = $choreClass->isDoneInCurrentPeriod($chore);
     ?>
-    <div class="tile">
-        <a class="tile_edit" href="/chore/EditChore.php?id=<?= $chore->id ?>">⚙️</a>
-        <div class="tile_icon">🧹</div>
+    <div class="choreTile">
         <div class="tile_title"><?= htmlspecialchars($chore->name) ?></div>
         <div class="tile_subtext">
             <?= htmlspecialchars($rotationLabels[$chore->rotation] ?? $chore->rotation) ?><br>
             Zuständig: <?= htmlspecialchars($assigneeName) ?>
+            <?php if ($done): ?><br>✅ Erledigt<?php endif; ?>
         </div>
-        <?php if ($done): ?>
-            <p>✅ Erledigt</p>
-        <?php else: ?>
-            <form action="" method="POST">
-                <input type="hidden" name="choreId" value="<?= $chore->id ?>">
-                <button type="submit" name="markDoneBtn">Erledigt</button>
-            </form>
-        <?php endif; ?>
+        <div class="eventMenu hidden">
+            <a href="/chore/EditChore.php?id=<?= $chore->id ?>">Bearbeiten</a>
+            <a href="/chore/DeleteChore.php?id=<?= $chore->id ?>&csrf_token=<?= urlencode(csrfToken()) ?>" onclick="return confirm('Ämtli wirklich löschen?')">Löschen</a>
+            <?php if (!$done): ?>
+                <a href="/chore/Chores.php?markDone=<?= $chore->id ?>&csrf_token=<?= urlencode(csrfToken()) ?>">Erledigt</a>
+            <?php endif; ?>
+        </div>
     </div>
 <?php endforeach; ?>
-</div>
 
 <p><a href="/chore/CreateChore.php">+ Neues Ämtli</a></p>
 

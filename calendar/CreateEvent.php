@@ -4,6 +4,7 @@ require_once __DIR__ . '/../src/classes/Event.php';
 require_once __DIR__ . '/../src/classes/User.php';
 require_once __DIR__ . '/../src/classes/Validator.php';
 require_once __DIR__ . '/../src/classes/Notification.php';
+require_once __DIR__ . '/../src/functions.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
 
@@ -16,6 +17,11 @@ $errors = $_SESSION['errors'] ?? [];
 $prefilledDate = $_GET['date'] ?? '';
 
 if(isset($_POST['createEventBtn'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        header("Location: /calendar/CreateEvent.php");
+        exit();
+    }
+
     $title = trim($_POST['title'] ?? '');
     $allDay = isset($_POST['all_day']) ? 1 : 0;
     $startAt = $_POST['start_at'] ?? '';
@@ -135,8 +141,8 @@ include_once __DIR__ . '/../src/components/navbar.php';
             Ganztägig
         </label>
         <div id="timeFields">
-            <label>Start: <input type="datetime-local" name="start_at" value="<?= $prefilledDate ? htmlspecialchars($prefilledDate) . 'T09:00' : '' ?>"></label>
-            <label>Ende: <input type="datetime-local" name="end_at" value="<?= $prefilledDate ? htmlspecialchars($prefilledDate) . 'T10:00' : '' ?>"></label>
+            <label>Start: <input type="datetime-local" name="start_at" id="startAtInput" value="<?= $prefilledDate ? htmlspecialchars($prefilledDate) . 'T09:00' : '' ?>"></label>
+            <label>Ende: <input type="datetime-local" name="end_at" id="endAtInput" value="<?= $prefilledDate ? htmlspecialchars($prefilledDate) . 'T10:00' : '' ?>"></label>
         </div>
 
         <div id="dateField" class="hidden">
@@ -158,6 +164,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
             </select>
         </label>
 
+        <?= csrfField() ?>
         <button type="submit" name="createEventBtn">Termin erstellen</button>
     </form>
 </div>

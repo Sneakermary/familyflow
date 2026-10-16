@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/User.php';
 require_once __DIR__ . '/../src/classes/Nickname.php';
+require_once __DIR__ . '/../src/functions.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
 
@@ -38,6 +39,11 @@ if ($targetUser === null) {
 }
 
 if (isset($_POST['saveNicknameBtn'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        header("Location: /family/EditNickname.php?id=" . $targetId);
+        exit();
+    }
+
     $newNickname = trim($_POST['nickname'] ?? '');
 
     if ($newNickname === '') {
@@ -62,6 +68,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
 <div class="contentcontainer">
     <form action="" method="POST">
         <input type="text" name="nickname" placeholder="Spitzname" value="<?= htmlspecialchars($currentNickname ?? '') ?>">
+        <?= csrfField() ?>
         <button type="submit" name="saveNicknameBtn">Speichern</button>
     </form>
     <p>Leer lassen und speichern, um den Spitznamen wieder zu entfernen.</p>

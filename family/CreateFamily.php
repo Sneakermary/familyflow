@@ -3,6 +3,7 @@ require_once __DIR__ . '/../src/classes/FamilyList.php';
 require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/Family.php';
 require_once __DIR__ . '/../src/classes/Validator.php';
+require_once __DIR__ . '/../src/functions.php';
 // guard.php: session_start() + Login-Pflicht (kein HTML)
 require_once __DIR__ . '/../src/components/guard.php';
 
@@ -10,6 +11,11 @@ $errors = $_SESSION['errors'] ?? [];
 
 // POST-Verarbeitung ZUERST (kann noch redirecten), erst danach kommt HTML
 if (isset($_POST['familynameBtn'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        header("Location: /family/CreateFamily.php");
+        exit();
+    }
+
     $familyname = trim($_POST['familyname'] ?? '');
 
     $errors = [];
@@ -70,6 +76,7 @@ unset($_SESSION['errors']);
 <div class="CreateFamilyContainer">
     <form action="" method="POST">
         <input type="text" name="familyname" placeholder="Familie" required>
+        <?= csrfField() ?>
         <button type="submit" name="familynameBtn">Familie erstellen</button>
     </form>
 </div>
