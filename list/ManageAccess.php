@@ -27,7 +27,7 @@ $list = $lists->getListById($listId);
 $user = new User($pdo);
 $members = $user->findUserByFamilyId($list->fam_id);
 
-if (isset($_POST['saveAccessBtn'])) {
+if (isset($_POST['saveAccessBtn']) && !$list->is_default) {
     if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
         header("Location: /list/ManageAccess.php?id=" . $listId);
         exit();
@@ -61,19 +61,23 @@ include_once __DIR__ . '/../src/components/navbar.php';
 <h2>Zugriff verwalten</h2>
 
 <div class="contentcontainer">
-    <form action="" method="POST">
-        <?php foreach($members as $member): ?>
-            <?php if($member->id != $list->owner_id): ?>
-                <label>
-                    <input type="checkbox" name="access[]" value="<?= $member->id ?>" <?= in_array($member->id, $currentAccess) ? 'checked' : '' ?>>
-                    <?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?>
-                </label>
-            <?php endif; ?>
-            <?php endforeach; ?>
+    <?php if ($list->is_default): ?>
+        <p>Das ist eine Standardliste. Sie ist immer für alle aktuellen und künftigen Mitglieder dieser Familie sichtbar und kann hier nicht eingeschränkt werden.</p>
+    <?php else: ?>
+        <form action="" method="POST">
+            <?php foreach($members as $member): ?>
+                <?php if($member->id != $list->owner_id): ?>
+                    <label>
+                        <input type="checkbox" name="access[]" value="<?= $member->id ?>" <?= in_array($member->id, $currentAccess) ? 'checked' : '' ?>>
+                        <?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?>
+                    </label>
+                <?php endif; ?>
+                <?php endforeach; ?>
 
-            <?= csrfField() ?>
-            <button type="submit" name="saveAccessBtn">Speichern</button>
-    </form>
+                <?= csrfField() ?>
+                <button type="submit" name="saveAccessBtn">Speichern</button>
+        </form>
+    <?php endif; ?>
 </div>
 
 <?php include_once __DIR__ . '/../src/components/footer.php'; ?>

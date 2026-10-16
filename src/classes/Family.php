@@ -40,6 +40,13 @@ class Family{
         return $stmt->fetch();
     }
 
+    // Mitgliedschaft entfernen (die Person selbst und ihre Daten bleiben erhalten,
+    // sie verliert nur den Zugriff auf diese Familie)
+    public function removeMember($userId, $famId) {
+        $stmt = $this->pdo->prepare("DELETE FROM family_members WHERE user_id = ? AND fam_id = ?");
+        $stmt->execute([$userId, $famId]);
+    }
+
         // Familiennamen aendern
     public function renameFamily($famId, $newName) {
         $stmt = $this->pdo->prepare("UPDATE families SET name = ? WHERE id = ?");

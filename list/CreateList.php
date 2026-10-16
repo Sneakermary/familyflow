@@ -61,7 +61,7 @@ if (isset($_POST['createListBtn'])) {
         );
     }
 
-    header("Location: /list/Lists.php");
+    header("Location: /list/ListDetail.php?id=" . $listId);
     exit();
 }
 

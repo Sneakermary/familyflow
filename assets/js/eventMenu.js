@@ -1,6 +1,7 @@
-// Popup-Menü je Kachel (Termine in Day.php, Ämtli in Chores.php): Klick auf die
-// Kachel oeffnet/schliesst nur das eigene Menü, die anderen Kacheln bleiben unberuehrt.
-document.querySelectorAll('.eventTile, .choreTile').forEach(function (tile) {
+// Popup-Menü je Kachel (Termine in Day.php, Ämtli in Chores.php, Mitglieder in
+// MyFamily.php): Klick auf die Kachel oeffnet/schliesst nur das eigene Menü,
+// die anderen Kacheln bleiben unberuehrt.
+document.querySelectorAll('.eventTile, .choreTile, .memberTile').forEach(function (tile) {
     const menu = tile.querySelector('.eventMenu');
     if (!menu) {
         return;

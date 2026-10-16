@@ -34,6 +34,8 @@ if (isset($_POST['registerBtn'])) {
 
     if(!empty($errors)){
         $_SESSION['errors'] = $errors;
+        // Passwoerter bewusst nicht gespeichert, nur die unkritischen Felder
+        $_SESSION['oldValues'] = ['firstname' => $firstname, 'lastname' => $lastname, 'email' => $email];
         header("Location: /user/UserRegister.php");
         exit();
     }
@@ -53,20 +55,24 @@ foreach($errors as $error){
     echo '<p>' . $error . '</p>';
 }
 unset($_SESSION['errors']);
+
+$oldValues = $_SESSION['oldValues'] ?? [];
+unset($_SESSION['oldValues']);
 ?>
 
 <div class="contentcontainer">
     <form action="" class="frontform" method="POST">
         <h3>Registrieren</h3>
 
-        <input type="text" name="firstname" placeholder="Vorname" required>
-        <input type="text" name="lastname" placeholder="Nachname" required>
-        <input type="email" name="email" placeholder="E-Mail" required>
+        <input type="text" name="firstname" placeholder="Vorname" value="<?= htmlspecialchars($oldValues['firstname'] ?? '') ?>" required>
+        <input type="text" name="lastname" placeholder="Nachname" value="<?= htmlspecialchars($oldValues['lastname'] ?? '') ?>" required>
+        <input type="email" name="email" placeholder="E-Mail" value="<?= htmlspecialchars($oldValues['email'] ?? '') ?>" required>
         <input type="password" name="pw" placeholder="Passwort" minlength="8" required>
         <input type="password" name="pwConfirm" placeholder="Passwort bestätigen" required>
         <?= csrfField() ?>
         <button type="submit" name="registerBtn">Registrieren</button>
     </form>
+    <p>Schon ein Konto? <a href="/user/UserLogin.php">Hier einloggen</a></p>
 </div>
 
 <?php include_once __DIR__ . '/../src/components/footer.php'; ?>

@@ -26,5 +26,6 @@ if (addStepBtn) {
         input.name = 'steps[]';
         input.placeholder = 'Schritt ' + stepCount;
         stepsContainer.appendChild(input);
+        input.focus();
     });
 }

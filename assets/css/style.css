@@ -242,6 +242,12 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
     text-decoration: none;
     padding: 4px 10px;
     margin-left: 24px;
+    transition: transform 0.15s ease;
+ }
+
+ .backLink:hover {
+    text-decoration: none;
+    transform: scale(1.15);
  }
 
  .dots {
@@ -282,6 +288,10 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
     cursor: pointer;
     flex-direction: column;
     align-items: flex-start;
+ }
+
+ .memberTile {
+    cursor: pointer;
  }
 
  .choreTile {

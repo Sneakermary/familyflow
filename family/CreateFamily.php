@@ -43,11 +43,9 @@ if (isset($_POST['familynameBtn'])) {
     $family->addMember($_SESSION['uid'], $famId);
     $lists = new FamilyList($pdo);
 
-    $einkaufenId = $lists->createList($famId, $_SESSION['uid'], 'Einkaufen');
-    $lists->addAccess($einkaufenId, $_SESSION['uid']);
-
-    $todoId = $lists->createList($famId, $_SESSION['uid'], 'To-Dos');
-    $lists->addAccess($todoId, $_SESSION['uid']);
+    // Standardlisten: immer fuer alle aktuellen und kuenftigen Familienmitglieder sichtbar
+    $lists->createList($famId, $_SESSION['uid'], 'Einkaufen', true);
+    $lists->createList($famId, $_SESSION['uid'], 'To-Dos', true);
 
 
     // Ab jetzt ist die neue Familie die aktuell gewählte Familie

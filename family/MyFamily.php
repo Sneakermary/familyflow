@@ -34,7 +34,8 @@ include_once __DIR__ . '/../src/components/navbar.php';
 <h3><?= htmlspecialchars($familyData->name) ?></h3>
 
 <?php foreach ($members as $member): ?>
-    <div class="member">
+    <?php $isSelf = $member->id == $_SESSION['uid']; ?>
+    <div class="member<?= $isSelf ? '' : ' memberTile' ?>">
         <span class="avatar"><?= htmlspecialchars(initials($member->firstname, $member->lastname)) ?></span>
         <span>
             <?php if (isset($nicknames[$member->id])): ?>
@@ -43,8 +44,11 @@ include_once __DIR__ . '/../src/components/navbar.php';
                 <?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?>
             <?php endif; ?>
         </span>
-        <?php if ($member->id != $_SESSION['uid']): ?>
-            <a href="/family/EditNickname.php?id=<?= $member->id ?>">⚙️</a>
+        <?php if (!$isSelf): ?>
+            <div class="eventMenu hidden">
+                <a href="/family/EditNickname.php?id=<?= $member->id ?>">Bearbeiten</a>
+                <a href="/family/RemoveMember.php?id=<?= $member->id ?>&csrf_token=<?= urlencode(csrfToken()) ?>" onclick="return confirm('<?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?> wirklich aus der Familie entfernen?')">Löschen</a>
+            </div>
         <?php endif; ?>
     </div>
 <?php endforeach; ?>

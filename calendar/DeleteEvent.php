@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/Event.php';
+require_once __DIR__ . '/../src/classes/User.php';
+require_once __DIR__ . '/../src/classes/Notification.php';
 require_once __DIR__ . '/../src/functions.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
@@ -31,6 +33,23 @@ $dayTimestamp = strtotime($event->start_at);
 $year = date('Y', $dayTimestamp);
 $month = (int) date('n', $dayTimestamp);
 $day = (int) date('j', $dayTimestamp);
+
+// Benachrichtigung an alle, die den Termin sehen durften (ausser der loeschenden Person selbst)
+$user = new User($pdo);
+$notificationClass = new Notification($pdo);
+$fromUser = $user->findById($_SESSION['uid']);
+$deleteMessage = $fromUser->firstname . ' ' . $fromUser->lastname . ' hat den Termin "' . $event->title . '" am ' . date('d.m.Y', $dayTimestamp) . ' gelöscht';
+
+if ($event->shared_with === null) {
+    $members = $user->findUserByFamilyId($event->fam_id);
+    foreach ($members as $member) {
+        if ($member->id != $_SESSION['uid']) {
+            $notificationClass->notify($member->id, $deleteMessage);
+        }
+    }
+} elseif ($event->shared_with != $_SESSION['uid']) {
+    $notificationClass->notify($event->shared_with, $deleteMessage);
+}
 
 $eventClass->deleteEvent($eventId);
 
