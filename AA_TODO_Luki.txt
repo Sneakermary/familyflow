@@ -1,0 +1,32 @@
+1. Startseite erstellen. Startseite, Registrieren und Login Navigation
+2. Nach Neuer Registrierung kein "Familie erstellen" Button
+3. Navbarlinks
+4. Familienmitglied hinzufügen unter "Meine Familie"
+5. Backlink fixen????
+6. Familie wechseln sichtbarer machen und aktuelle Familie anzeigen
+7. Listen -> "Zugriff verwalten" zu "Zugriffsinformationen"
+8. Erledigte Punkte übers Menü wieder einblenden
+9. Zugriff verwalten -> Backlink fehlt
+10. 8. und 9. auch für Todos
+11. In Listen einzelnen Eintrag löschen.
+12. aktueller Tag farblich markieren + eventuell Einträge in der Vergangenheit verhindern
+13. Heute Knopf bei Kalender
+14. Mehrtägige Termine im Kalender anzeigen lassen + Ganztägig von bis
+15. Mitglied aus Familie löschen zu Aus Familie entfernen
+16. Familienersteller soll nicht gelöscht werden können von anderen Mitgliedern
+17. Rezept Seite umändern, leicht verwirrend
+18. Neues Rezept -> Foto hochladen bei "Geschrieben" hinzufügen + "ohne Text" und "mit Text"
+19. Ämtli -> bessere Begriffe
+20. Nur ich aus Ämtli entfernen
+21. Ämtli Option wieder auf "Nicht erledigt" zu stellen
+
+Design auf Farben kontrollieren
+
+
+Ausbau-Features:
+Eigener Kalender, Familienübergreifend
+Meine Listen
+Nach Ablehnung einer Einladung, kann der User 3 Tage nicht erneut eingeladen werden.
+Benachrichtigung vor Termin
+Löschen von Terminen durch den Nichtersteller erlauben?
+Alle Rezepte anzeigen bzw danach suchen
