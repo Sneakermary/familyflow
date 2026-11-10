@@ -37,6 +37,10 @@ if (!$darfSehen) {
 }
 
 $steps = $recipe->getStepsForRecipe($recipeId);
+
+// Festes Linkziel statt history.back(): nach dem Anlegen eines Rezepts landet man direkt
+// hier, im Verlauf steht davor noch das leere "Neues Rezept"-Formular - history.back()
+// wuerde also dorthin zurueckspringen statt zur eigentlichen Uebersicht.
 $backUrl = $r->folder_id ? "/recipe/Folder.php?id=" . $r->folder_id : "/recipe/Recipes.php";
 
 include_once __DIR__ . '/../src/components/head.php';

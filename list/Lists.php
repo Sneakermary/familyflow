@@ -19,9 +19,16 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<a href="/Dashboard.php" class="backLink">&larr;</a>
+<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
 
-<h2>Listen</h2>
+<div class="listHeader">
+    <h2>Listen</h2>
+    <span id="listMenuBtn" class="dots">⋮</span>
+    <div id="listMenuList" class="hidden">
+        <a href="/list/CreateList.php">Liste erstellen</a>
+        <a href="/list/MyLists.php">Meine Listen</a>
+    </div>
+</div>
 
 <div class="tiles">
 <?php foreach ($myLists as $list): ?>
@@ -37,7 +44,5 @@ include_once __DIR__ . '/../src/components/navbar.php';
     </div>
 <?php endforeach; ?>
 </div>
-
-<p><a href="/list/CreateList.php">+ Neue Liste</a></p>
 
 <?php include_once __DIR__ . '/../src/components/footer.php'; ?>

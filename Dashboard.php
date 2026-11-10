@@ -23,6 +23,7 @@ $user = new User($pdo);
 
 $familyData = $family->findById($_SESSION['fam_id']);
 $members = $user->findUserByFamilyId($_SESSION['fam_id']);
+$isAdmin = $family->isMember($_SESSION['uid'], $_SESSION['fam_id'])->role === 'admin';
 
 $lists = new FamilyList($pdo);
 $listCount = count($lists->getListsForUser($_SESSION['uid'], $_SESSION['fam_id']));
@@ -38,7 +39,17 @@ include_once __DIR__ . '/src/components/head.php';
 include_once __DIR__ . '/src/components/navbar.php';
 ?>
 
-<h2>Dashboard</h2>
+<div class="listHeader">
+    <h2>Dashboard</h2>
+    <span id="listMenuBtn" class="dots">⋮</span>
+    <div id="listMenuList" class="hidden">
+        <a href="/family/EditFamily.php?id=<?= $_SESSION['fam_id'] ?>">Familie Verlassen</a>
+        <?php if ($isAdmin): ?>
+            <a href="/family/EditFamily.php?id=<?= $_SESSION['fam_id'] ?>">Familie Löschen</a>
+        <?php endif; ?>
+    </div>
+</div>
+<h3><?= htmlspecialchars($familyData->name) ?></h3>
 
 <div class="tiles">
     <!-- LISTEN -->
@@ -80,7 +91,7 @@ include_once __DIR__ . '/src/components/navbar.php';
     <!-- ÄMTLI -->
     <div class="tile" data-href="/chore/Chores.php">
         <div class="tile_icon">🧹</div>
-        <div class="tile_title">Ämtli</div>
+        <div class="tile_title">Aufgaben</div>
         <div class="tile_subtext">
             Aufgaben verwalten
         </div>

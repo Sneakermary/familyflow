@@ -23,7 +23,6 @@ if (isset($_POST['createRecipeBtn'])) {
     }
 
     $title = trim($_POST['title'] ?? '');
-    $mode = $_POST['mode'] ?? 'photo';
     $folderId = $_POST['folder_id'] !== '' ? (int) $_POST['folder_id'] : null;
     $sharedWith = $_POST['shared_with'] ?? '';
 
@@ -33,46 +32,42 @@ if (isset($_POST['createRecipeBtn'])) {
         $errors['title'] = 'Rezeptname ist erforderlich';
     }
 
+    // Foto und Zutaten/Schritte sind unabhaengig voneinander, beides ist optional
     $photoFilename = null;
-    $ingredients = null;
-    $steps = [];
 
-    if ($mode === 'photo') {
-        if (!isset($_FILES['photo']) || $_FILES['photo']['error'] === UPLOAD_ERR_NO_FILE) {
-            $errors['photo'] = 'Bitte ein Foto hochladen';
-        } elseif ($_FILES['photo']['error'] !== UPLOAD_ERR_OK) {
-            $errors['photo'] = 'Fehler beim Hochladen';
+    if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+        $allowedTypes = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+        ];
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $_FILES['photo']['tmp_name']);
+
+        $maxSize = 5 * 1024 * 1024; // 5 MB
+
+        if (!isset($allowedTypes[$mimeType])) {
+            $errors['photo'] = 'Nur JPG, PNG oder WebP erlaubt';
+        } elseif ($_FILES['photo']['size'] > $maxSize) {
+            $errors['photo'] = 'Foto ist zu groß (max. 5 MB)';
         } else {
-            $allowedTypes = [
-                'image/jpeg' => 'jpg',
-                'image/png' => 'png',
-                'image/webp' => 'webp',
-            ];
-
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mimeType = finfo_file($finfo, $_FILES['photo']['tmp_name']);
-
-            $maxSize = 5 * 1024 * 1024; // 5 MB
-
-            if (!isset($allowedTypes[$mimeType])) {
-                $errors['photo'] = 'Nur JPG, PNG oder WebP erlaubt';
-            } elseif ($_FILES['photo']['size'] > $maxSize) {
-                $errors['photo'] = 'Foto ist zu groß (max. 5 MB)';
-            } else {
-                $extension = $allowedTypes[$mimeType];
-                $photoFilename = uniqid('recipe_', true) . '.' . $extension;
-                $targetPath = __DIR__ . '/../uploads/recipes/' . $photoFilename;
-                move_uploaded_file($_FILES['photo']['tmp_name'], $targetPath);
-            }
+            $extension = $allowedTypes[$mimeType];
+            $photoFilename = uniqid('recipe_', true) . '.' . $extension;
+            $targetPath = __DIR__ . '/../uploads/recipes/' . $photoFilename;
+            move_uploaded_file($_FILES['photo']['tmp_name'], $targetPath);
         }
-    } else {
-        $ingredients = trim($_POST['ingredients'] ?? '');
-        $rawSteps = $_POST['steps'] ?? [];
-        foreach ($rawSteps as $step) {
-            $step = trim($step);
-            if ($step !== '') {
-                $steps[] = $step;
-            }
+    }
+
+    $ingredients = trim($_POST['ingredients'] ?? '');
+    $ingredients = $ingredients !== '' ? $ingredients : null;
+
+    $steps = [];
+    $rawSteps = $_POST['steps'] ?? [];
+    foreach ($rawSteps as $step) {
+        $step = trim($step);
+        if ($step !== '') {
+            $steps[] = $step;
         }
     }
 
@@ -119,7 +114,7 @@ if (isset($_POST['createRecipeBtn'])) {
         );
     }
 
-    header("Location: /recipe/Recipes.php");
+    header("Location: /recipe/RecipeDetail.php?id=" . $recipeId);
     exit();
 }
 
@@ -134,7 +129,7 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<a href="/recipe/Recipes.php" class="backLink">&larr;</a>
+<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
 
 <h2>Neues Rezept</h2>
 
@@ -156,23 +151,16 @@ include_once __DIR__ . '/../src/components/navbar.php';
             </select>
         </label>
 
-        <div>
-            <label><input type="radio" name="mode" value="photo" id="modePhoto" checked> Mit Foto</label>
-            <label><input type="radio" name="mode" value="written" id="modeWritten"> Geschrieben</label>
-        </div>
-
-        <div id="photoFields">
+        <label>Foto hinzufügen (optional):
             <input type="file" name="photo" accept="image/*">
-        </div>
+        </label>
 
-        <div id="writtenFields" class="hidden">
-            <textarea name="ingredients" placeholder="Zutaten"></textarea>
+        <textarea name="ingredients" placeholder="Zutaten (optional)"></textarea>
 
-            <div id="stepsContainer">
-                <input type="text" name="steps[]" placeholder="Schritt 1">
-            </div>
-            <button type="button" id="addStepBtn">+ Schritt hinzufügen</button>
+        <div id="stepsContainer">
+            <input type="text" name="steps[]" placeholder="Schritt 1">
         </div>
+        <button type="button" id="addStepBtn">+ Schritt hinzufügen</button>
 
         <label>Teilen mit:
             <select name="shared_with">

@@ -128,7 +128,7 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<a href="/recipe/RecipeDetail.php?id=<?= $recipeId ?>" class="backLink">&larr;</a>
+<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
 
 <h2>Rezept bearbeiten</h2>
 

@@ -13,4 +13,11 @@ document.querySelectorAll('.eventTile, .choreTile, .memberTile').forEach(functio
         }
         menu.classList.toggle('hidden');
     });
+
+    // Menue schliessen, wenn irgendwo ausserhalb dieser Kachel geklickt wird
+    document.addEventListener('click', function (event) {
+        if (!menu.classList.contains('hidden') && !tile.contains(event.target)) {
+            menu.classList.add('hidden');
+        }
+    });
 });

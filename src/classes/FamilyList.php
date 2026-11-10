@@ -47,6 +47,18 @@ class FamilyList {
         return $stmt->fetchAll();
     }
 
+    // Alle Listen, die einer Person gehoeren, familienuebergreifend (fuer "Meine Listen").
+    // LEFT JOIN statt JOIN, weil eine Liste auch zu gar keiner Familie gehoeren kann (fam_id NULL).
+    public function getListsOwnedByUser($userId) {
+        $stmt = $this->pdo->prepare("SELECT lists.*, families.name AS family_name
+            FROM lists
+            LEFT JOIN families ON families.id = lists.fam_id
+            WHERE lists.owner_id = ?
+            ORDER BY lists.name ASC");
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll();
+    }
+
     // Eine einzelne Liste per Id holen (wie Family::findById)
     public function getListById($listId) {
         $stmt = $this->pdo->prepare("SELECT * FROM lists WHERE id = ?");
@@ -100,6 +112,12 @@ class FamilyList {
     public function removeAccess($listId, $userId) {
         $stmt = $this->pdo->prepare("DELETE FROM list_access WHERE list_id = ? AND user_id = ?");
         $stmt->execute([$listId, $userId]);
+    }
+
+    // Einzelnen Eintrag löschen
+    public function deleteItem($itemId, $listId) {
+        $stmt = $this->pdo->prepare("DELETE FROM list_items WHERE id = ? AND list_id = ?");
+        $stmt->execute([$itemId, $listId]);
     }
 }
 

@@ -57,10 +57,11 @@ unset($_SESSION['errors']);
         <h3>Login</h3>
 
         <input type="email" name="email" placeholder="E-Mail" value="<?= htmlspecialchars($oldEmail) ?>" required>
-        <input type="password" name="pw" placeholder="Passwort" required>
+        <input type="password" name="pw" placeholder="Passwort" autocomplete="off" required>
         <?= csrfField() ?>
         <button type="submit" name="loginBtn">Login</button>
     </form>
+    <p><a href="/index.php">&larr; Zur Startseite</a></p>
     <p>Noch kein Konto? <a href="/user/UserRegister.php">Hier registrieren</a></p>
 </div>
 

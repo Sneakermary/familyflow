@@ -63,6 +63,12 @@ class Chore {
         $stmt->execute([$userId, $choreId]);
     }
 
+    // Erledigt-Status zuruecksetzen
+    public function markNotDone($choreId) {
+        $stmt = $this->pdo->prepare("UPDATE chores SET last_done_at = NULL, done_by = NULL WHERE id = ?");
+        $stmt->execute([$choreId]);
+    }
+
     // Rotations-Teilnehmer in der richtigen Reihenfolge holen
     public function getRotationUserIds($choreId) {
         $stmt = $this->pdo->prepare("SELECT user_id FROM chore_users WHERE chore_id = ? ORDER BY position");

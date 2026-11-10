@@ -48,7 +48,10 @@ class Event
         $stmt->execute([$eventId]);
     }
 
-    // Alle Termine einer Person fuer einen bestimmten Monat (fuers Monats-Raster)
+    // Alle Termine einer Person fuer einen bestimmten Monat (fuers Monats-Raster).
+    // Ueberlappungs-Check (start_at <= Monatsende UND end_at >= Monatsanfang) statt nur
+    // "start_at im Monat", damit mehrtaegige Termine auch dann auftauchen, wenn sie in
+    // einem frueheren Monat begonnen haben und in diesen hineinragen.
     public function getEventsForUserInMonth($userId, $famId, $year, $month)
     {
         $start = sprintf('%04d-%02d-01 00:00:00', $year, $month);
@@ -56,13 +59,14 @@ class Event
 
         $stmt = $this->pdo->prepare("SELECT * FROM events
             WHERE fam_id = ? AND (shared_with IS NULL OR shared_with = ? OR owner_id = ?)
-            AND start_at BETWEEN ? AND ?
+            AND start_at <= ? AND end_at >= ?
             ORDER BY start_at ASC");
-        $stmt->execute([$famId, $userId, $userId, $start, $end]);
+        $stmt->execute([$famId, $userId, $userId, $end, $start]);
         return $stmt->fetchAll();
     }
 
-    // Alle Termine einer Person für einen einzelnen Tag (Tages-Ansicht)
+    // Alle Termine einer Person für einen einzelnen Tag (Tages-Ansicht), gleicher
+    // Ueberlappungs-Check wie oben
     public function getEventsForUserOnDay($userId, $famId, $year, $month, $day)
     {
         $start = sprintf('%04d-%02d-%02d 00:00:00', $year, $month, $day);
@@ -70,9 +74,9 @@ class Event
 
         $stmt = $this->pdo->prepare("SELECT * FROM events
             WHERE fam_id = ? AND (shared_with IS NULL OR shared_with = ? OR owner_id = ?)
-            AND start_at BETWEEN ? AND ?
+            AND start_at <= ? AND end_at >= ?
             ORDER BY start_at ASC");
-        $stmt->execute([$famId, $userId, $userId, $start, $end]);
+        $stmt->execute([$famId, $userId, $userId, $end, $start]);
         return $stmt->fetchAll();
     }
 }

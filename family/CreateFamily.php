@@ -40,7 +40,7 @@ if (isset($_POST['familynameBtn'])) {
     $famId = $family->createFamily($familyname);
 
     // addMember traegt die Person in die Zwischentabelle family_members ein. Reihenfolge: erst der User, dann die Familie
-    $family->addMember($_SESSION['uid'], $famId);
+    $family->addMember($_SESSION['uid'], $famId, 'admin');
     $lists = new FamilyList($pdo);
 
     // Standardlisten: immer fuer alle aktuellen und kuenftigen Familienmitglieder sichtbar
@@ -60,7 +60,7 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<a href="/Dashboard.php" class="backLink">&larr;</a>
+<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
 
 <h3>Erstelle eine Familie</h3>
 

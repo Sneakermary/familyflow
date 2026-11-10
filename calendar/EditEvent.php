@@ -57,9 +57,15 @@ if (isset($_POST['editEventBtn'])) {
     }
 
     if ($allDay) {
-        $eventDate = $_POST['event_date'] ?? '';
-        if (!$validator->required($eventDate)) {
-            $errors['event_date'] = 'Datum ist erforderlich';
+        $eventDateFrom = $_POST['event_date_from'] ?? '';
+        $eventDateTo = $_POST['event_date_to'] ?? '';
+        if (!$validator->required($eventDateFrom)) {
+            $errors['event_date_from'] = 'Startdatum ist erforderlich';
+        }
+        if (!$validator->required($eventDateTo)) {
+            $errors['event_date_to'] = 'Enddatum ist erforderlich';
+        } elseif ($eventDateFrom !== '' && $eventDateTo < $eventDateFrom) {
+            $errors['event_date_to'] = 'Enddatum darf nicht vor dem Startdatum liegen';
         }
     } else {
         if (!$validator->required($startAt)) {
@@ -77,8 +83,8 @@ if (isset($_POST['editEventBtn'])) {
     }
 
     if ($allDay) {
-        $startAtForDb = $eventDate . ' 00:00:00';
-        $endAtForDb = $eventDate . ' 23:59:59';
+        $startAtForDb = $eventDateFrom . ' 00:00:00';
+        $endAtForDb = $eventDateTo . ' 23:59:59';
     } else {
         $startAtForDb = str_replace('T', ' ', $startAt) . ':00';
         $endAtForDb = str_replace('T', ' ', $endAt) . ':00';
@@ -107,13 +113,14 @@ $members = $user->findUserByFamilyId($_SESSION['fam_id']);
 
 $startAtValue = str_replace(' ', 'T', substr($event->start_at, 0, 16));
 $endAtValue = str_replace(' ', 'T', substr($event->end_at, 0, 16));
-$eventDateValue = substr($event->start_at, 0, 10);
+$eventDateFromValue = substr($event->start_at, 0, 10);
+$eventDateToValue = substr($event->end_at, 0, 10);
 
 include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<a href="/calendar/Calendar.php" class="backLink">&larr;</a>
+<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
 
 <h2>Termin bearbeiten</h2>
 
@@ -136,7 +143,8 @@ include_once __DIR__ . '/../src/components/navbar.php';
         </div>
 
         <div id="dateField" class="<?= $event->all_day ? '' : 'hidden' ?>">
-            <label>Datum: <input type="date" name="event_date" value="<?= htmlspecialchars($eventDateValue) ?>"></label>
+            <label>Von: <input type="date" name="event_date_from" value="<?= htmlspecialchars($eventDateFromValue) ?>"></label>
+            <label>Bis: <input type="date" name="event_date_to" value="<?= htmlspecialchars($eventDateToValue) ?>"></label>
         </div>
 
         <input type="text" name="location" placeholder="Ort" value="<?= htmlspecialchars($event->location ?? '') ?>">

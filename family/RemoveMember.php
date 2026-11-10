@@ -21,8 +21,12 @@ $db = new Database;
 $pdo = $db->connect();
 $family = new Family($pdo);
 
-// Sicherheitscheck: ich selbst und die Zielperson muessen beide Mitglied dieser Familie sein
-if (!$family->isMember($_SESSION['uid'], $_SESSION['fam_id']) || !$family->isMember($targetId, $_SESSION['fam_id'])) {
+// Sicherheitscheck: ich selbst und die Zielperson muessen beide Mitglied dieser Familie sein,
+// und die Zielperson darf nicht die Familienerstellerin/der Familienersteller (admin) sein
+$myMembership = $family->isMember($_SESSION['uid'], $_SESSION['fam_id']);
+$targetMembership = $family->isMember($targetId, $_SESSION['fam_id']);
+
+if (!$myMembership || !$targetMembership || $targetMembership->role === 'admin') {
     header("Location: /family/MyFamily.php");
     exit();
 }

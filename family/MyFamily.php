@@ -28,13 +28,20 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<a href="/Dashboard.php" class="backLink">&larr;</a>
+<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
 
-<h2>Meine Familie</h2>
+<div class="listHeader">
+    <h2>Meine Familie</h2>
+    <span id="listMenuBtn" class="dots">⋮</span>
+    <div id="listMenuList" class="hidden">
+        <a href="/family/InviteMember.php">Mitglied einladen</a>
+    </div>
+</div>
 <h3><?= htmlspecialchars($familyData->name) ?></h3>
 
 <?php foreach ($members as $member): ?>
     <?php $isSelf = $member->id == $_SESSION['uid']; ?>
+    <?php $memberRole = $family->isMember($member->id, $_SESSION['fam_id'])->role; ?>
     <div class="member<?= $isSelf ? '' : ' memberTile' ?>">
         <span class="avatar"><?= htmlspecialchars(initials($member->firstname, $member->lastname)) ?></span>
         <span>
@@ -47,11 +54,12 @@ include_once __DIR__ . '/../src/components/navbar.php';
         <?php if (!$isSelf): ?>
             <div class="eventMenu hidden">
                 <a href="/family/EditNickname.php?id=<?= $member->id ?>">Bearbeiten</a>
-                <a href="/family/RemoveMember.php?id=<?= $member->id ?>&csrf_token=<?= urlencode(csrfToken()) ?>" onclick="return confirm('<?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?> wirklich aus der Familie entfernen?')">Löschen</a>
+                <?php if ($memberRole !== 'admin'): ?>
+                    <a href="/family/RemoveMember.php?id=<?= $member->id ?>&csrf_token=<?= urlencode(csrfToken()) ?>" onclick="return confirm('<?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?> wirklich aus der Familie entfernen?')">Löschen</a>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
     </div>
 <?php endforeach; ?>
-
 
 <?php include_once __DIR__ . '/../src/components/footer.php'; ?>

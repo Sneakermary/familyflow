@@ -15,7 +15,7 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<a href="/Dashboard.php" class="backLink">&larr;</a>
+<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
 
 <div class="yearHeader">
     <a href="?year=<?= $year - 1 ?>">&larr;</a>

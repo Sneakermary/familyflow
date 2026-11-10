@@ -48,6 +48,16 @@ if (isset($_GET['toggle'])) {
     header("Location: /list/ListDetail.php?id=" . $listId);
     exit();
 }
+if(isset($_GET['deleteItem'])) {
+    if(!verifyCsrfToken($_GET['csrf_token'] ?? '')) {
+        header("Location: /list/ListDetail.php?id=" . $listId);
+        exit();
+    }
+
+    $lists->deleteItem((int) $_GET['deleteItem'], $listId);
+    header("Location: /list/ListDetail.php?id=" . $listId);
+    exit();
+}
 
 // Alle erledigten Eintraege loeschen
 if (isset($_GET['deleteDone'])) {
@@ -68,7 +78,7 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<a href="/list/Lists.php" class="backLink">&larr;</a>
+<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
 
 <div class="listHeader">
     <h2><?= htmlspecialchars($list->name) ?></h2>
@@ -76,7 +86,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
     <div id="listMenuList" class="hidden">
         <a href="#" onclick="var name = prompt('Neuer Name:'); if(name) {window.location.href='/list/RenameList.php?id=<?= $listId ?>&name=' + encodeURIComponent(name) + '&csrf_token=<?= urlencode(csrfToken()) ?>'; } return false;">Umbenennen</a>
         <a href="/list/DeleteList.php?id=<?= $listId ?>&csrf_token=<?= urlencode(csrfToken()) ?>" onclick="return confirm('Liste wirklich löschen?')">Liste Löschen</a>
-        <a href="/list/ManageAccess.php?id=<?= $listId ?>">Zugriff verwalten</a>
+        <a href="/list/ManageAccess.php?id=<?= $listId ?>">Zugriffsinformationen</a>
         <a href="#" id="hideDoneBtn">Erledigte ausblenden</a>
         <a href="/list/ListDetail.php?id=<?= $listId ?>&deleteDone=1&csrf_token=<?= urlencode(csrfToken()) ?>" onclick="return confirm('Alle erledigten Einträge wirklich löschen?')">Erledigte löschen</a>
     </div>
@@ -86,6 +96,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
     <div class="member <?= $item->done ? 'done' : '' ?>">
         <input type="checkbox" onclick="window.location.href='/list/ListDetail.php?id=<?= $listId ?>&toggle=<?= $item->id ?>&csrf_token=<?= urlencode(csrfToken()) ?>'" <?= $item->done ? 'checked' : '' ?>>
         <span><?= htmlspecialchars($item->content) ?></span>
+        <a href="/list/ListDetail.php?id=<?= $listId ?>&deleteItem=<?= $item->id ?>&csrf_token=<?= urlencode(csrfToken()) ?>" class="memberDelete" onclick="return confirm('Eintrag wirklich löschen?')">✕</a>
     </div>
 <?php endforeach; ?>
 

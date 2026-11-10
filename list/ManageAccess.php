@@ -27,7 +27,7 @@ $list = $lists->getListById($listId);
 $user = new User($pdo);
 $members = $user->findUserByFamilyId($list->fam_id);
 
-if (isset($_POST['saveAccessBtn']) && !$list->is_default) {
+if (isset($_POST['saveAccessBtn']) && !$list->is_default && $list->fam_id !== null) {
     if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
         header("Location: /list/ManageAccess.php?id=" . $listId);
         exit();
@@ -58,10 +58,14 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<h2>Zugriff verwalten</h2>
+<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
+
+<h2>Zugriffsinformation</h2>
 
 <div class="contentcontainer">
-    <?php if ($list->is_default): ?>
+    <?php if ($list->fam_id === null): ?>
+        <p>Diese Liste gehört zu keiner Familie und ist rein privat – es gibt niemanden, mit dem man sie teilen könnte.</p>
+    <?php elseif ($list->is_default): ?>
         <p>Das ist eine Standardliste. Sie ist immer für alle aktuellen und künftigen Mitglieder dieser Familie sichtbar und kann hier nicht eingeschränkt werden.</p>
     <?php else: ?>
         <form action="" method="POST">

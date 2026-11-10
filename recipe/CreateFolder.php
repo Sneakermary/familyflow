@@ -35,9 +35,9 @@ if (isset($_POST['createFolderBtn'])) {
     $db = new Database;
     $pdo = $db->connect();
     $folderClass = new RecipeFolder($pdo);
-    $folderClass->createFolder($_SESSION['fam_id'], $name);
+    $folderId = $folderClass->createFolder($_SESSION['fam_id'], $name);
 
-    header("Location: /recipe/Recipes.php");
+    header("Location: /recipe/Folder.php?id=" . $folderId);
     exit();
 }
 
@@ -45,7 +45,7 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<a href="/recipe/Recipes.php" class="backLink">&larr;</a>
+<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
 
 <h2>Neuer Ordner</h2>
 

@@ -32,6 +32,22 @@ if (isset($_GET['markDone'])) {
     exit();
 }
 
+// Erledigt-Status zuruecksetzen
+if (isset($_GET['markNotDone'])) {
+    if (!verifyCsrfToken($_GET['csrf_token'] ?? '')) {
+        header("Location: /chore/Chores.php");
+        exit();
+    }
+
+    $choreId = (int) $_GET['markNotDone'];
+    $chore = $choreClass->getChoreById($choreId);
+    if ($chore && $chore->fam_id == $_SESSION['fam_id'] && $choreClass->isVisibleToUser($chore, $_SESSION['uid'])) {
+        $choreClass->markNotDone($choreId);
+    }
+    header("Location: /chore/Chores.php");
+    exit();
+}
+
 $myChores = $choreClass->getChoresForUser($_SESSION['uid'], $_SESSION['fam_id']);
 
 // Namen der Familienmitglieder einmal holen, statt pro Ämtli einzeln nachzufragen
@@ -42,7 +58,7 @@ foreach ($members as $member) {
 }
 
 $rotationLabels = [
-    'none' => 'Fest zugeteilt',
+    'none' => 'Einmalig',
     'daily' => 'Täglich rotierend',
     'weekly' => 'Wöchentlich rotierend',
     'monthly' => 'Monatlich rotierend',
@@ -54,9 +70,15 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<a href="/Dashboard.php" class="backLink">&larr;</a>
+<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
 
-<h2>Ämtli</h2>
+<div class="listHeader">
+    <h2>Aufgaben</h2>
+    <span id="listMenuBtn" class="dots">⋮</span>
+    <div id="listMenuList" class="hidden">
+        <a href="/chore/CreateChore.php">Aufgabe erstellen</a>
+    </div>
+</div>
 
 <?php foreach ($myChores as $chore): ?>
     <?php
@@ -73,14 +95,16 @@ include_once __DIR__ . '/../src/components/navbar.php';
         </div>
         <div class="eventMenu hidden">
             <a href="/chore/EditChore.php?id=<?= $chore->id ?>">Bearbeiten</a>
-            <a href="/chore/DeleteChore.php?id=<?= $chore->id ?>&csrf_token=<?= urlencode(csrfToken()) ?>" onclick="return confirm('Ämtli wirklich löschen?')">Löschen</a>
-            <?php if (!$done): ?>
+            <?php if ($chore->owner_id == $_SESSION['uid']): ?>
+                <a href="/chore/DeleteChore.php?id=<?= $chore->id ?>&csrf_token=<?= urlencode(csrfToken()) ?>" onclick="return confirm('Aufgabe wirklich löschen?')">Löschen</a>
+            <?php endif; ?>
+            <?php if ($done): ?>
+                <a href="/chore/Chores.php?markNotDone=<?= $chore->id ?>&csrf_token=<?= urlencode(csrfToken()) ?>">Nicht erledigt</a>
+            <?php else: ?>
                 <a href="/chore/Chores.php?markDone=<?= $chore->id ?>&csrf_token=<?= urlencode(csrfToken()) ?>">Erledigt</a>
             <?php endif; ?>
         </div>
     </div>
 <?php endforeach; ?>
-
-<p><a href="/chore/CreateChore.php">+ Neues Ämtli</a></p>
 
 <?php include_once __DIR__ . '/../src/components/footer.php'; ?>

@@ -77,7 +77,7 @@ if (isset($_POST['createChoreBtn'])) {
     $notificationClass = new Notification($pdo);
     $fromUser = $user->findById($_SESSION['uid']);
     $choreLink = '/chore/Chores.php';
-    $message = $fromUser->firstname . ' ' . $fromUser->lastname . ' hat ein Ämtli erstellt: ' . $name;
+    $message = $fromUser->firstname . ' ' . $fromUser->lastname . ' hat eine Aufgabe erstellt: ' . $name;
 
     if ($visibility === 'all') {
         $members = $user->findUserByFamilyId($_SESSION['fam_id']);
@@ -113,9 +113,9 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<a href="/chore/Chores.php" class="backLink">&larr;</a>
+<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
 
-<h2>Neues Ämtli</h2>
+<h2>Neue Aufgabe</h2>
 
 <?php foreach ($errors as $error): ?>
     <p><?= htmlspecialchars($error) ?></p>
@@ -126,7 +126,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
     <form action="" method="POST">
         <input type="text" name="name" placeholder="z. B. Müll rausbringen" required>
 
-        <label>Zuständig:
+        <label>Wiederholen:
             <select name="rotation" id="rotationSelect">
                 <option value="none">Fest zugeteilt</option>
                 <option value="daily">Täglich rotierend</option>
@@ -138,7 +138,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
         </label>
 
         <div id="assignedField">
-            <label>Person:
+            <label>Zuständig:
                 <select name="assigned_user_id">
                     <option value="">Noch niemand</option>
                     <?php foreach ($members as $member): ?>
@@ -178,7 +178,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
         </div>
 
         <?= csrfField() ?>
-        <button type="submit" name="createChoreBtn">Ämtli erstellen</button>
+        <button type="submit" name="createChoreBtn">Aufgabe erstellen</button>
     </form>
 </div>
 

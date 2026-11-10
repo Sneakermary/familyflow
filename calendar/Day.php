@@ -31,7 +31,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
 
-<a href="/calendar/Calendar.php?year=<?= $year ?>&month=<?= $month ?>" class="backLink">&larr;</a>
+<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
 
 <h2><?= $weekdayNames[$weekdayNumber - 1] ?> – <?= $day ?>. <?= $monthNames[$month - 1] ?> <?= $year ?></h2>
 

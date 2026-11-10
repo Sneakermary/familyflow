@@ -18,8 +18,8 @@ $choreClass = new Chore($pdo);
 
 $chore = $choreClass->getChoreById($choreId);
 
-// Sicherheitscheck: gehoert das Ämtli zur aktuellen Familie und darf ich es ueberhaupt sehen?
-if (!$chore || !isset($_SESSION['fam_id']) || $chore->fam_id != $_SESSION['fam_id'] || !$choreClass->isVisibleToUser($chore, $_SESSION['uid'])) {
+// Sicherheitscheck: gehoert das Ämtli zur aktuellen Familie, darf ich es ueberhaupt sehen, und bin ich die Person, die es erstellt hat?
+if (!$chore || !isset($_SESSION['fam_id']) || $chore->fam_id != $_SESSION['fam_id'] || !$choreClass->isVisibleToUser($chore, $_SESSION['uid']) || $chore->owner_id != $_SESSION['uid']) {
     header("Location: /chore/Chores.php");
     exit();
 }

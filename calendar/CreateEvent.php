@@ -31,21 +31,32 @@ if(isset($_POST['createEventBtn'])) {
     $sharedWith = $_POST['shared_with'] ?? '';
 
     $validator = new Validator;
+    $minDate = date('Y-m-d', strtotime('-1 year'));
 
     if(!$validator->required($title)){
         $errors['title'] = 'Titel ist erforderlich';
     }
 
     if($allDay) {
-        $eventDate = $_POST['event_date'] ?? '';
-        if(!$validator->required($eventDate)) {
-            $errors['event_date'] = 'Datum ist erforderlich';
+        $eventDateFrom = $_POST['event_date_from'] ?? '';
+        $eventDateTo = $_POST['event_date_to'] ?? '';
+        if(!$validator->required($eventDateFrom)) {
+            $errors['event_date_from'] = 'Startdatum ist erforderlich';
+        } elseif ($eventDateFrom < $minDate) {
+            $errors['event_date_from'] = 'Datum darf nicht mehr als 1 Jahr in der Vergangenheit liegen';
+        }
+        if(!$validator->required($eventDateTo)) {
+            $errors['event_date_to'] = 'Enddatum ist erforderlich';
+        } elseif ($eventDateFrom !== '' && $eventDateTo < $eventDateFrom) {
+            $errors['event_date_to'] = 'Enddatum darf nicht vor dem Startdatum liegen';
         }
     } else {
         $startAt = $_POST['start_at'] ?? '';
         $endAt = $_POST['end_at'] ?? '';
         if (!$validator->required($startAt)) {
             $errors['start_at'] = 'Start ist erforderlich';
+        } elseif (substr($startAt, 0, 10) < $minDate) {
+            $errors['start_at'] = 'Start darf nicht mehr als 1 Jahr in der Vergangenheit liegen';
         }
         if (!$validator->required($endAt)) {
             $errors['end_at'] = 'Ende ist erforderlich';
@@ -59,8 +70,8 @@ if(isset($_POST['createEventBtn'])) {
     }
 
     if($allDay) {
-        $startAtForDb = $eventDate . ' 00:00:00';
-        $endAtForDb = $eventDate . ' 23:59:59';
+        $startAtForDb = $eventDateFrom . ' 00:00:00';
+        $endAtForDb = $eventDateTo . ' 23:59:59';
     } else {
         $startAtForDb = str_replace('T', ' ', $startAt) . ':00';
         $endAtForDb = str_replace('T', ' ', $endAt) . ':00';
@@ -123,7 +134,7 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<a href="/calendar/Calendar.php" class="backLink">&larr;</a>
+<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
 
 <h2>Neuer Termin</h2>
 
@@ -146,7 +157,8 @@ include_once __DIR__ . '/../src/components/navbar.php';
         </div>
 
         <div id="dateField" class="hidden">
-            <label>Datum: <input type="date" name="event_date" value="<?= htmlspecialchars($prefilledDate) ?>"></label>
+            <label>Von: <input type="date" name="event_date_from" value="<?= htmlspecialchars($prefilledDate) ?>"></label>
+            <label>Bis: <input type="date" name="event_date_to" value="<?= htmlspecialchars($prefilledDate) ?>"></label>
         </div>
 
         <input type="text" name="location" placeholder="Ort">
@@ -155,7 +167,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
         <label> Teilen mit:
             <select name="shared_with">
                 <option value="">Alle</option>
-                <option value="<?= $_SESSION['uid'] ?>">Nur ich (privat)</option>
+                <option value="<?= $_SESSION['uid'] ?>" selected>Nur ich</option>
                 <?php foreach($members as $member): ?>
                     <?php if($member->id != $_SESSION['uid']): ?>
                         <option value="<?= $member->id ?>"><?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?></option>

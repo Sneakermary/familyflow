@@ -7,8 +7,11 @@ require_once __DIR__ . '/../src/classes/Notification.php';
 require_once __DIR__ . '/../src/functions.php';
 require_once __DIR__ . '/../src/components/guard.php';
 
+// Aus "Meine Listen" angelegt: die Liste gehoert dann zu gar keiner Familie (fam_id NULL),
+// rein privat, kein "Teilen mit"
+$isPersonal = isset($_GET['personal']) || isset($_POST['personal']);
 
-if (!isset($_SESSION['fam_id'])) {
+if (!$isPersonal && !isset($_SESSION['fam_id'])) {
     header("Location: /family/CreateFamily.php");
     exit();
 }
@@ -39,26 +42,29 @@ if (isset($_POST['createListBtn'])) {
     $lists = new FamilyList($pdo);
     $user = new User($pdo);
 
-    $listId = $lists->createList($_SESSION['fam_id'], $_SESSION['uid'], $name);
+    $listId = $lists->createList($isPersonal ? null : $_SESSION['fam_id'], $_SESSION['uid'], $name);
     $lists->addAccess($listId, $_SESSION['uid']);
 
+    // Teilen mit anderen gibt es nur innerhalb einer Familie - eine private Liste
+    // (familienlos) kann niemand sonst sehen
+    if (!$isPersonal) {
+        $sharedWith = $_POST['sharedWith'] ?? [];
+        foreach ($sharedWith as $memberid) {
+            $lists->addAccess($listId, $memberid);
+        }
 
-    $sharedWith = $_POST['sharedWith'] ?? [];
-    foreach ($sharedWith as $memberid) {
-        $lists->addAccess($listId, $memberid);
-    }
+        // Benachrichtigung an alle, mit denen die Liste geteilt wurde
+        $notificationClass = new Notification($pdo);
+        $fromUser = $user->findById($_SESSION['uid']);
+        $listLink = '/list/ListDetail.php?id=' . $listId;
 
-    // Benachrichtigung an alle, mit denen die Liste geteilt wurde
-    $notificationClass = new Notification($pdo);
-    $fromUser = $user->findById($_SESSION['uid']);
-    $listLink = '/list/ListDetail.php?id=' . $listId;
-
-    foreach ($sharedWith as $memberid) {
-        $notificationClass->notify(
-            $memberid,
-            $fromUser->firstname . ' ' . $fromUser->lastname . ' hat eine Liste mit dir geteilt: ' . $name,
-            $listLink
-        );
+        foreach ($sharedWith as $memberid) {
+            $notificationClass->notify(
+                $memberid,
+                $fromUser->firstname . ' ' . $fromUser->lastname . ' hat eine Liste mit dir geteilt: ' . $name,
+                $listLink
+            );
+        }
     }
 
     header("Location: /list/ListDetail.php?id=" . $listId);
@@ -68,14 +74,14 @@ if (isset($_POST['createListBtn'])) {
 $db = new Database;
 $pdo = $db->connect();
 $user = new User($pdo);
-$members = $user->findUserByFamilyId($_SESSION['fam_id']);
+$members = $isPersonal ? [] : $user->findUserByFamilyId($_SESSION['fam_id']);
 
 include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 
 ?>
 
-<a href="/list/Lists.php" class="backLink">&larr;</a>
+<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
 
 <h2>Neue Liste</h2>
 
@@ -87,15 +93,21 @@ include_once __DIR__ . '/../src/components/navbar.php';
 <div class="contentcontainer">
     <form action="" method="POST">
         <input type="text" name="name" placeholder="Listenname" required>
-        <p>Mit wem teilen? (nichts ankreuzen = privat, nur du) </p>
-        <?php foreach ($members as $member): ?>
-            <?php if ($member->id != $_SESSION['uid']): ?>
-                <label>
-                    <input type="checkbox" name="sharedWith[]" value="<?= $member->id ?>">
-                    <?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?>
-                </label>
-            <?php endif; ?>
-        <?php endforeach; ?>
+
+        <?php if ($isPersonal): ?>
+            <input type="hidden" name="personal" value="1">
+            <p>Diese Liste gehört zu keiner Familie und ist rein privat.</p>
+        <?php else: ?>
+            <p>Mit wem teilen? (nichts ankreuzen = privat, nur du) </p>
+            <?php foreach ($members as $member): ?>
+                <?php if ($member->id != $_SESSION['uid']): ?>
+                    <label>
+                        <input type="checkbox" name="sharedWith[]" value="<?= $member->id ?>">
+                        <?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?>
+                    </label>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        <?php endif; ?>
 
         <?= csrfField() ?>
         <button type="submit" name="createListBtn">Liste erstellen</button>

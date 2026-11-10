@@ -72,6 +72,7 @@ unset($_SESSION['oldValues']);
         <?= csrfField() ?>
         <button type="submit" name="registerBtn">Registrieren</button>
     </form>
+    <p><a href="/index.php">&larr; Zur Startseite</a></p>
     <p>Schon ein Konto? <a href="/user/UserLogin.php">Hier einloggen</a></p>
 </div>
 

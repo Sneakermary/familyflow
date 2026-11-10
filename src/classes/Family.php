@@ -29,15 +29,21 @@ class Family{
         return $stmt->fetchAll();
     }
 
-    public function addMember($userId, $famId) {
-        $stmt = $this->pdo->prepare("INSERT INTO family_members(user_id, fam_id) VALUES (?, ?)");
-        $stmt->execute([$userId, $famId]);
+    public function addMember($userId, $famId, $role = 'member') {
+        $stmt = $this->pdo->prepare("INSERT INTO family_members(user_id, fam_id, role) VALUES (?, ?, ?)");
+        $stmt->execute([$userId, $famId, $role]);
     }
 
     public function isMember($userId, $famId) {
         $stmt = $this->pdo->prepare("SELECT * FROM family_members WHERE user_id = ? AND fam_id = ?");
         $stmt->execute([$userId, $famId]);
         return $stmt->fetch();
+    }
+
+    // Jemand anderen zum Admin machen (z.B. bevor der bisherige Admin die Familie verlaesst)
+    public function promoteToAdmin($userId, $famId) {
+        $stmt = $this->pdo->prepare("UPDATE family_members SET role = 'admin' WHERE user_id = ? AND fam_id = ?");
+        $stmt->execute([$userId, $famId]);
     }
 
     // Mitgliedschaft entfernen (die Person selbst und ihre Daten bleiben erhalten,

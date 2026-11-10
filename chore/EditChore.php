@@ -108,9 +108,9 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<a href="/chore/Chores.php" class="backLink">&larr;</a>
+<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
 
-<h2>Ämtli bearbeiten</h2>
+<h2>Aufgabe bearbeiten</h2>
 
 <?php foreach ($errors as $error): ?>
     <p><?= htmlspecialchars($error) ?></p>
@@ -121,7 +121,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
     <form action="" method="POST">
         <input type="text" name="name" value="<?= htmlspecialchars($chore->name) ?>" required>
 
-        <label>Zuständig:
+        <label>Wiederholen:
             <select name="rotation" id="rotationSelect">
                 <option value="none" <?= $chore->rotation === 'none' ? 'selected' : '' ?>>Fest zugeteilt</option>
                 <option value="daily" <?= $chore->rotation === 'daily' ? 'selected' : '' ?>>Täglich rotierend</option>
@@ -133,7 +133,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
         </label>
 
         <div id="assignedField">
-            <label>Person:
+            <label>Zuständig:
                 <select name="assigned_user_id">
                     <option value="">Noch niemand</option>
                     <?php foreach ($members as $member): ?>
@@ -176,9 +176,9 @@ include_once __DIR__ . '/../src/components/navbar.php';
         <button type="submit" name="saveChoreBtn">Speichern</button>
     </form>
 
-    <form action="" method="POST" onsubmit="return confirm('Ämtli wirklich löschen?')">
+    <form action="" method="POST" onsubmit="return confirm('Aufgabe wirklich löschen?')">
         <?= csrfField() ?>
-        <button type="submit" name="deleteChoreBtn">Ämtli löschen</button>
+        <button type="submit" name="deleteChoreBtn">Aufgabe löschen</button>
     </form>
 </div>
 
