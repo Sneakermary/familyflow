@@ -74,11 +74,16 @@ if (isset($_GET['deleteDone'])) {
 $list = $lists->getListById($listId);
 $items = $lists->getItems($listId);
 
+// Festes Linkziel statt history.back(): nach dem Anlegen einer Liste landet man direkt
+// hier, im Verlauf steht davor noch das leere "Neue Liste"-Formular - history.back()
+// wuerde also dorthin zurueckspringen statt zur eigentlichen Uebersicht.
+$backUrl = $list->fam_id === null ? "/list/MyLists.php" : "/list/Lists.php";
+
 include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
+<a href="<?= $backUrl ?>" class="backLink">&larr;</a>
 
 <div class="listHeader">
     <h2><?= htmlspecialchars($list->name) ?></h2>

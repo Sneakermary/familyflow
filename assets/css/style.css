@@ -364,6 +364,47 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
     display: none;
  }
 
+ .calendarFamilyForm {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+ }
+
+ .calendarFamilyRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text);
+ }
+
+ .calendarFamilyRow span {
+    flex: 1;
+ }
+
+ .calendarFamilyRow input[type="color"] {
+    width: 28px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+ }
+
+ .calendarFamilyForm button {
+    margin-top: 6px;
+ }
+
+ .calendarFamilyDot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 4px;
+ }
+
  .eventTile {
     cursor: pointer;
     flex-direction: column;
@@ -497,22 +538,31 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
  }
 
  .todayBtn {
-    background: var(--primary);
-    color: white;
-    padding: 6px 14px;
+    background: transparent;
+    color: var(--heading, var(--primary-dark));
+    border: 2px solid var(--heading, var(--primary-dark));
+    padding: 3px 8px;
     border-radius: var(--radius-small);
     font-size: 0.9rem;
+    font-weight: bold;
  }
 
  .todayBtn:hover {
-    background: var(--primary-dark);
+    background: var(--heading, var(--primary-dark));
+    color: white;
     text-decoration: none;
  }
 
- .calendarHeader a {
+ .calendarHeader a:not(.todayBtn) {
     font-size: 1.5rem;
     line-height: 1;
     padding: 4px 10px;
+ }
+
+ .calendarHeaderCenter {
+    display: flex;
+    align-items: center;
+    gap: 12px;
  }
 
  .calendarGrid {
@@ -617,10 +667,16 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
     padding: 16px 24px;
  }
 
- .yearHeader a {
+ .yearHeader a:not(.todayBtn) {
     font-size: 1.5rem;
     line-height: 1;
     padding: 4px 10px;
+}
+
+.yearHeaderCenter {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .yearGrid {
@@ -637,6 +693,10 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 12px;
+}
+
+.miniMonth.miniMonthCurrent {
+    border: 2px solid var(--primary);
 }
 
 .miniMonthTitle {
@@ -693,6 +753,20 @@ textarea {
     min-height: 100px;
     resize: vertical;
     font-family: inherit;
+}
+
+.feedbackField {
+    display: block;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.feedbackField textarea {
+    display: block;
+    width: 100%;
+    margin-top: 6px;
+    font-weight: normal;
+    box-sizing: border-box;
 }
 
 #stepsContainer {

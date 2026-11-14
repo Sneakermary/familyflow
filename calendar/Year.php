@@ -19,13 +19,17 @@ include_once __DIR__ . '/../src/components/navbar.php';
 
 <div class="yearHeader">
     <a href="?year=<?= $year - 1 ?>">&larr;</a>
-    <h2><?= $year ?></h2>
+    <div class="yearHeaderCenter">
+        <h2><?= $year ?></h2>
+        <a href="/calendar/Calendar.php?year=<?= date('Y') ?>&month=<?= date('n') ?>" class="todayBtn">Heute</a>
+    </div>
     <a href="?year=<?= $year + 1 ?>">&rarr;</a>
 </div>
 
 <div class="yearGrid">
     <?php for ($month = 1; $month <= 12; $month++): ?>
-        <div class="miniMonth">
+        <?php $isCurrentMonth = ($year == date('Y') && $month == date('n')); ?>
+        <div class="miniMonth<?= $isCurrentMonth ? ' miniMonthCurrent' : '' ?>">
             <a href="/calendar/Calendar.php?year=<?= $year ?>&month=<?= $month ?>" class="miniMonthTitle"><?= $monthNames[$month - 1] ?></a>
 
             <div class="miniMonthGrid">

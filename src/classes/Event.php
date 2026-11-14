@@ -79,4 +79,39 @@ class Event
         $stmt->execute([$famId, $userId, $userId, $end, $start]);
         return $stmt->fetchAll();
     }
+
+    // "Mein Kalender": Termine aus ALLEN Familien der Person fuer einen Monat, nicht nur
+    // der gerade aktiven. Join ueber family_members statt fam_id = ?, damit jede Familie
+    // mitzaehlt, in der die Person Mitglied ist. families.name wird mitgeladen, damit man
+    // auf der Uebersicht sieht, zu welcher Familie ein Termin gehoert.
+    public function getEventsForUserAcrossFamiliesInMonth($userId, $year, $month)
+    {
+        $start = sprintf('%04d-%02d-01 00:00:00', $year, $month);
+        $end = date('Y-m-t 23:59:59', strtotime($start));
+
+        $stmt = $this->pdo->prepare("SELECT events.*, families.name AS family_name FROM events
+            JOIN family_members ON family_members.fam_id = events.fam_id AND family_members.user_id = ?
+            JOIN families ON families.id = events.fam_id
+            WHERE (events.shared_with IS NULL OR events.shared_with = ? OR events.owner_id = ?)
+            AND events.start_at <= ? AND events.end_at >= ?
+            ORDER BY events.start_at ASC");
+        $stmt->execute([$userId, $userId, $userId, $end, $start]);
+        return $stmt->fetchAll();
+    }
+
+    // Gleiches Prinzip wie oben, nur fuer einen einzelnen Tag (Tages-Ansicht von "Mein Kalender")
+    public function getEventsForUserAcrossFamiliesOnDay($userId, $year, $month, $day)
+    {
+        $start = sprintf('%04d-%02d-%02d 00:00:00', $year, $month, $day);
+        $end = sprintf('%04d-%02d-%02d 23:59:59', $year, $month, $day);
+
+        $stmt = $this->pdo->prepare("SELECT events.*, families.name AS family_name FROM events
+            JOIN family_members ON family_members.fam_id = events.fam_id AND family_members.user_id = ?
+            JOIN families ON families.id = events.fam_id
+            WHERE (events.shared_with IS NULL OR events.shared_with = ? OR events.owner_id = ?)
+            AND events.start_at <= ? AND events.end_at >= ?
+            ORDER BY events.start_at ASC");
+        $stmt->execute([$userId, $userId, $userId, $end, $start]);
+        return $stmt->fetchAll();
+    }
 }

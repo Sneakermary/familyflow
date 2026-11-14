@@ -28,7 +28,10 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
+<!-- Festes Linkziel statt history.back(): nach dem Speichern eines Spitznamens landet man
+     ueber den Redirect wieder hier, im Verlauf steht davor noch EditNickname.php - history.back()
+     wuerde also faelschlich dorthin zurueckspringen statt zum Dashboard. -->
+<a href="/Dashboard.php" class="backLink">&larr;</a>
 
 <div class="listHeader">
     <h2>Meine Familie</h2>

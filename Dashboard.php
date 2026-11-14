@@ -96,5 +96,14 @@ include_once __DIR__ . '/src/components/navbar.php';
             Aufgaben verwalten
         </div>
     </div>
+
+    <!-- FEEDBACK -->
+    <div class="tile" data-href="/Feedback.php">
+        <div class="tile_icon">💬</div>
+        <div class="tile_title">Wünsche, Beschwerden und Anregungen</div>
+        <div class="tile_subtext">
+            Feedback geben
+        </div>
+    </div>
 </div>
 <?php include_once __DIR__ . '/src/components/footer.php'; ?>

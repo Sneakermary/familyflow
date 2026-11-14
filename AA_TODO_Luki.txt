@@ -24,11 +24,11 @@ Design auf Farben kontrollieren
 ✔️nach design änderung springt er auf familie erstellen
 
 Ausbau-Features:
-Eigener Kalender, Familienübergreifend
+✔️Eigener Kalender, Familienübergreifend
 ✔️Meine Listen
 Nach Ablehnung einer Einladung, kann der User 3 Tage nicht erneut eingeladen werden.
 Benachrichtigung vor Termin
 Löschen von Terminen durch den Nichtersteller erlauben?
 ✔️Alle Rezepte anzeigen bzw danach suchen
-Nch dem erstelen des nicknamens darf man mit dem Backlink nicht wieder ins bearbeiten kommen, sondern zur übersicht
-Ämtli same
+✔️Nch dem erstelen des nicknamens darf man mit dem Backlink nicht wieder ins bearbeiten kommen, sondern zur übersicht
+✔️Ämtli same

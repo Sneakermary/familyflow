@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/Event.php';
+require_once __DIR__ . '/../src/classes/Family.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
 
@@ -44,7 +45,9 @@ $weeks = array_chunk($cells, 7);
 $db = new Database;
 $pdo = $db->connect();
 $eventClass = new Event($pdo);
+$familyClass = new Family($pdo);
 $events = $eventClass->getEventsForUserInMonth($_SESSION['uid'], $_SESSION['fam_id'], $year, $month);
+$familyData = $familyClass->findById($_SESSION['fam_id']);
 
 
 // Termine nach Tag gruppieren, damit man sie beim Rendern schnell findet.
@@ -68,18 +71,25 @@ include_once __DIR__ . '/../src/components/navbar.php';
 <a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
 
 <div class="listHeader">
-    <h2>Kalender</h2>
-    <a href="?year=<?= date('Y') ?>&month=<?= date('n') ?>" class="todayBtn">Heute</a>
+    <h2><?= htmlspecialchars($familyData->name) ?> Kalender</h2>
     <span id="listMenuBtn" class="dots">⋮</span>
     <div id="listMenuList" class="hidden">
         <a href="/calendar/CreateEvent.php">Termin erstellen</a>
         <a href="/calendar/Year.php?year=<?= $year ?>">Jahresansicht</a>
+        <a href="/calendar/MyCalendar.php">Mein Kalender</a>
     </div>
 </div>
 
 <div class="calendarHeader">
     <a href="?year=<?= $prevYear ?>&month=<?= $prevMonth ?>">&larr;</a>
-    <h3><?= $monthNames[$month - 1] ?> <a href="/calendar/Year.php?year=<?= $year ?>"><?= $year ?></a></h3>
+    <div class="calendarHeaderCenter">
+        <h3><?= $monthNames[$month - 1] ?> <a href="/calendar/Year.php?year=<?= $year ?>"><?= $year ?></a></h3>
+        <?php if ($isCurrentMonth): ?>
+            <a href="/calendar/Day.php?year=<?= date('Y') ?>&month=<?= date('n') ?>&day=<?= date('j') ?>" class="todayBtn">Heute</a>
+        <?php else: ?>
+            <a href="?year=<?= date('Y') ?>&month=<?= date('n') ?>" class="todayBtn">Heute</a>
+        <?php endif; ?>
+    </div>
     <a href="?year=<?= $nextYear ?>&month=<?= $nextMonth ?>">&rarr;</a>
 </div>
 
