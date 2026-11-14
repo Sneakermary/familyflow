@@ -13,7 +13,7 @@ $feedbackClass = new Feedback($pdo);
 // Nur Annas eigener Account darf das Feedback von allen lesen - kein allgemeines
 // Admin-System in der App, deshalb fest an die eigene E-Mail-Adresse gebunden.
 $me = $user->findById($_SESSION['uid']);
-if (!$me || $me->email !== 'anna@mama.at') {
+if (!$me || $me->email !== 'an.ma.stilianu@gmail.com') {
     header("Location: /Dashboard.php");
     exit();
 }
