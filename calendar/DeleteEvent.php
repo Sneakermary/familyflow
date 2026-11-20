@@ -22,7 +22,7 @@ $event = $eventClass->getEventById($eventId);
 
 // Sicherheitscheck: gehoert der Termin zur aktuellen Familie, und darf ich ihn ueberhaupt sehen?
 $darfLoeschen = isset($_SESSION['fam_id']) && $event && $event->fam_id == $_SESSION['fam_id']
-    && ($event->shared_with === null || $event->shared_with == $_SESSION['uid'] || $event->owner_id == $_SESSION['uid']);
+    && $eventClass->isVisibleToUser($eventId, $_SESSION['uid']);
 
 if (!$darfLoeschen) {
     header("Location: /calendar/Calendar.php");
@@ -40,15 +40,15 @@ $notificationClass = new Notification($pdo);
 $fromUser = $user->findById($_SESSION['uid']);
 $deleteMessage = $fromUser->firstname . ' ' . $fromUser->lastname . ' hat den Termin "' . $event->title . '" am ' . date('d.m.Y', $dayTimestamp) . ' gelöscht';
 
-if ($event->shared_with === null) {
-    $members = $user->findUserByFamilyId($event->fam_id);
-    foreach ($members as $member) {
-        if ($member->id != $_SESSION['uid']) {
-            $notificationClass->notify($member->id, $deleteMessage);
-        }
+$currentSharedWith = $eventClass->getSharedWithIds($eventId);
+$notifyIds = empty($currentSharedWith)
+    ? array_column($user->findUserByFamilyId($event->fam_id), 'id')
+    : $currentSharedWith;
+
+foreach ($notifyIds as $notifyId) {
+    if ($notifyId != $_SESSION['uid']) {
+        $notificationClass->notify($notifyId, $deleteMessage);
     }
-} elseif ($event->shared_with != $_SESSION['uid']) {
-    $notificationClass->notify($event->shared_with, $deleteMessage);
 }
 
 $eventClass->deleteEvent($eventId);

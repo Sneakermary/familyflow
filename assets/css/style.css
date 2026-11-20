@@ -15,6 +15,7 @@
     --radius: 14px;
     --radius-small: 8px;
     --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.06);
+    --text-small: 0.5em;
 }
 
 * {
@@ -81,6 +82,11 @@ h2, h3 {
     cursor: pointer;
 }
 
+.familySwitchCaret {
+    vertical-align: middle;
+    margin-left: 2px;
+}
+
 #familySwitchList {
     position: absolute;
     top: 100%;
@@ -121,6 +127,7 @@ h2, h3 {
     width: 45px;
     height: 45px;
     border-radius: 50%;
+    object-fit: cover;
     background: var(--avatar-bg);
     color: var(--avatar-text);
     font-weight: bold;
@@ -415,6 +422,15 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
     cursor: pointer;
  }
 
+ .noteTile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    margin-bottom: 8px;
+ }
+
  .choreTile {
     cursor: pointer;
     flex-direction: column;
@@ -657,6 +673,15 @@ body > div:not(.navbar):not(.contentcontainer):not(.CreateFamilyContainer) {
     white-space: nowrap;
     text-overflow: ellipsis;
  }
+
+ .calendarBirthdayBar {
+    background: #ec4899;
+ }
+
+ .birthdayTile {
+    cursor: default;
+    border-left-color: #ec4899;
+ }
  /*MONATSANSICHT*/
  .yearHeader {
     display: flex;
@@ -755,13 +780,14 @@ textarea {
     font-family: inherit;
 }
 
-.feedbackField {
+.stackedField {
     display: block;
     margin-bottom: 20px;
     font-weight: bold;
 }
 
-.feedbackField textarea {
+.stackedField textarea,
+.stackedField input {
     display: block;
     width: 100%;
     margin-top: 6px;
@@ -786,6 +812,48 @@ textarea {
     display: block;
     border-radius: var(--radius-small);
     margin-bottom: 8px;
+}
+
+.profileAvatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    background: var(--avatar-bg);
+    color: var(--avatar-text);
+    font-weight: bold;
+    font-size: 2rem;
+}
+
+.avatarLink {
+    cursor: pointer;
+}
+
+.profileName {
+    text-align: center;
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+}
+
+.profileDetail {
+    margin-left: 20px;
+}
+
+.noteHeading {
+    margin-left: 10px;
+    margin-top: 32px;
+}
+
+.noteRow {
+    margin-left: 20px;
+}
+
+.noteLabel {
+    margin-right: 10px;
 }
 
 .privateLockIcon {

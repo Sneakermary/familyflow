@@ -85,6 +85,8 @@ $weeks = array_chunk($cells, 7);
 // Familienuebergreifend: Termine aus allen Familien der Person, nach den Sichtbarkeits-Einstellungen gefiltert
 $events = $eventClass->getEventsForUserAcrossFamiliesInMonth($_SESSION['uid'], $year, $month);
 $events = array_filter($events, fn($event) => $familySettings[$event->fam_id]['visible'] ?? true);
+$events = array_merge($events, $eventClass->getBirthdaysForUserAcrossFamiliesInMonth($_SESSION['uid'], $year, $month));
+usort($events, fn($a, $b) => strcmp($a->start_at, $b->start_at));
 
 // Termine nach Tag gruppieren, gleiches Prinzip wie Calendar.php
 $monthKey = sprintf('%04d-%02d', $year, $month);
@@ -160,7 +162,11 @@ include_once __DIR__ . '/../src/components/navbar.php';
                     <span class="calendarDayNumber"><?= $day ?></span>
                     <?php if (!empty($eventsByDay[$day])): ?>
                         <?php foreach ($eventsByDay[$day] as $event): ?>
-                            <span class="calendarEventBar" style="background: <?= htmlspecialchars($familySettings[$event->fam_id]['color'] ?? '#6b7280') ?>"><?= htmlspecialchars($event->title) ?></span>
+                            <?php if (!empty($event->isBirthday)): ?>
+                                <span class="calendarEventBar calendarBirthdayBar"><?= htmlspecialchars($event->title) ?></span>
+                            <?php else: ?>
+                                <span class="calendarEventBar" style="background: <?= htmlspecialchars($familySettings[$event->fam_id]['color'] ?? '#6b7280') ?>"><?= htmlspecialchars($event->title) ?></span>
+                            <?php endif; ?>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </a>

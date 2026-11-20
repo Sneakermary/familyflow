@@ -2,11 +2,33 @@
 require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/Event.php';
 require_once __DIR__ . '/../src/classes/Family.php';
+require_once __DIR__ . '/../src/classes/User.php';
+require_once __DIR__ . '/../src/functions.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
 
 if (!isset($_SESSION['fam_id'])) {
     header("Location: /family/CreateFamily.php");
+    exit();
+}
+
+$db = new Database;
+$pdo = $db->connect();
+$userClass = new User($pdo);
+
+// Eigene Terminfarbe speichern, damit man seine Termine im gemeinsamen Familienkalender
+// von denen anderer Mitglieder unterscheiden kann
+if (isset($_POST['saveCalendarColorBtn'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        header("Location: /calendar/Calendar.php");
+        exit();
+    }
+
+    $color = $_POST['calendarColor'] ?? '';
+    if (preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
+        $userClass->setCalendarColor($_SESSION['uid'], $color);
+    }
+    header("Location: " . $_SERVER['PHP_SELF'] . "?" . http_build_query(['year' => $_GET['year'] ?? date('Y'), 'month' => $_GET['month'] ?? date('n')]));
     exit();
 }
 
@@ -42,12 +64,21 @@ for ($day = 1; $day <= $daysInMonth; $day++) {
 }
 $weeks = array_chunk($cells, 7);
 
-$db = new Database;
-$pdo = $db->connect();
 $eventClass = new Event($pdo);
 $familyClass = new Family($pdo);
 $events = $eventClass->getEventsForUserInMonth($_SESSION['uid'], $_SESSION['fam_id'], $year, $month);
+$events = array_merge($events, $eventClass->getBirthdaysForFamilyInMonth($_SESSION['fam_id'], $year, $month));
+usort($events, fn($a, $b) => strcmp($a->start_at, $b->start_at));
 $familyData = $familyClass->findById($_SESSION['fam_id']);
+
+// Eigene Terminfarbe je Mitglied, damit man im gemeinsamen Kalender sieht, wessen Termin
+// welcher ist - ohne gespeicherte Farbe bleibt es bei der bisherigen neutralen Standardfarbe
+$members = $userClass->findUserByFamilyId($_SESSION['fam_id']);
+$memberColors = [];
+foreach ($members as $member) {
+    $memberColors[$member->id] = $member->calendar_color;
+}
+$myColor = $memberColors[$_SESSION['uid']] ?? '#6b7280';
 
 
 // Termine nach Tag gruppieren, damit man sie beim Rendern schnell findet.
@@ -68,7 +99,10 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
+<!-- Festes Linkziel statt history.back(): nach dem Anlegen eines Termins landet man ueber
+     den Redirect wieder hier, im Verlauf steht davor noch das leere "Neuer Termin"-Formular -
+     history.back() wuerde zurueck ins Formular fuehren statt zum Dashboard. -->
+<a href="/Dashboard.php" class="backLink">&larr;</a>
 
 <div class="listHeader">
     <h2><?= htmlspecialchars($familyData->name) ?> Kalender</h2>
@@ -77,6 +111,14 @@ include_once __DIR__ . '/../src/components/navbar.php';
         <a href="/calendar/CreateEvent.php">Termin erstellen</a>
         <a href="/calendar/Year.php?year=<?= $year ?>">Jahresansicht</a>
         <a href="/calendar/MyCalendar.php">Mein Kalender</a>
+        <form action="" method="POST" class="calendarFamilyForm">
+            <label class="calendarFamilyRow">
+                <span>Meine Farbe</span>
+                <input type="color" name="calendarColor" value="<?= htmlspecialchars($myColor) ?>">
+            </label>
+            <?= csrfField() ?>
+            <button type="submit" name="saveCalendarColorBtn">Speichern</button>
+        </form>
     </div>
 </div>
 
@@ -119,7 +161,13 @@ include_once __DIR__ . '/../src/components/navbar.php';
                     <span class="calendarDayNumber"><?= $day ?></span>
                     <?php if (!empty($eventsByDay[$day])): ?>
                         <?php foreach ($eventsByDay[$day] as $event): ?>
-                            <span class="calendarEventBar"><?= htmlspecialchars($event->title) ?></span>
+                            <?php if (!empty($event->isBirthday)): ?>
+                                <span class="calendarEventBar calendarBirthdayBar"><?= htmlspecialchars($event->title) ?></span>
+                            <?php elseif (!empty($memberColors[$event->owner_id])): ?>
+                                <span class="calendarEventBar" style="background: <?= htmlspecialchars($memberColors[$event->owner_id]) ?>"><?= htmlspecialchars($event->title) ?></span>
+                            <?php else: ?>
+                                <span class="calendarEventBar"><?= htmlspecialchars($event->title) ?></span>
+                            <?php endif; ?>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </a>

@@ -36,5 +36,24 @@ class User{
         // Neue User-Id zurückgeben, wie bei Family::createFamily
         return $this->pdo->lastInsertId();
     }
+
+    // Eigene Terminfarbe im Familienkalender (nicht zu verwechseln mit calendar_family_settings,
+    // das ist die Farbe pro Familie in "Mein Kalender" - hier geht's um die Farbe pro Person
+    // innerhalb EINER Familie, damit man die eigenen Termine von denen anderer unterscheiden kann)
+    public function setCalendarColor($userId, $color) {
+        $stmt = $this->pdo->prepare("UPDATE users SET calendar_color = ? WHERE id = ?");
+        $stmt->execute([$color, $userId]);
+    }
+
+    public function updateProfile($userId, $firstname, $lastname, $email, $birthdate, $avatar = null) {
+    if ($avatar !== null) {
+        $stmt = $this->pdo->prepare("UPDATE users SET firstname = ?, lastname = ?, email = ?, birthdate = ?, avatar = ? WHERE id = ?");
+        $stmt->execute([$firstname, $lastname, $email, $birthdate, $avatar, $userId]);
+    } else {
+        $stmt = $this->pdo->prepare("UPDATE users SET firstname = ?, lastname = ?, email = ?, birthdate = ? WHERE id = ?");
+        $stmt->execute([$firstname, $lastname, $email, $birthdate, $userId]);
+    }
+}
+
 }
 ?>

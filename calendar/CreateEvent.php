@@ -28,7 +28,8 @@ if(isset($_POST['createEventBtn'])) {
     $endAt = $_POST['end_at'] ?? '';
     $location = trim($_POST['location'] ?? '');
     $description = trim($_POST['description'] ?? '');
-    $sharedWith = $_POST['shared_with'] ?? '';
+    $sharedAll = isset($_POST['shared_all']);
+    $sharedWithIds = array_map('intval', $_POST['shared_with'] ?? []);
 
     $validator = new Validator;
     $minDate = date('Y-m-d', strtotime('-1 year'));
@@ -82,9 +83,7 @@ if(isset($_POST['createEventBtn'])) {
     $eventClass = new Event($pdo);
     $user = new User($pdo);
 
-    $sharedWithId = $sharedWith !== '' ? (int) $sharedWith : null;
-
-    $eventClass->createEvent(
+    $eventId = $eventClass->createEvent(
         $_SESSION['fam_id'],
         $_SESSION['uid'],
         $title,
@@ -92,9 +91,11 @@ if(isset($_POST['createEventBtn'])) {
         $endAtForDb,
         $location !== '' ? $location : null,
         $description !== '' ? $description : null,
-        $sharedWithId,
         $allDay
     );
+
+    // Leeres Array = fuer alle sichtbar (gleiche Bedeutung wie frueher shared_with = NULL)
+    $eventClass->setSharedWith($eventId, $sharedAll ? [] : $sharedWithIds);
 
     // Benachrichtigung an alle, die den Termin sehen duerfen (ausser einem selbst)
     $notificationClass = new Notification($pdo);
@@ -102,23 +103,18 @@ if(isset($_POST['createEventBtn'])) {
     $dayTimestamp = strtotime($startAtForDb);
     $eventLink = '/calendar/Day.php?year=' . date('Y', $dayTimestamp) . '&month=' . (int) date('n', $dayTimestamp) . '&day=' . (int) date('j', $dayTimestamp);
 
-    if ($sharedWithId === null) {
-        $members = $user->findUserByFamilyId($_SESSION['fam_id']);
-        foreach ($members as $member) {
-            if ($member->id != $_SESSION['uid']) {
-                $notificationClass->notify(
-                    $member->id,
-                    $fromUser->firstname . ' ' . $fromUser->lastname . ' hat einen Termin erstellt: ' . $title,
-                    $eventLink
-                );
-            }
+    $notifyIds = $sharedAll
+        ? array_column($user->findUserByFamilyId($_SESSION['fam_id']), 'id')
+        : $sharedWithIds;
+
+    foreach ($notifyIds as $notifyId) {
+        if ($notifyId != $_SESSION['uid']) {
+            $notificationClass->notify(
+                $notifyId,
+                $fromUser->firstname . ' ' . $fromUser->lastname . ' hat einen Termin erstellt: ' . $title,
+                $eventLink
+            );
         }
-    } elseif ($sharedWithId != $_SESSION['uid']) {
-        $notificationClass->notify(
-            $sharedWithId,
-            $fromUser->firstname . ' ' . $fromUser->lastname . ' hat einen Termin erstellt: ' . $title,
-            $eventLink
-        );
     }
 
     header("Location: /calendar/Calendar.php");
@@ -164,17 +160,21 @@ include_once __DIR__ . '/../src/components/navbar.php';
         <input type="text" name="location" placeholder="Ort">
         <textarea name="description" placeholder="Beschreibung"></textarea>
 
-        <label> Teilen mit:
-            <select name="shared_with">
-                <option value="">Alle</option>
-                <option value="<?= $_SESSION['uid'] ?>" selected>Nur ich</option>
-                <?php foreach($members as $member): ?>
-                    <?php if($member->id != $_SESSION['uid']): ?>
-                        <option value="<?= $member->id ?>"><?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?></option>
-                    <?php endif; ?> 
-                <?php endforeach; ?>
-            </select>
+        <label>
+            <input type="checkbox" name="shared_all" id="sharedAllCheckbox" checked>
+            Für alle sichtbar
         </label>
+        <div id="sharedWithFields" class="hidden">
+            <p>Wer soll es sehen können?</p>
+            <?php foreach ($members as $member): ?>
+                <?php if ($member->id != $_SESSION['uid']): ?>
+                    <label>
+                        <input type="checkbox" name="shared_with[]" value="<?= $member->id ?>">
+                        <?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?>
+                    </label>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
 
         <?= csrfField() ?>
         <button type="submit" name="createEventBtn">Termin erstellen</button>

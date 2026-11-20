@@ -58,33 +58,19 @@ if (isset($_POST['editRecipeBtn'])) {
     }
 
     // Foto: neues hochladen, behalten, oder entfernen - unabhaengig von Zutaten/Schritten
+    $photoError = null;
+    $newPhoto = handleImageUpload('photo', 'recipes', 'recipe', 1600, $photoError);
+    if ($photoError !== null) {
+        $errors['photo'] = $photoError;
+    }
+
     $photoFilename = $r->photo;
-
-    if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-        $allowedTypes = [
-            'image/jpeg' => 'jpg',
-            'image/png' => 'png',
-            'image/webp' => 'webp',
-        ];
-
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mimeType = finfo_file($finfo, $_FILES['photo']['tmp_name']);
-
-        $maxSize = 5 * 1024 * 1024; // 5 MB
-
-        if (!isset($allowedTypes[$mimeType])) {
-            $errors['photo'] = 'Nur JPG, PNG oder WebP erlaubt';
-        } elseif ($_FILES['photo']['size'] > $maxSize) {
-            $errors['photo'] = 'Foto ist zu groß (max. 5 MB)';
-        } else {
-            $extension = $allowedTypes[$mimeType];
-            $photoFilename = uniqid('recipe_', true) . '.' . $extension;
-            $targetPath = __DIR__ . '/../uploads/recipes/' . $photoFilename;
-            move_uploaded_file($_FILES['photo']['tmp_name'], $targetPath);
-        }
+    if ($newPhoto !== null) {
+        $photoFilename = $newPhoto;
     } elseif ($removePhoto) {
         $photoFilename = null;
     }
+
 
     // Zutaten/Schritte: immer aus dem Formular lesen, unabhaengig vom Foto
     $ingredients = trim($_POST['ingredients'] ?? '');
@@ -100,6 +86,8 @@ if (isset($_POST['editRecipeBtn'])) {
     }
 
     if (!empty($errors)) {
+        // Bei Fehlern wurde evtl. schon ein neues Foto gespeichert -> wieder weg damit
+        deleteUploadedImage('recipes', $newPhoto);
         $_SESSION['errors'] = $errors;
         header("Location: /recipe/EditRecipe.php?id=" . $recipeId);
         exit();
@@ -108,6 +96,11 @@ if (isset($_POST['editRecipeBtn'])) {
     $sharedWithId = $sharedWith !== '' ? (int) $sharedWith : null;
 
     $recipe->updateRecipe($recipeId, $folderId, $title, $ingredients, $photoFilename, $sharedWithId);
+
+    // Altes Foto loeschen, wenn es ersetzt oder entfernt wurde
+    if ($photoFilename !== $r->photo) {
+        deleteUploadedImage('recipes', $r->photo);
+    }
 
     $recipe->deleteStepsForRecipe($recipeId);
     foreach ($steps as $i => $step) {

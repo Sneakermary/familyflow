@@ -27,7 +27,7 @@ $event = $eventClass->getEventById($eventId);
 
 // Sicherheitscheck: gehoert der Termin zur aktuellen Familie, und darf ich ihn ueberhaupt sehen?
 $darfBearbeiten = $event && $event->fam_id == $_SESSION['fam_id']
-    && ($event->shared_with === null || $event->shared_with == $_SESSION['uid'] || $event->owner_id == $_SESSION['uid']);
+    && $eventClass->isVisibleToUser($eventId, $_SESSION['uid']);
 
 if (!$darfBearbeiten) {
     header("Location: /calendar/Calendar.php");
@@ -48,7 +48,8 @@ if (isset($_POST['editEventBtn'])) {
     $endAt = $_POST['end_at'] ?? '';
     $location = trim($_POST['location'] ?? '');
     $description = trim($_POST['description'] ?? '');
-    $sharedWith = $_POST['shared_with'] ?? '';
+    $sharedAll = isset($_POST['shared_all']);
+    $sharedWithIds = array_map('intval', $_POST['shared_with'] ?? []);
 
     $validator = new Validator;
 
@@ -90,8 +91,6 @@ if (isset($_POST['editEventBtn'])) {
         $endAtForDb = str_replace('T', ' ', $endAt) . ':00';
     }
 
-    $sharedWithId = $sharedWith !== '' ? (int) $sharedWith : null;
-
     $eventClass->updateEvent(
         $eventId,
         $title,
@@ -99,9 +98,9 @@ if (isset($_POST['editEventBtn'])) {
         $endAtForDb,
         $location !== '' ? $location : null,
         $description !== '' ? $description : null,
-        $sharedWithId,
         $allDay
     );
+    $eventClass->setSharedWith($eventId, $sharedAll ? [] : $sharedWithIds);
 
     $dayTimestamp = strtotime($startAtForDb);
     header("Location: /calendar/Day.php?year=" . date('Y', $dayTimestamp) . "&month=" . (int) date('n', $dayTimestamp) . "&day=" . (int) date('j', $dayTimestamp));
@@ -110,6 +109,7 @@ if (isset($_POST['editEventBtn'])) {
 
 $user = new User($pdo);
 $members = $user->findUserByFamilyId($_SESSION['fam_id']);
+$currentSharedWith = $eventClass->getSharedWithIds($eventId);
 
 $startAtValue = str_replace(' ', 'T', substr($event->start_at, 0, 16));
 $endAtValue = str_replace(' ', 'T', substr($event->end_at, 0, 16));
@@ -150,17 +150,21 @@ include_once __DIR__ . '/../src/components/navbar.php';
         <input type="text" name="location" placeholder="Ort" value="<?= htmlspecialchars($event->location ?? '') ?>">
         <textarea name="description" placeholder="Beschreibung"><?= htmlspecialchars($event->description ?? '') ?></textarea>
 
-        <label> Teilen mit:
-            <select name="shared_with">
-                <option value="" <?= $event->shared_with === null ? 'selected' : '' ?>>Alle</option>
-                <option value="<?= $_SESSION['uid'] ?>" <?= $event->shared_with == $_SESSION['uid'] ? 'selected' : '' ?>>Nur ich (privat)</option>
-                <?php foreach ($members as $member): ?>
-                    <?php if ($member->id != $_SESSION['uid']): ?>
-                        <option value="<?= $member->id ?>" <?= $event->shared_with == $member->id ? 'selected' : '' ?>><?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?></option>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            </select>
+        <label>
+            <input type="checkbox" name="shared_all" id="sharedAllCheckbox" <?= empty($currentSharedWith) ? 'checked' : '' ?>>
+            Für alle sichtbar
         </label>
+        <div id="sharedWithFields" class="<?= empty($currentSharedWith) ? 'hidden' : '' ?>">
+            <p>Wer soll es sehen können?</p>
+            <?php foreach ($members as $member): ?>
+                <?php if ($member->id != $_SESSION['uid']): ?>
+                    <label>
+                        <input type="checkbox" name="shared_with[]" value="<?= $member->id ?>" <?= in_array($member->id, $currentSharedWith) ? 'checked' : '' ?>>
+                        <?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?>
+                    </label>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
 
         <?= csrfField() ?>
         <button type="submit" name="editEventBtn">Speichern</button>

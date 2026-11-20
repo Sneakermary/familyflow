@@ -66,9 +66,10 @@ class FamilyList {
         return $stmt->fetch();
     }
 
-    // Alle Eintraege einer Liste
+    // Alle Eintraege einer Liste - erledigte wandern per ORDER BY ans Ende, statt nur optisch
+    // ausgeblendet zu werden (siehe "Erledigte ausblenden"), unerledigte bleiben in Anlege-Reihenfolge
     public function getItems($listId) {
-        $stmt = $this->pdo->prepare("SELECT * FROM list_items WHERE list_id = ?");
+        $stmt = $this->pdo->prepare("SELECT * FROM list_items WHERE list_id = ? ORDER BY done ASC, id ASC");
         $stmt->execute([$listId]);
         return $stmt->fetchAll();
     }

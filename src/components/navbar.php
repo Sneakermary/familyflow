@@ -10,9 +10,6 @@ $pdo = $db->connect();
 $user = new User($pdo);
 $currentUser = $user->findById($_SESSION['uid']);
 
-// hier werden die Initialen vom user geholt und groß geschrieben
-$initials = initials($currentUser->firstname, $currentUser->lastname);
-
 $notificationClass = new Notification($pdo);
 $unreadCount = $notificationClass->getUnreadCountForUser($_SESSION['uid']);
 
@@ -23,13 +20,18 @@ $myFamilies = $familyClass->findFamiliesByUserId($_SESSION['uid']);
 ?>
 <div class="navbar">
     <div class="navbarLogo">
-        <a href="/family/SelectFamily.php">
+        <a href="/Dashboard.php">
             <h3>FamilyFlow</h3>
         </a>
     </div>
     <?php if ($currentFamily): ?>
         <div class="familySwitch">
-            <span id="familySwitchBtn" class="familyName"><?= htmlspecialchars($currentFamily->name) ?></span>
+            <span id="familySwitchBtn" class="familyName">
+                <?= htmlspecialchars($currentFamily->name) ?>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="familySwitchCaret">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </span>
             <div id="familySwitchList" class="hidden">
                 <?php foreach ($myFamilies as $fam): ?>
                     <a href="/family/SelectFamily.php?fam_id=<?= $fam->id ?>">
@@ -48,8 +50,9 @@ $myFamilies = $familyClass->findFamiliesByUserId($_SESSION['uid']);
             <span class="bellBadge"><?= $unreadCount ?></span>
         <?php endif; ?>
     </a>
-    <span id="menuBtn" class="avatar"><?= htmlspecialchars($initials) ?></span>
+    <?= avatarHtml($currentUser, 'id="menuBtn" class="avatar"') ?>
     <div id="menuList" class="hidden">
+        <a href="/user/Profile.php">Mein Profil</a>
         <a href="/family/SelectFamily.php">Familie wechseln</a>
         <a href="/family/CreateFamily.php">Familie erstellen</a>
         <a href="/family/InviteMember.php">Mitglied einladen</a>

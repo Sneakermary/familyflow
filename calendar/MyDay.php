@@ -36,6 +36,8 @@ foreach ($myFamilies as $index => $fam) {
 
 $events = $eventClass->getEventsForUserAcrossFamiliesOnDay($_SESSION['uid'], $year, $month, $day);
 $events = array_filter($events, fn($event) => $familySettings[$event->fam_id]['visible'] ?? true);
+$events = array_merge($events, $eventClass->getBirthdaysForUserAcrossFamiliesOnDay($_SESSION['uid'], $year, $month, $day));
+usort($events, fn($a, $b) => strcmp($a->start_at, $b->start_at));
 
 include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
@@ -49,16 +51,22 @@ include_once __DIR__ . '/../src/components/navbar.php';
     <p>Keine Termine an diesem Tag.</p>
 <?php else: ?>
     <?php foreach ($events as $event): ?>
-        <?php $color = $familySettings[$event->fam_id]['color'] ?? '#6b7280'; ?>
-        <div class="eventTile" style="border-left-color: <?= htmlspecialchars($color) ?>">
-            <div class="tile_title"><?= htmlspecialchars($event->title) ?></div>
-            <div class="tile_subtext">
-                <span class="calendarFamilyDot" style="background: <?= htmlspecialchars($color) ?>"></span>
-                <?= htmlspecialchars($event->family_name) ?><br>
-                <?= date('H:i', strtotime($event->start_at)) ?> – <?= date('H:i', strtotime($event->end_at)) ?>
-                <?php if ($event->location): ?><br><?= htmlspecialchars($event->location) ?><?php endif; ?>
+        <?php if (!empty($event->isBirthday)): ?>
+            <div class="eventTile birthdayTile">
+                <div class="tile_title"><?= htmlspecialchars($event->title) ?></div>
             </div>
-        </div>
+        <?php else: ?>
+            <?php $color = $familySettings[$event->fam_id]['color'] ?? '#6b7280'; ?>
+            <div class="eventTile" style="border-left-color: <?= htmlspecialchars($color) ?>">
+                <div class="tile_title"><?= htmlspecialchars($event->title) ?></div>
+                <div class="tile_subtext">
+                    <span class="calendarFamilyDot" style="background: <?= htmlspecialchars($color) ?>"></span>
+                    <?= htmlspecialchars($event->family_name) ?><br>
+                    <?= date('H:i', strtotime($event->start_at)) ?> – <?= date('H:i', strtotime($event->end_at)) ?>
+                    <?php if ($event->location): ?><br><?= htmlspecialchars($event->location) ?><?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
     <?php endforeach; ?>
 <?php endif; ?>
 

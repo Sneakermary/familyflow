@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/Event.php';
+require_once __DIR__ . '/../src/classes/User.php';
 require_once __DIR__ . '/../src/functions.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
@@ -23,7 +24,16 @@ $weekdayNames = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Sam
 $db = new Database;
 $pdo = $db->connect();
 $eventClass = new Event($pdo);
+$userClass = new User($pdo);
 $events = $eventClass->getEventsForUserOnDay($_SESSION['uid'], $_SESSION['fam_id'], $year, $month, $day);
+$events = array_merge($events, $eventClass->getBirthdaysForFamilyOnDay($_SESSION['fam_id'], $year, $month, $day));
+
+// Gleiche eigene Terminfarbe wie auf Calendar.php, als Randfarbe der Termin-Kachel
+$members = $userClass->findUserByFamilyId($_SESSION['fam_id']);
+$memberColors = [];
+foreach ($members as $member) {
+    $memberColors[$member->id] = $member->calendar_color;
+}
 
 include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
@@ -31,7 +41,10 @@ include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
 
-<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
+<!-- Festes Linkziel statt history.back(): nach dem Bearbeiten/Loeschen eines Termins landet
+     man ueber den Redirect wieder hier, im Verlauf steht davor noch EditEvent.php - history.back()
+     wuerde zurueck ins gerade verlassene Formular fuehren statt zum Ausgangsmonat. -->
+<a href="/calendar/Calendar.php?year=<?= $year ?>&month=<?= $month ?>" class="backLink">&larr;</a>
 
 <h2><?= $weekdayNames[$weekdayNumber - 1] ?> – <?= $day ?>. <?= $monthNames[$month - 1] ?> <?= $year ?></h2>
 
@@ -39,17 +52,23 @@ include_once __DIR__ . '/../src/components/navbar.php';
     <p>Keine Termine an diesem Tag.</p>
 <?php else: ?>
     <?php foreach ($events as $event): ?>
-        <div class="eventTile">
-            <div class="tile_title"><?= htmlspecialchars($event->title) ?></div>
-            <div class="tile_subtext">
-                <?= date('H:i', strtotime($event->start_at)) ?> – <?= date('H:i', strtotime($event->end_at)) ?>
-                <?php if ($event->location): ?><br><?= htmlspecialchars($event->location) ?><?php endif; ?>
+        <?php if (!empty($event->isBirthday)): ?>
+            <div class="eventTile birthdayTile">
+                <div class="tile_title"><?= htmlspecialchars($event->title) ?></div>
             </div>
-            <div class="eventMenu hidden">
-                <a href="/calendar/EditEvent.php?id=<?= $event->id ?>">Bearbeiten</a>
-                <a href="/calendar/DeleteEvent.php?id=<?= $event->id ?>&csrf_token=<?= urlencode(csrfToken()) ?>" onclick="return confirm('Termin wirklich löschen?')">Löschen</a>
+        <?php else: ?>
+            <div class="eventTile" <?= !empty($memberColors[$event->owner_id]) ? 'style="border-left-color: ' . htmlspecialchars($memberColors[$event->owner_id]) . '"' : '' ?>>
+                <div class="tile_title"><?= htmlspecialchars($event->title) ?></div>
+                <div class="tile_subtext">
+                    <?= date('H:i', strtotime($event->start_at)) ?> – <?= date('H:i', strtotime($event->end_at)) ?>
+                    <?php if ($event->location): ?><br><?= htmlspecialchars($event->location) ?><?php endif; ?>
+                </div>
+                <div class="eventMenu hidden">
+                    <a href="/calendar/EditEvent.php?id=<?= $event->id ?>">Bearbeiten</a>
+                    <a href="/calendar/DeleteEvent.php?id=<?= $event->id ?>&csrf_token=<?= urlencode(csrfToken()) ?>" onclick="return confirm('Termin wirklich löschen?')">Löschen</a>
+                </div>
             </div>
-        </div>
+        <?php endif; ?>
     <?php endforeach; ?>
 <?php endif; ?>
 

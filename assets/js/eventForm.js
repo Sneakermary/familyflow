@@ -9,6 +9,16 @@ if (allDayCheckbox) {
     });
 }
 
+// "Für alle sichtbar" blendet die Checkbox-Liste der einzelnen Mitglieder ein/aus
+const sharedAllCheckbox = document.getElementById('sharedAllCheckbox');
+const sharedWithFields = document.getElementById('sharedWithFields');
+
+if (sharedAllCheckbox) {
+    sharedAllCheckbox.addEventListener('change', function () {
+        sharedWithFields.classList.toggle('hidden', sharedAllCheckbox.checked);
+    });
+}
+
 // Ende springt automatisch eine Stunde nach Start mit, solange niemand das Ende
 // von Hand angefasst hat - danach bleibt es stehen, wie vom Menschen gewollt.
 const startAtInput = document.getElementById('startAtInput');

@@ -36,7 +36,10 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<a href="#" class="backLink" onclick="history.back(); return false;">&larr;</a>
+<!-- Festes Linkziel statt history.back(): nach dem Anlegen eines Ordners landet man ueber
+     den Redirect wieder hier, im Verlauf steht davor noch das leere "Neuer Ordner"-Formular -
+     history.back() wuerde zurueck ins Formular fuehren statt zur Rezepte-Uebersicht. -->
+<a href="/recipe/Recipes.php" class="backLink">&larr;</a>
 
 <h2><?= htmlspecialchars($folder->name) ?></h2>
 

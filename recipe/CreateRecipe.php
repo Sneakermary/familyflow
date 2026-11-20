@@ -33,31 +33,12 @@ if (isset($_POST['createRecipeBtn'])) {
     }
 
     // Foto und Zutaten/Schritte sind unabhaengig voneinander, beides ist optional
-    $photoFilename = null;
-
-    if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-        $allowedTypes = [
-            'image/jpeg' => 'jpg',
-            'image/png' => 'png',
-            'image/webp' => 'webp',
-        ];
-
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mimeType = finfo_file($finfo, $_FILES['photo']['tmp_name']);
-
-        $maxSize = 5 * 1024 * 1024; // 5 MB
-
-        if (!isset($allowedTypes[$mimeType])) {
-            $errors['photo'] = 'Nur JPG, PNG oder WebP erlaubt';
-        } elseif ($_FILES['photo']['size'] > $maxSize) {
-            $errors['photo'] = 'Foto ist zu groß (max. 5 MB)';
-        } else {
-            $extension = $allowedTypes[$mimeType];
-            $photoFilename = uniqid('recipe_', true) . '.' . $extension;
-            $targetPath = __DIR__ . '/../uploads/recipes/' . $photoFilename;
-            move_uploaded_file($_FILES['photo']['tmp_name'], $targetPath);
-        }
+    $photoError = null;
+    $photoFilename = handleImageUpload('photo', 'recipes', 'recipe', 1600, $photoError);
+    if ($photoError !== null) {
+        $errors['photo'] = $photoError;
     }
+
 
     $ingredients = trim($_POST['ingredients'] ?? '');
     $ingredients = $ingredients !== '' ? $ingredients : null;
@@ -72,10 +53,13 @@ if (isset($_POST['createRecipeBtn'])) {
     }
 
     if (!empty($errors)) {
+        // Bei Fehlern wurde evtl. schon ein Foto gespeichert -> wieder weg damit
+        deleteUploadedImage('recipes', $photoFilename);
         $_SESSION['errors'] = $errors;
         header("Location: /recipe/CreateRecipe.php");
         exit();
     }
+
 
     $db = new Database;
     $pdo = $db->connect();

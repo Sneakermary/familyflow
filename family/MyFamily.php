@@ -46,7 +46,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
     <?php $isSelf = $member->id == $_SESSION['uid']; ?>
     <?php $memberRole = $family->isMember($member->id, $_SESSION['fam_id'])->role; ?>
     <div class="member<?= $isSelf ? '' : ' memberTile' ?>">
-        <span class="avatar"><?= htmlspecialchars(initials($member->firstname, $member->lastname)) ?></span>
+        <a href="/user/Profile.php?id=<?= $member->id ?>" class="avatarLink"><?= avatarHtml($member) ?></a>
         <span>
             <?php if (isset($nicknames[$member->id])): ?>
                 <?= htmlspecialchars($nicknames[$member->id]) ?>
@@ -56,6 +56,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
         </span>
         <?php if (!$isSelf): ?>
             <div class="eventMenu hidden">
+                <a href="/user/Profile.php?id=<?= $member->id ?>">Anzeigen</a>
                 <a href="/family/EditNickname.php?id=<?= $member->id ?>">Bearbeiten</a>
                 <?php if ($memberRole !== 'admin'): ?>
                     <a href="/family/RemoveMember.php?id=<?= $member->id ?>&csrf_token=<?= urlencode(csrfToken()) ?>" onclick="return confirm('<?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?> wirklich aus der Familie entfernen?')">Löschen</a>

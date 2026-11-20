@@ -47,25 +47,25 @@ include_once __DIR__ . '/src/components/navbar.php';
     <p>Schreib einfach zu den Bereichen, die dir auffallen – alle Felder sind optional.</p>
 
     <form action="" method="POST">
-        <label class="feedbackField">Dashboard
+        <label class="stackedField">Dashboard
             <textarea name="dashboard" rows="3"></textarea>
         </label>
-        <label class="feedbackField">Listen
+        <label class="stackedField">Listen
             <textarea name="listen" rows="3"></textarea>
         </label>
-        <label class="feedbackField">Kalender
+        <label class="stackedField">Kalender
             <textarea name="kalender" rows="3"></textarea>
         </label>
-        <label class="feedbackField">Meine Familie
+        <label class="stackedField">Meine Familie
             <textarea name="meine_familie" rows="3"></textarea>
         </label>
-        <label class="feedbackField">Rezepte
+        <label class="stackedField">Rezepte
             <textarea name="rezepte" rows="3"></textarea>
         </label>
-        <label class="feedbackField">Aufgaben
+        <label class="stackedField">Aufgaben
             <textarea name="aufgaben" rows="3"></textarea>
         </label>
-        <label class="feedbackField">Layout
+        <label class="stackedField">Layout
             <textarea name="layout" rows="3"></textarea>
         </label>
         <?= csrfField() ?>
