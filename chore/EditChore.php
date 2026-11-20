@@ -67,21 +67,21 @@ if (isset($_POST['saveChoreBtn'])) {
         exit();
     }
 
-    if ($rotation === 'none') {
-        $assignedUserId = $_POST['assigned_user_id'] !== '' ? (int) $_POST['assigned_user_id'] : null;
-        $rotationStart = null;
-    } else {
-        $assignedUserId = null;
-        $rotationStart = $_POST['rotation_start'] ?? date('Y-m-d');
-    }
+    // Nur echte Familienmitglieder uebernehmen (Formularwerte kann man im Browser veraendern)
+    $members = (new User($pdo))->findUserByFamilyId($_SESSION['fam_id']);
+    $rotationUsers = filterFamilyMemberIds($rotationUsers, $members);
+    $assignedUsers = filterFamilyMemberIds($_POST['assignedUsers'] ?? [], $members);
+    $accessUsers = filterFamilyMemberIds($_POST['accessUsers'] ?? [], $members);
 
-    $choreClass->updateChore($choreId, $name, $visibility, $assignedUserId, $rotation, $rotationStart);
+    $rotationStart = $rotation === 'none' ? null : ($_POST['rotation_start'] ?? date('Y-m-d'));
 
-    // Immer neu setzen (auch leer), damit alte Eintraege verschwinden, wenn z.B.
-    // von Rotation auf "Fest zugeteilt" gewechselt wird
+    $choreClass->updateChore($choreId, $name, $visibility, $rotation, $rotationStart);
+
+    // Immer beide neu setzen (eins davon leer), damit alte Eintraege verschwinden, wenn
+    // zwischen Rotation und "Fest zugeteilt" gewechselt wird
+    $choreClass->setAssignees($choreId, $rotation === 'none' ? $assignedUsers : []);
     $choreClass->setRotationUserIds($choreId, $rotation !== 'none' ? $rotationUsers : []);
 
-    $accessUsers = $_POST['accessUsers'] ?? [];
     $choreClass->setAccess($choreId, $visibility === 'selected' ? $accessUsers : []);
 
     header("Location: /chore/Chores.php");
@@ -102,6 +102,7 @@ if (isset($_POST['deleteChoreBtn'])) {
 $user = new User($pdo);
 $members = $user->findUserByFamilyId($_SESSION['fam_id']);
 $currentRotationUsers = $choreClass->getRotationUserIds($choreId);
+$currentAssignees = $choreClass->getAssigneeIds($choreId);
 $currentAccessUsers = $choreClass->getAccessUserIds($choreId);
 
 include_once __DIR__ . '/../src/components/head.php';
@@ -133,14 +134,13 @@ include_once __DIR__ . '/../src/components/navbar.php';
         </label>
 
         <div id="assignedField">
-            <label>Zuständig:
-                <select name="assigned_user_id">
-                    <option value="">Noch niemand</option>
-                    <?php foreach ($members as $member): ?>
-                        <option value="<?= $member->id ?>" <?= $chore->assigned_user_id == $member->id ? 'selected' : '' ?>><?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </label>
+            <p>Zuständig (eine oder mehrere Personen):</p>
+            <?php foreach ($members as $member): ?>
+                <label>
+                    <input type="checkbox" name="assignedUsers[]" value="<?= $member->id ?>" <?= in_array($member->id, $currentAssignees) ? 'checked' : '' ?>>
+                    <?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?>
+                </label>
+            <?php endforeach; ?>
         </div>
 
         <div id="rotationFields" class="hidden">
@@ -158,7 +158,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
             <select name="visibility" id="visibilitySelect">
                 <option value="owner" <?= $chore->visibility === 'owner' ? 'selected' : '' ?>>Nur ich</option>
                 <option value="selected" <?= $chore->visibility === 'selected' ? 'selected' : '' ?>>Bestimmte Personen</option>
-                <option value="assignee" <?= $chore->visibility === 'assignee' ? 'selected' : '' ?>>Nur die zuständige Person</option>
+                <option value="assignee" <?= $chore->visibility === 'assignee' ? 'selected' : '' ?>>Nur die Zuständigen</option>
                 <option value="all" <?= $chore->visibility === 'all' ? 'selected' : '' ?>>Alle</option>
             </select>
         </label>

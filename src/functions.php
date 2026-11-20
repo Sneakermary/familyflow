@@ -177,3 +177,23 @@ function deleteUploadedImage($folder, $filename) {
         unlink($path);
     }
 }
+
+// Nur Ids uebernehmen, die wirklich zu Mitgliedern der Familie gehoeren
+// (Formularwerte kann man im Browser beliebig veraendern)
+function filterFamilyMemberIds($postedIds, $members) {
+    $memberIds = array_map('intval', array_column($members, 'id'));
+    $ids = array_map('intval', (array) $postedIds);
+    return array_values(array_unique(array_intersect($ids, $memberIds)));
+}
+
+// "Für alle sichtbar" + Checkboxen -> Liste fuer setSharedWith() (Termine, Rezepte).
+// Leeres Array = fuer alle sichtbar. Sonst ist die erstellende Person immer mit drin -
+// so bleibt "niemand angekreuzt" wirklich privat, statt als leere Liste "fuer alle" zu bedeuten.
+function sharedWithFromForm($sharedAll, $postedIds, $members, $ownerId) {
+    if ($sharedAll) {
+        return [];
+    }
+    $ids = filterFamilyMemberIds($postedIds, $members);
+    $ids[] = (int) $ownerId;
+    return array_values(array_unique($ids));
+}

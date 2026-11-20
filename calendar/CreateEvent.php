@@ -95,7 +95,10 @@ if(isset($_POST['createEventBtn'])) {
     );
 
     // Leeres Array = fuer alle sichtbar (gleiche Bedeutung wie frueher shared_with = NULL)
-    $eventClass->setSharedWith($eventId, $sharedAll ? [] : $sharedWithIds);
+    // Leeres Array = fuer alle sichtbar, sonst die angekreuzten Personen + man selbst
+    $familyMembers = $user->findUserByFamilyId($_SESSION['fam_id']);
+    $sharedWithIds = sharedWithFromForm($sharedAll, $sharedWithIds, $familyMembers, $_SESSION['uid']);
+    $eventClass->setSharedWith($eventId, $sharedWithIds);
 
     // Benachrichtigung an alle, die den Termin sehen duerfen (ausser einem selbst)
     $notificationClass = new Notification($pdo);
@@ -104,7 +107,7 @@ if(isset($_POST['createEventBtn'])) {
     $eventLink = '/calendar/Day.php?year=' . date('Y', $dayTimestamp) . '&month=' . (int) date('n', $dayTimestamp) . '&day=' . (int) date('j', $dayTimestamp);
 
     $notifyIds = $sharedAll
-        ? array_column($user->findUserByFamilyId($_SESSION['fam_id']), 'id')
+        ? array_column($familyMembers, 'id')
         : $sharedWithIds;
 
     foreach ($notifyIds as $notifyId) {

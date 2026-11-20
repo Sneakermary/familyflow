@@ -54,21 +54,23 @@ if (isset($_POST['createChoreBtn'])) {
     $choreClass = new Chore($pdo);
     $user = new User($pdo);
 
+    // Nur echte Familienmitglieder uebernehmen (Formularwerte kann man im Browser veraendern)
+    $members = $user->findUserByFamilyId($_SESSION['fam_id']);
+    $rotationUsers = filterFamilyMemberIds($rotationUsers, $members);
+    $assignedUsers = filterFamilyMemberIds($_POST['assignedUsers'] ?? [], $members);
+    $accessUsers = filterFamilyMemberIds($_POST['accessUsers'] ?? [], $members);
+
+    $rotationStart = $rotation === 'none' ? null : ($_POST['rotation_start'] ?? date('Y-m-d'));
+
+    $choreId = $choreClass->createChore($_SESSION['fam_id'], $_SESSION['uid'], $name, $visibility, $rotation, $rotationStart);
+
     if ($rotation === 'none') {
-        $assignedUserId = $_POST['assigned_user_id'] !== '' ? (int) $_POST['assigned_user_id'] : null;
-        $rotationStart = null;
+        // Fest zugeteilt: eine oder mehrere Personen (keine angekreuzt = noch niemand)
+        $choreClass->setAssignees($choreId, $assignedUsers);
     } else {
-        $assignedUserId = null;
-        $rotationStart = $_POST['rotation_start'] ?? date('Y-m-d');
-    }
-
-    $choreId = $choreClass->createChore($_SESSION['fam_id'], $_SESSION['uid'], $name, $visibility, $assignedUserId, $rotation, $rotationStart);
-
-    if ($rotation !== 'none') {
         $choreClass->setRotationUserIds($choreId, $rotationUsers);
     }
 
-    $accessUsers = $_POST['accessUsers'] ?? [];
     if ($visibility === 'selected') {
         $choreClass->setAccess($choreId, $accessUsers);
     }
@@ -94,9 +96,10 @@ if (isset($_POST['createChoreBtn'])) {
         }
     } elseif ($visibility === 'assignee') {
         $chore = $choreClass->getChoreById($choreId);
-        $currentAssignee = $choreClass->getCurrentAssigneeId($chore);
-        if ($currentAssignee && $currentAssignee != $_SESSION['uid']) {
-            $notificationClass->notify($currentAssignee, $message, $choreLink);
+        foreach ($choreClass->getCurrentAssigneeIds($chore) as $assigneeId) {
+            if ($assigneeId != $_SESSION['uid']) {
+                $notificationClass->notify($assigneeId, $message, $choreLink);
+            }
         }
     }
 
@@ -138,14 +141,13 @@ include_once __DIR__ . '/../src/components/navbar.php';
         </label>
 
         <div id="assignedField">
-            <label>Zuständig:
-                <select name="assigned_user_id">
-                    <option value="">Noch niemand</option>
-                    <?php foreach ($members as $member): ?>
-                        <option value="<?= $member->id ?>"><?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </label>
+            <p>Zuständig (eine oder mehrere Personen):</p>
+            <?php foreach ($members as $member): ?>
+                <label>
+                    <input type="checkbox" name="assignedUsers[]" value="<?= $member->id ?>">
+                    <?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?>
+                </label>
+            <?php endforeach; ?>
         </div>
 
         <div id="rotationFields" class="hidden">
@@ -163,7 +165,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
             <select name="visibility" id="visibilitySelect">
                 <option value="owner">Nur ich</option>
                 <option value="selected">Bestimmte Personen</option>
-                <option value="assignee">Nur die zuständige Person</option>
+                <option value="assignee">Nur die Zuständigen</option>
                 <option value="all">Alle</option>
             </select>
         </label>

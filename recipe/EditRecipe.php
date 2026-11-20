@@ -31,9 +31,7 @@ if (!$r || $r->fam_id != $_SESSION['fam_id']) {
     exit();
 }
 
-$darfSehen = $r->shared_with === null || $r->shared_with == $_SESSION['uid'] || $r->owner_id == $_SESSION['uid'];
-
-if (!$darfSehen) {
+if (!$recipe->isVisibleToUser($recipeId, $_SESSION['uid'])) {
     header("Location: /recipe/Recipes.php");
     exit();
 }
@@ -48,7 +46,7 @@ if (isset($_POST['editRecipeBtn'])) {
 
     $title = trim($_POST['title'] ?? '');
     $folderId = $_POST['folder_id'] !== '' ? (int) $_POST['folder_id'] : null;
-    $sharedWith = $_POST['shared_with'] ?? '';
+    $sharedAll = isset($_POST['shared_all']);
     $removePhoto = isset($_POST['removePhoto']);
 
     $validator = new Validator;
@@ -93,9 +91,13 @@ if (isset($_POST['editRecipeBtn'])) {
         exit();
     }
 
-    $sharedWithId = $sharedWith !== '' ? (int) $sharedWith : null;
+    $user = new User($pdo);
+    $members = $user->findUserByFamilyId($_SESSION['fam_id']);
+    // Leeres Array = fuer alle sichtbar, sonst die angekreuzten Personen + man selbst
+    $sharedWithIds = sharedWithFromForm($sharedAll, $_POST['shared_with'] ?? [], $members, $_SESSION['uid']);
 
-    $recipe->updateRecipe($recipeId, $folderId, $title, $ingredients, $photoFilename, $sharedWithId);
+    $recipe->updateRecipe($recipeId, $folderId, $title, $ingredients, $photoFilename);
+    $recipe->setSharedWith($recipeId, $sharedWithIds);
 
     // Altes Foto loeschen, wenn es ersetzt oder entfernt wurde
     if ($photoFilename !== $r->photo) {
@@ -116,6 +118,7 @@ $folders = $folderClass->getFoldersForFamily($_SESSION['fam_id']);
 $user = new User($pdo);
 $members = $user->findUserByFamilyId($_SESSION['fam_id']);
 $steps = $recipe->getStepsForRecipe($recipeId);
+$currentSharedWith = $recipe->getSharedWithIds($recipeId);
 
 include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
@@ -164,17 +167,22 @@ include_once __DIR__ . '/../src/components/navbar.php';
         </div>
         <button type="button" id="addStepBtn">+ Schritt hinzufügen</button>
 
-        <label>Teilen mit:
-            <select name="shared_with">
-                <option value="">Alle</option>
-                <option value="<?= $_SESSION['uid'] ?>" <?= $r->shared_with == $_SESSION['uid'] ? 'selected' : '' ?>>Nur ich (privat)</option>
-                <?php foreach ($members as $member): ?>
-                    <?php if ($member->id != $_SESSION['uid']): ?>
-                        <option value="<?= $member->id ?>" <?= $r->shared_with == $member->id ? 'selected' : '' ?>><?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?></option>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            </select>
+        <!-- Gleiches Muster wie bei Terminen: niemand angekreuzt + "Für alle" aus = privat -->
+        <label>
+            <input type="checkbox" name="shared_all" id="sharedAllCheckbox" <?= empty($currentSharedWith) ? 'checked' : '' ?>>
+            Für alle sichtbar
         </label>
+        <div id="sharedWithFields" class="<?= empty($currentSharedWith) ? 'hidden' : '' ?>">
+            <p>Wer soll es sehen können?</p>
+            <?php foreach ($members as $member): ?>
+                <?php if ($member->id != $_SESSION['uid']): ?>
+                    <label>
+                        <input type="checkbox" name="shared_with[]" value="<?= $member->id ?>" <?= in_array($member->id, $currentSharedWith) ? 'checked' : '' ?>>
+                        <?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?>
+                    </label>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
 
         <?= csrfField() ?>
         <button type="submit" name="editRecipeBtn">Speichern</button>

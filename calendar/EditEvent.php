@@ -100,7 +100,9 @@ if (isset($_POST['editEventBtn'])) {
         $description !== '' ? $description : null,
         $allDay
     );
-    $eventClass->setSharedWith($eventId, $sharedAll ? [] : $sharedWithIds);
+    // Leeres Array = fuer alle sichtbar, sonst die angekreuzten Personen + man selbst
+    $familyMembers = (new User($pdo))->findUserByFamilyId($_SESSION['fam_id']);
+    $eventClass->setSharedWith($eventId, sharedWithFromForm($sharedAll, $sharedWithIds, $familyMembers, $_SESSION['uid']));
 
     $dayTimestamp = strtotime($startAtForDb);
     header("Location: /calendar/Day.php?year=" . date('Y', $dayTimestamp) . "&month=" . (int) date('n', $dayTimestamp) . "&day=" . (int) date('j', $dayTimestamp));

@@ -29,9 +29,7 @@ if (!$r || $r->fam_id != $_SESSION['fam_id']) {
 }
 
 // Sicherheitscheck 2: darf diese Person es ueberhaupt sehen? (gleiche Logik wie beim Kalender)
-$darfSehen = $r->shared_with === null || $r->shared_with == $_SESSION['uid'] || $r->owner_id == $_SESSION['uid'];
-
-if (!$darfSehen) {
+if (!$recipe->isVisibleToUser($recipeId, $_SESSION['uid'])) {
     header("Location: /recipe/Recipes.php");
     exit();
 }

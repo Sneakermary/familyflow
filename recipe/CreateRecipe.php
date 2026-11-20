@@ -24,7 +24,7 @@ if (isset($_POST['createRecipeBtn'])) {
 
     $title = trim($_POST['title'] ?? '');
     $folderId = $_POST['folder_id'] !== '' ? (int) $_POST['folder_id'] : null;
-    $sharedWith = $_POST['shared_with'] ?? '';
+    $sharedAll = isset($_POST['shared_all']);
 
     $validator = new Validator;
 
@@ -66,9 +66,12 @@ if (isset($_POST['createRecipeBtn'])) {
     $recipe = new Recipe($pdo);
     $user = new User($pdo);
 
-    $sharedWithId = $sharedWith !== '' ? (int) $sharedWith : null;
+    $members = $user->findUserByFamilyId($_SESSION['fam_id']);
+    // Leeres Array = fuer alle sichtbar, sonst die angekreuzten Personen + man selbst
+    $sharedWithIds = sharedWithFromForm($sharedAll, $_POST['shared_with'] ?? [], $members, $_SESSION['uid']);
 
-    $recipeId = $recipe->createRecipe($_SESSION['fam_id'], $_SESSION['uid'], $folderId, $title, $ingredients, $photoFilename, $sharedWithId);
+    $recipeId = $recipe->createRecipe($_SESSION['fam_id'], $_SESSION['uid'], $folderId, $title, $ingredients, $photoFilename);
+    $recipe->setSharedWith($recipeId, $sharedWithIds);
 
     foreach ($steps as $i => $step) {
         $recipe->addStep($recipeId, $i + 1, $step);
@@ -79,23 +82,15 @@ if (isset($_POST['createRecipeBtn'])) {
     $fromUser = $user->findById($_SESSION['uid']);
     $recipeLink = '/recipe/RecipeDetail.php?id=' . $recipeId;
 
-    if ($sharedWithId === null) {
-        $members = $user->findUserByFamilyId($_SESSION['fam_id']);
-        foreach ($members as $member) {
-            if ($member->id != $_SESSION['uid']) {
-                $notificationClass->notify(
-                    $member->id,
-                    $fromUser->firstname . ' ' . $fromUser->lastname . ' hat ein Rezept erstellt: ' . $title,
-                    $recipeLink
-                );
-            }
+    $notifyIds = empty($sharedWithIds) ? array_column($members, 'id') : $sharedWithIds;
+    foreach ($notifyIds as $notifyId) {
+        if ($notifyId != $_SESSION['uid']) {
+            $notificationClass->notify(
+                $notifyId,
+                $fromUser->firstname . ' ' . $fromUser->lastname . ' hat ein Rezept erstellt: ' . $title,
+                $recipeLink
+            );
         }
-    } elseif ($sharedWithId != $_SESSION['uid']) {
-        $notificationClass->notify(
-            $sharedWithId,
-            $fromUser->firstname . ' ' . $fromUser->lastname . ' hat ein Rezept erstellt: ' . $title,
-            $recipeLink
-        );
     }
 
     header("Location: /recipe/RecipeDetail.php?id=" . $recipeId);
@@ -146,17 +141,22 @@ include_once __DIR__ . '/../src/components/navbar.php';
         </div>
         <button type="button" id="addStepBtn">+ Schritt hinzufügen</button>
 
-        <label>Teilen mit:
-            <select name="shared_with">
-                <option value="">Alle</option>
-                <option value="<?= $_SESSION['uid'] ?>">Nur ich (privat)</option>
-                <?php foreach ($members as $member): ?>
-                    <?php if ($member->id != $_SESSION['uid']): ?>
-                        <option value="<?= $member->id ?>"><?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?></option>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            </select>
+        <!-- Gleiches Muster wie bei Terminen: niemand angekreuzt + "Für alle" aus = privat -->
+        <label>
+            <input type="checkbox" name="shared_all" id="sharedAllCheckbox" checked>
+            Für alle sichtbar
         </label>
+        <div id="sharedWithFields" class="hidden">
+            <p>Wer soll es sehen können?</p>
+            <?php foreach ($members as $member): ?>
+                <?php if ($member->id != $_SESSION['uid']): ?>
+                    <label>
+                        <input type="checkbox" name="shared_with[]" value="<?= $member->id ?>">
+                        <?= htmlspecialchars($member->firstname) ?> <?= htmlspecialchars($member->lastname) ?>
+                    </label>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
 
         <?= csrfField() ?>
         <button type="submit" name="createRecipeBtn">Rezept erstellen</button>

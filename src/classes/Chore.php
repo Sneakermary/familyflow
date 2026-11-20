@@ -7,11 +7,28 @@ class Chore {
         $this->pdo = $pdo;
     }
 
-    //Neues Ämtli anlegen, gibt die neue Id zurück
-    public function createChore($famId, $ownerId, $name, $visibility, $assignedUserId, $rotation, $rotationStart) {
-        $stmt = $this->pdo->prepare("INSERT INTO chores (fam_id, owner_id, name, visibility, assigned_user_id, rotation, rotation_start) VALUES(?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$famId, $ownerId, $name, $visibility, $assignedUserId, $rotation, $rotationStart]);
+    //Neues Ämtli anlegen, gibt die neue Id zurück. Feste Zustaendige (auch mehrere)
+    // werden separat per setAssignees() gesetzt, Rotations-Teilnehmer per setRotationUserIds()
+    public function createChore($famId, $ownerId, $name, $visibility, $rotation, $rotationStart) {
+        $stmt = $this->pdo->prepare("INSERT INTO chores (fam_id, owner_id, name, visibility, rotation, rotation_start) VALUES(?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$famId, $ownerId, $name, $visibility, $rotation, $rotationStart]);
         return $this->pdo->lastInsertId();
+    }
+
+    // Feste Zustaendige (ohne Rotation) - mehrere Personen moeglich, leer = noch niemand
+    public function getAssigneeIds($choreId) {
+        $stmt = $this->pdo->prepare("SELECT user_id FROM chore_assignees WHERE chore_id = ?");
+        $stmt->execute([$choreId]);
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    // Feste Zustaendige komplett ersetzen
+    public function setAssignees($choreId, array $userIds) {
+        $this->pdo->prepare("DELETE FROM chore_assignees WHERE chore_id = ?")->execute([$choreId]);
+        $stmt = $this->pdo->prepare("INSERT INTO chore_assignees (chore_id, user_id) VALUES (?, ?)");
+        foreach (array_unique($userIds) as $userId) {
+            $stmt->execute([$choreId, $userId]);
+        }
     }
 
     public function getChoreById($choreId) {
@@ -36,9 +53,8 @@ class Chore {
     }
 
     // Darf diese Person das Ämtli sehen (und damit auch abhaken)?
-    // Ersteller:in und die gerade zustaendige Person sehen es immer, egal welche Sichtbarkeit eingestellt ist.
-    // Bei Rotation steht die zustaendige Person nicht fest in der Spalte assigned_user_id,
-    // deshalb wird sie hier live ueber getCurrentAssigneeId() berechnet.
+    // Ersteller:in und die gerade Zustaendigen sehen es immer, egal welche Sichtbarkeit eingestellt ist.
+    // Bei Rotation wird die zustaendige Person live ueber getCurrentAssigneeIds() berechnet.
     public function isVisibleToUser($chore, $userId) {
         if ($chore->visibility === 'all') {
             return true;
@@ -46,7 +62,7 @@ class Chore {
         if ($chore->owner_id == $userId) {
             return true;
         }
-        if ($this->getCurrentAssigneeId($chore) == $userId) {
+        if (in_array($userId, $this->getCurrentAssigneeIds($chore))) {
             return true;
         }
         if ($chore->visibility === 'selected') {
@@ -94,19 +110,21 @@ class Chore {
         }
     }
 
-        // Zuständige Person gerade jetzt (ohne Rotation = fest zugeteilte Person)
-    public function getCurrentAssigneeId($chore) {
+    // Wer ist gerade jetzt zustaendig? Gibt immer ein Array zurueck:
+    // ohne Rotation = alle fest Zugeteilten (auch mehrere), mit Rotation = die eine Person,
+    // die in diesem Zeitraum dran ist. Leer = noch niemand.
+    public function getCurrentAssigneeIds($chore) {
         if ($chore->rotation === 'none') {
-            return $chore->assigned_user_id;
+            return $this->getAssigneeIds($chore->id);
         }
         $userIds = $this->getRotationUserIds($chore->id);
         if (count($userIds) === 0) {
-            return null;
+            return [];
         }
         $start = new DateTime($chore->rotation_start);
         $today = new DateTime('today');
         $periods = $this->periodsSince($start, $today, $chore->rotation);
-        return $userIds[$periods % count($userIds)];
+        return [$userIds[$periods % count($userIds)]];
     }
 
     // Wie viele ganze Zeitraeume liegen zwischen Start und heute
@@ -166,9 +184,9 @@ class Chore {
     }
 
     // Aemtli aktualisieren
-    public function updateChore($choreId, $name, $visibility, $assignedUserId, $rotation, $rotationStart) {
-        $stmt = $this->pdo->prepare("UPDATE chores SET name = ?, visibility = ?, assigned_user_id = ?, rotation = ?, rotation_start = ? WHERE id = ?");
-        $stmt->execute([$name, $visibility, $assignedUserId, $rotation, $rotationStart, $choreId]);
+    public function updateChore($choreId, $name, $visibility, $rotation, $rotationStart) {
+        $stmt = $this->pdo->prepare("UPDATE chores SET name = ?, visibility = ?, rotation = ?, rotation_start = ? WHERE id = ?");
+        $stmt->execute([$name, $visibility, $rotation, $rotationStart, $choreId]);
     }
 
     public function deleteChore($choreId) {

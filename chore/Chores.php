@@ -85,8 +85,11 @@ include_once __DIR__ . '/../src/components/navbar.php';
 
 <?php foreach ($myChores as $chore): ?>
     <?php
-        $assigneeId = $choreClass->getCurrentAssigneeId($chore);
-        $assigneeName = $assigneeId ? ($memberNames[$assigneeId] ?? 'Unbekannt') : 'Noch niemand zugeteilt';
+        $assigneeNames = [];
+        foreach ($choreClass->getCurrentAssigneeIds($chore) as $assigneeId) {
+            $assigneeNames[] = $memberNames[$assigneeId] ?? 'Unbekannt';
+        }
+        $assigneeName = $assigneeNames ? implode(', ', $assigneeNames) : 'Noch niemand zugeteilt';
         $done = $choreClass->isDoneInCurrentPeriod($chore);
     ?>
     <div class="choreTile">
