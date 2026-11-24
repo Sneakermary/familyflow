@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../src/components/session.php';
 
 session_unset();
 session_destroy();

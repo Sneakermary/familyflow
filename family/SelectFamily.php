@@ -33,6 +33,16 @@ include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
+<?php if (isset($_SESSION['info'])): ?>
+    <p><?= htmlspecialchars($_SESSION['info']) ?></p>
+    <?php unset($_SESSION['info']); ?>
+<?php endif; ?>
+
+<?php if (empty($families)): ?>
+    <!-- Neu registriert, noch in keiner Familie: gleich den naechsten Schritt anbieten -->
+    <p>Du bist noch in keiner Familie. <a href="/family/CreateFamily.php">Jetzt eine Familie erstellen</a> oder warte auf eine Einladung.</p>
+<?php endif; ?>
+
 <div class="listHeader">
     <h2>Meine Familien</h2>
     <span id="listMenuBtn" class="dots">⋮</span>

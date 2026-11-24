@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+require_once __DIR__ . '/../src/components/session.php';
 require_once __DIR__ . '/../src/functions.php';
 $errors = $_SESSION['errors'] ?? [];
 

@@ -1,6 +1,6 @@
 <?php
 // Ziel des Links aus der "Passwort vergessen"-Mail: /user/ResetPassword.php?token=...
-session_start();
+require_once __DIR__ . '/../src/components/session.php';
 require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/User.php';
 require_once __DIR__ . '/../src/classes/UserToken.php';
