@@ -62,9 +62,6 @@ if (isset($_POST['registerBtn'])) {
 // Ab hier nur noch Anzeige, keine Redirects mehr moeglich
 include_once __DIR__ . '/../src/components/head.php';
 
-foreach($errors as $error){
-    echo '<p>' . $error . '</p>';
-}
 unset($_SESSION['errors']);
 
 $oldValues = $_SESSION['oldValues'] ?? [];
@@ -75,6 +72,10 @@ unset($_SESSION['oldValues']);
     <form action="" class="frontform" method="POST">
         <h3>Registrieren</h3>
 
+        <?php foreach ($errors as $error): ?>
+            <div class="flash flashError"><?= htmlspecialchars($error) ?></div>
+        <?php endforeach; ?>
+
         <input type="text" name="firstname" placeholder="Vorname" value="<?= htmlspecialchars($oldValues['firstname'] ?? '') ?>" required>
         <input type="text" name="lastname" placeholder="Nachname" value="<?= htmlspecialchars($oldValues['lastname'] ?? '') ?>" required>
         <input type="email" name="email" placeholder="E-Mail" value="<?= htmlspecialchars($oldValues['email'] ?? '') ?>" required>
@@ -82,6 +83,7 @@ unset($_SESSION['oldValues']);
         <input type="password" name="pwConfirm" placeholder="Passwort bestätigen" required>
         <?= csrfField() ?>
         <button type="submit" name="registerBtn">Registrieren</button>
+        <p class="formHint">Nach dem Registrieren bekommst du eine E-Mail mit einem Bestätigungslink. Erst nach dem Klick darauf kannst du dich einloggen.</p>
     </form>
     <p><a href="/index.php">&larr; Zur Startseite</a></p>
     <p>Schon ein Konto? <a href="/user/UserLogin.php">Hier einloggen</a></p>

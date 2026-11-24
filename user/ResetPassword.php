@@ -54,15 +54,14 @@ if (isset($_POST['resetBtn'])) {
 }
 
 include_once __DIR__ . '/../src/components/head.php';
-
-foreach ($errors as $error) {
-    echo '<p>' . htmlspecialchars($error) . '</p>';
-}
 ?>
 
 <div class="contentcontainer">
     <form action="/user/ResetPassword.php" class="frontform" method="POST">
         <h3>Neues Passwort festlegen</h3>
+        <?php foreach ($errors as $error): ?>
+            <div class="flash flashError"><?= htmlspecialchars($error) ?></div>
+        <?php endforeach; ?>
         <input type="password" name="pw" placeholder="Neues Passwort" minlength="8" required>
         <input type="password" name="pwConfirm" placeholder="Neues Passwort bestätigen" required>
         <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">

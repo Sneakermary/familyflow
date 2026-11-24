@@ -1072,3 +1072,36 @@ body.theme-velvetaurora {
 .linkButton:hover {
     background: var(--primary-dark);
 }
+
+/* Meldungs-Boxen (Login, Registrieren, Passwort): gut sichtbar statt nur Text */
+.flash {
+    padding: 10px 12px;
+    border-radius: var(--radius-small);
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.flash a {
+    color: inherit;
+    font-weight: bold;
+}
+
+.flashInfo {
+    background: #e8f0fe;
+    border: 1px solid #a8c4f5;
+    color: #1a3d7c;
+}
+
+.flashError {
+    background: #fdecec;
+    border: 1px solid #f3b4b4;
+    color: #8a1f1f;
+}
+
+/* Kleiner fester Hinweistext unter Formularen */
+.formHint {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-top: 8px;
+}

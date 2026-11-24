@@ -56,26 +56,31 @@ unset($_SESSION['oldEmail']);
 
 include_once __DIR__ . '/../src/components/head.php';
 
-foreach($errors as $error) {
-    echo '<p>' . $error . '</p>';
-}
 unset($_SESSION['errors']);
 
 // Hinweise nach Registrieren / Bestaetigen / Passwort zuruecksetzen
-if (isset($_SESSION['info'])) {
-    echo '<p>' . $_SESSION['info'] . '</p>';
-    unset($_SESSION['info']);
-}
+$info = $_SESSION['info'] ?? null;
+unset($_SESSION['info']);
 
 ?>
 <div class="contentcontainer">
     <form action="" class="frontform" method="POST">
         <h3>Login</h3>
 
+        <!-- Meldungen als farbige Box direkt im Formular, damit man sie am Handy nicht uebersieht.
+             Texte stammen nur aus unserem eigenen Code (teils mit Link), deshalb ohne htmlspecialchars. -->
+        <?php if ($info): ?>
+            <div class="flash flashInfo"><?= $info ?></div>
+        <?php endif; ?>
+        <?php foreach ($errors as $error): ?>
+            <div class="flash flashError"><?= $error ?></div>
+        <?php endforeach; ?>
+
         <input type="email" name="email" placeholder="E-Mail" value="<?= htmlspecialchars($oldEmail) ?>" required>
         <input type="password" name="pw" placeholder="Passwort" autocomplete="off" required>
         <?= csrfField() ?>
         <button type="submit" name="loginBtn">Login</button>
+        <p class="formHint">Neu registriert? Bitte bestätige zuerst deine E-Mail-Adresse über den Link in der Mail, die wir dir geschickt haben – danach kannst du dich einloggen.</p>
     </form>
     <p><a href="/user/ForgotPassword.php">Passwort vergessen?</a></p>
     <p><a href="/index.php">&larr; Zur Startseite</a></p>
