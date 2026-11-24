@@ -275,3 +275,21 @@ function sendNewUserNotification($user) {
 
     return $mailer->send($to, 'FamilyFlow', 'Neue Registrierung: ' . $name, $html, $text);
 }
+
+// Ist die eingeloggte Person die Betreiberin der App? (z.B. fuer die Feedback-Uebersicht)
+// Verglichen wird mit 'admin_email' aus mailconfig.php - so steht keine private
+// Adresse im Code. Leere Einstellung = niemand ist Betreiberin.
+function isAppAdmin(PDO $pdo) {
+    if (!isset($_SESSION['uid'])) {
+        return false;
+    }
+    require_once __DIR__ . '/classes/Mailer.php';
+    require_once __DIR__ . '/classes/User.php';
+
+    $adminEmail = (new Mailer())->adminEmail();
+    if ($adminEmail === '') {
+        return false;
+    }
+    $me = (new User($pdo))->findById($_SESSION['uid']);
+    return $me && strcasecmp($me->email, $adminEmail) === 0;
+}

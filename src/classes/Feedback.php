@@ -10,8 +10,8 @@ class Feedback {
     // Leere Felder werden als NULL gespeichert statt als leerer String
     public function createFeedback($userId, array $fields) {
         $stmt = $this->pdo->prepare("INSERT INTO feedback
-            (user_id, dashboard, listen, kalender, meine_familie, rezepte, aufgaben, layout)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            (user_id, dashboard, listen, kalender, meine_familie, rezepte, aufgaben, layout, allgemein)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $userId,
             $fields['dashboard'] !== '' ? $fields['dashboard'] : null,
@@ -21,6 +21,7 @@ class Feedback {
             $fields['rezepte'] !== '' ? $fields['rezepte'] : null,
             $fields['aufgaben'] !== '' ? $fields['aufgaben'] : null,
             $fields['layout'] !== '' ? $fields['layout'] : null,
+            $fields['allgemein'] !== '' ? $fields['allgemein'] : null,
         ]);
     }
 

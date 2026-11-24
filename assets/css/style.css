@@ -1057,3 +1057,18 @@ body.theme-velvetaurora {
     --avatar-text: #ffffff;
     --navbar-bg: linear-gradient(90deg, #5b0f6e, #a0126e, #0c3a3c);
 }
+
+/* Link, der wie ein Button aussieht (z.B. "Alle Rückmeldungen ansehen") */
+.linkButton {
+    display: inline-block;
+    padding: 10px;
+    border-radius: var(--radius-small);
+    background: var(--primary);
+    color: white;
+    text-decoration: none;
+    margin-bottom: 16px;
+}
+
+.linkButton:hover {
+    background: var(--primary-dark);
+}

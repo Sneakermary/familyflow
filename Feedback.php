@@ -25,6 +25,7 @@ if (isset($_POST['sendFeedbackBtn'])) {
         'rezepte' => trim($_POST['rezepte'] ?? ''),
         'aufgaben' => trim($_POST['aufgaben'] ?? ''),
         'layout' => trim($_POST['layout'] ?? ''),
+        'allgemein' => trim($_POST['allgemein'] ?? ''),
     ];
 
     $feedbackClass->createFeedback($_SESSION['uid'], $fields);
@@ -40,6 +41,11 @@ include_once __DIR__ . '/src/components/navbar.php';
 <h2>Wünsche, Beschwerden und Anregungen</h2>
 
 <div class="contentcontainer">
+    <?php if (isAppAdmin($pdo)): ?>
+        <!-- Nur fuer die Betreiberin sichtbar (Adresse aus mailconfig.php) -->
+        <a href="/FeedbackList.php" class="linkButton">📋 Alle Rückmeldungen ansehen</a>
+    <?php endif; ?>
+
     <?php if ($success): ?>
         <p>Danke für dein Feedback! 🎉</p>
     <?php endif; ?>
@@ -67,6 +73,9 @@ include_once __DIR__ . '/src/components/navbar.php';
         </label>
         <label class="stackedField">Layout
             <textarea name="layout" rows="3"></textarea>
+        </label>
+        <label class="stackedField">Allgemein
+            <textarea name="allgemein" rows="3"></textarea>
         </label>
         <?= csrfField() ?>
         <button type="submit" name="sendFeedbackBtn">Absenden</button>

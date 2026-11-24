@@ -2,18 +2,17 @@
 require_once __DIR__ . '/src/classes/Database.php';
 require_once __DIR__ . '/src/classes/User.php';
 require_once __DIR__ . '/src/classes/Feedback.php';
+require_once __DIR__ . '/src/functions.php';
 
 require_once __DIR__ . '/src/components/guard.php';
 
 $db = new Database;
 $pdo = $db->connect();
-$user = new User($pdo);
 $feedbackClass = new Feedback($pdo);
 
-// Nur Annas eigener Account darf das Feedback von allen lesen - kein allgemeines
-// Admin-System in der App, deshalb fest an die eigene E-Mail-Adresse gebunden.
-$me = $user->findById($_SESSION['uid']);
-if (!$me || $me->email !== 'an.ma.stilianu@gmail.com') {
+// Nur die Betreiberin darf das Feedback von allen lesen. Wer das ist, steht als
+// 'admin_email' in src/config/mailconfig.php (nicht im Code, also nicht auf GitHub).
+if (!isAppAdmin($pdo)) {
     header("Location: /Dashboard.php");
     exit();
 }
@@ -28,6 +27,7 @@ $categories = [
     'rezepte' => 'Rezepte',
     'aufgaben' => 'Aufgaben',
     'layout' => 'Layout',
+    'allgemein' => 'Allgemein',
 ];
 
 include_once __DIR__ . '/src/components/head.php';
