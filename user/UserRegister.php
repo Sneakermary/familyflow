@@ -42,7 +42,14 @@ if (isset($_POST['registerBtn'])) {
 
     $pw_hash = password_hash($password, PASSWORD_DEFAULT);
 
-    $user->createUser($firstname, $lastname, $email, $pw_hash);
+    $newUserId = $user->createUser($firstname, $lastname, $email, $pw_hash);
+
+    // Bestaetigungsmail mit Link schicken
+    if (sendVerificationMail($pdo, $user->findById($newUserId))) {
+        $_SESSION['info'] = 'Fast geschafft! Wir haben dir eine E-Mail an ' . htmlspecialchars($email) . ' geschickt. Bitte klicke auf den Link darin, um deine Adresse zu bestätigen.';
+    } else {
+        $_SESSION['info'] = 'Dein Konto wurde angelegt, aber die Bestätigungsmail konnte gerade nicht verschickt werden. Bitte versuche es später über "Bestätigungsmail erneut senden".';
+    }
 
     header("Location: /user/UserLogin.php");
     exit();

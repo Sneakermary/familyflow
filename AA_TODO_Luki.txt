@@ -33,4 +33,4 @@ Löschen von Terminen durch den Nichtersteller erlauben?
 ✔️Nch dem erstelen des nicknamens darf man mit dem Backlink nicht wieder ins bearbeiten kommen, sondern zur übersicht
 ✔️Ämtli same
 Mehrsprachigkeit (z.B. Englisch) - aufwändig, da alle Texte aktuell direkt im HTML stehen statt in einer zentralen Übersetzungsdatei, eher Tagesprojekt
-E-Mail-Funktion: Bestaetigungsmail bei Registrierung + Passwort zuruecksetzen (Token-Link, Token nur gehasht speichern, bei "Passwort vergessen" immer gleiche Meldung). Lokal mit Laragon Mail Catcher testen, fuer den Pi spaeter eigene Gmail-Adresse + App-Passwort (PHPMailer/SMTP), Zugangsdaten in mailconfig.php (gitignore). Naechster Schritt: DB planen (Spalte fuer "bestaetigt" + Token-Tabelle, Bestandsuser als bestaetigt markieren)
+✔️E-Mail-Funktion: Bestaetigungsmail + Passwort zuruecksetzen (fertig 20.11.) - offen: eigene Gmail-Adresse + App-Passwort anlegen und in mailconfig.php auf dem Pi eintragen

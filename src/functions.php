@@ -197,3 +197,53 @@ function sharedWithFromForm($sharedAll, $postedIds, $members, $ownerId) {
     $ids[] = (int) $ownerId;
     return array_values(array_unique($ids));
 }
+
+// Bestaetigungsmail (neu) verschicken - beim Registrieren und bei "Mail erneut senden".
+// Der Link ist 24 Stunden gueltig. Gibt true zurueck, wenn die Mail raus ist.
+function sendVerificationMail(PDO $pdo, $user) {
+    require_once __DIR__ . '/classes/UserToken.php';
+    require_once __DIR__ . '/classes/Mailer.php';
+
+    $token = (new UserToken($pdo))->create($user->id, 'verify', 24 * 60);
+    $mailer = new Mailer();
+    $url = $mailer->url('/user/VerifyEmail.php?token=' . $token);
+
+    [$html, $text] = $mailer->buildButtonMail(
+        $user->firstname,
+        'willkommen bei FamilyFlow! Bitte bestätige noch deine E-Mail-Adresse, damit du dich einloggen kannst.',
+        'E-Mail bestätigen',
+        $url,
+        'Der Link ist 24 Stunden gültig. Falls du dich nicht bei FamilyFlow registriert hast, kannst du diese Mail einfach ignorieren.'
+    );
+
+    $sent = $mailer->send($user->email, $user->firstname . ' ' . $user->lastname, 'Bitte bestätige deine E-Mail-Adresse', $html, $text);
+    if (!$sent) {
+        // Nicht verschickter Link wird wieder geloescht, sonst blockiert der Spam-Schutz "erneut senden"
+        (new UserToken($pdo))->deleteForUser($user->id, 'verify');
+    }
+    return $sent;
+}
+
+// Mail mit Link zum Passwort-Zuruecksetzen verschicken. Der Link ist 1 Stunde gueltig.
+function sendPasswordResetMail(PDO $pdo, $user) {
+    require_once __DIR__ . '/classes/UserToken.php';
+    require_once __DIR__ . '/classes/Mailer.php';
+
+    $token = (new UserToken($pdo))->create($user->id, 'reset', 60);
+    $mailer = new Mailer();
+    $url = $mailer->url('/user/ResetPassword.php?token=' . $token);
+
+    [$html, $text] = $mailer->buildButtonMail(
+        $user->firstname,
+        'du hast ein neues Passwort für FamilyFlow angefordert. Klicke auf den Button, um ein neues Passwort festzulegen.',
+        'Neues Passwort festlegen',
+        $url,
+        'Der Link ist 1 Stunde gültig. Falls du das nicht warst, kannst du diese Mail ignorieren - dein Passwort bleibt unverändert.'
+    );
+
+    $sent = $mailer->send($user->email, $user->firstname . ' ' . $user->lastname, 'Passwort zurücksetzen', $html, $text);
+    if (!$sent) {
+        (new UserToken($pdo))->deleteForUser($user->id, 'reset');
+    }
+    return $sent;
+}

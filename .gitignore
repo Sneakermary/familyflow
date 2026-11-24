@@ -4,3 +4,8 @@ uploads/recipes/*
 !uploads/recipes/.gitkeep
 uploads/avatars/*
 !uploads/avatars/.gitkeep
+src/config/mailconfig.php
+storage/mails/*
+!storage/mails/.gitkeep
+!storage/mails/index.html
+vendor/phpmailer/phpmailer/get_oauth_token.php

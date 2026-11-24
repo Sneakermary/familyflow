@@ -25,6 +25,16 @@ if (isset($_POST['loginBtn'])) {
     $found = $user->findByEmail($email);
 
     if ($found && password_verify($pw, $found->pw_hash)) {
+        // E-Mail noch nicht bestaetigt -> nicht einloggen. Die Meldung kommt erst NACH der
+        // Passwortpruefung, damit niemand so herausfinden kann, welche Adressen registriert sind.
+        require_once __DIR__ . '/../src/classes/Mailer.php';
+        if ($found->email_verified_at === null && (new Mailer())->requiresVerification()) {
+            $_SESSION['errors'] = ['login' => 'Bitte bestätige zuerst deine E-Mail-Adresse über den Link in der Mail, die wir dir geschickt haben. <a href="/user/ResendVerification.php">Bestätigungsmail erneut senden</a>'];
+            $_SESSION['oldEmail'] = $email;
+            header("Location: /user/UserLogin.php");
+            exit();
+        }
+
         // Neue Session-Id nach dem Login, damit eine evtl. vorher bekannte Session-Id
         // (z.B. aus einer URL oder einem offenen WLAN) danach nicht mehr gueltig ist.
         session_regenerate_id(true);
@@ -51,6 +61,12 @@ foreach($errors as $error) {
 }
 unset($_SESSION['errors']);
 
+// Hinweise nach Registrieren / Bestaetigen / Passwort zuruecksetzen
+if (isset($_SESSION['info'])) {
+    echo '<p>' . $_SESSION['info'] . '</p>';
+    unset($_SESSION['info']);
+}
+
 ?>
 <div class="contentcontainer">
     <form action="" class="frontform" method="POST">
@@ -61,6 +77,7 @@ unset($_SESSION['errors']);
         <?= csrfField() ?>
         <button type="submit" name="loginBtn">Login</button>
     </form>
+    <p><a href="/user/ForgotPassword.php">Passwort vergessen?</a></p>
     <p><a href="/index.php">&larr; Zur Startseite</a></p>
     <p>Noch kein Konto? <a href="/user/UserRegister.php">Hier registrieren</a></p>
 </div>

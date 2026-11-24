@@ -37,6 +37,18 @@ class User{
         return $this->pdo->lastInsertId();
     }
 
+    // E-Mail-Adresse als bestaetigt markieren (Klick auf den Link in der Bestaetigungsmail)
+    public function markEmailVerified($userId) {
+        $stmt = $this->pdo->prepare("UPDATE users SET email_verified_at = NOW() WHERE id = ? AND email_verified_at IS NULL");
+        $stmt->execute([$userId]);
+    }
+
+    // Neues Passwort (schon gehasht) speichern - z.B. nach "Passwort vergessen"
+    public function updatePassword($userId, $pwHash) {
+        $stmt = $this->pdo->prepare("UPDATE users SET pw_hash = ? WHERE id = ?");
+        $stmt->execute([$pwHash, $userId]);
+    }
+
     // Eigene Terminfarbe im Familienkalender (nicht zu verwechseln mit calendar_family_settings,
     // das ist die Farbe pro Familie in "Mein Kalender" - hier geht's um die Farbe pro Person
     // innerhalb EINER Familie, damit man die eigenen Termine von denen anderer unterscheiden kann)
