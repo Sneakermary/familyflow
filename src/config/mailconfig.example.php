@@ -25,4 +25,8 @@ return [
     'smtp_port' => 587,
     'smtp_user' => 'familyflow.app@gmail.com',
     'smtp_pass' => '',
+
+    // An diese Adresse geht bei jeder neuen Registrierung eine kurze Info-Mail.
+    // Leer lassen = keine Info-Mails.
+    'admin_email' => '',
 ];

@@ -247,3 +247,31 @@ function sendPasswordResetMail(PDO $pdo, $user) {
     }
     return $sent;
 }
+
+// Info-Mail an die Betreiberin, wenn sich jemand neu registriert hat.
+// Empfaenger = 'admin_email' in mailconfig.php (leer = keine Mail).
+// Fehler hier duerfen die Registrierung nie stoppen, deshalb nur true/false zurueck.
+function sendNewUserNotification($user) {
+    require_once __DIR__ . '/classes/Mailer.php';
+
+    $mailer = new Mailer();
+    $to = $mailer->adminEmail();
+    if ($to === '') {
+        return false;
+    }
+
+    $name = $user->firstname . ' ' . $user->lastname;
+    // Zeitzone ausdruecklich angeben - am Pi steht PHP sonst evtl. auf UTC (1 Stunde daneben)
+    $time = (new DateTime('now', new DateTimeZone('Europe/Vienna')))->format('d.m.Y, H:i');
+
+    $html = '<div style="font-family: Arial, sans-serif; color: #333;">'
+        . '<h2 style="color: #4f46e5;">Neue Registrierung bei FamilyFlow</h2>'
+        . '<p><b>Name:</b> ' . htmlspecialchars($name) . '<br>'
+        . '<b>E-Mail:</b> ' . htmlspecialchars($user->email) . '<br>'
+        . '<b>Zeit:</b> ' . $time . '</p>'
+        . '<p style="font-size: 13px; color: #666;">Die E-Mail-Adresse ist noch nicht bestätigt.</p>'
+        . '</div>';
+    $text = "Neue Registrierung bei FamilyFlow\n\nName: $name\nE-Mail: {$user->email}\nZeit: $time\n";
+
+    return $mailer->send($to, 'FamilyFlow', 'Neue Registrierung: ' . $name, $html, $text);
+}

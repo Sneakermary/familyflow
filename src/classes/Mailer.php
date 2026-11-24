@@ -24,6 +24,7 @@ class Mailer {
             'smtp_port' => 587,
             'smtp_user' => '',
             'smtp_pass' => '',
+            'admin_email' => '',
         ], is_array($config) ? $config : []);
     }
 
@@ -35,6 +36,11 @@ class Mailer {
 
     public function requiresVerification() {
         return (bool) $this->config['require_verification'];
+    }
+
+    // Adresse der Betreiberin, die ueber neue Registrierungen informiert wird ('' = aus)
+    public function adminEmail() {
+        return trim((string) $this->config['admin_email']);
     }
 
     // Gibt true zurueck, wenn die Mail raus ist (bzw. abgelegt wurde), sonst false
