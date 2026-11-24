@@ -46,7 +46,17 @@ class Mailer {
         $mail = new PHPMailer(true);
         try {
             $mail->isSMTP();
-            $mail->Host = $this->config['smtp_host'];
+            // IPv4 erzwingen: In manchen Netzen (z.B. am Pi) wird fuer smtp.gmail.com auch eine
+            // IPv6-Adresse gefunden, IPv6 funktioniert dort aber nicht -> Verbindung haengt.
+            // gethostbyname() liefert nur IPv4. Das TLS-Zertifikat wird trotzdem gegen den
+            // echten Hostnamen geprueft (peer_name), die Verbindung bleibt also sicher.
+            $host = $this->config['smtp_host'];
+            $mail->Host = gethostbyname($host);
+            $mail->SMTPOptions = ['ssl' => [
+                'peer_name' => $host,
+                'verify_peer' => true,
+                'verify_peer_name' => true,
+            ]];
             $mail->Port = (int) $this->config['smtp_port'];
             $mail->SMTPAuth = true;
             $mail->Username = $this->config['smtp_user'];
@@ -54,6 +64,8 @@ class Mailer {
             // Port 465 = verschluesselt von Anfang an, sonst (587) per STARTTLS
             $mail->SMTPSecure = $mail->Port === 465 ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
             $mail->CharSet = 'UTF-8';
+            // Nicht minutenlang haengen, wenn der Mailserver nicht erreichbar ist (Standard waeren 300 s)
+            $mail->Timeout = 15;
 
             $mail->setFrom($this->config['from_email'], $this->config['from_name']);
             $mail->addAddress($toEmail, $toName);
