@@ -12,6 +12,10 @@
 # ---------------------------------------------------------------
 set -euo pipefail
 
+# rclone-Einstellungen (R2-Zugang + Verschluesselung) liegen beim root-Benutzer.
+# Fest angeben, weil der naechtliche Systemdienst sonst evtl. kein HOME kennt.
+export RCLONE_CONFIG="${RCLONE_CONFIG:-/root/.config/rclone/rclone.conf}"
+
 APP_DIR="/var/www/familyflow"
 LOCAL_DIR="/var/backups/familyflow"
 REMOTE="ffbackup:"
