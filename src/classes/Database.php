@@ -13,7 +13,13 @@ class Database {
             return $pdo;
         }
         catch(PDOException $e) {
-            die("Error gefunden: ".$e->getMessage());
+            // Technische Details (Servername, Benutzer, ...) NUR ins Server-Log, nie in den Browser.
+            // Am Pi nachlesen: sudo tail /var/log/apache2/error.log
+            error_log('FamilyFlow: Datenbank nicht erreichbar - ' . $e->getMessage());
+
+            // Besucher bekommen eine freundliche Seite (HTTP 503 = voruebergehend nicht verfuegbar)
+            include __DIR__ . '/../components/db_error.php';
+            exit();
         }
     }
 }
