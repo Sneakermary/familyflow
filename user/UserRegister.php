@@ -108,6 +108,7 @@ unset($_SESSION['oldValues']);
         <?= csrfField() ?>
         <button type="submit" name="registerBtn">Registrieren</button>
         <p class="formHint">Nach dem Registrieren bekommst du eine E-Mail mit einem Bestätigungslink. Erst nach dem Klick darauf kannst du dich einloggen.</p>
+        <p class="formHint">Infos dazu, welche Daten wir speichern, findest du in der <a href="/datenschutz.php">Datenschutzerklärung</a>.</p>
     </form>
 
     <p class="auth-switch">Schon ein Konto? <a href="/user/UserLogin.php">Hier einloggen</a></p>

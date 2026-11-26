@@ -305,6 +305,39 @@ body.auth {
 
 .legal a:hover { text-decoration: underline; }
 
+.legal ul { margin: 0 0 0.8rem; padding-left: 1.3rem; }
+
+.legal-summary {
+    margin: 0.4rem 0 0.6rem;
+    padding: 1rem 1.2rem;
+    border-radius: 16px;
+    background: var(--au-info-bg);
+    color: var(--au-info-text);
+    font-size: 0.95rem;
+}
+
+.legal-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.4rem 0 0.9rem;
+    font-size: 0.9rem;
+}
+
+.legal-table th,
+.legal-table td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.55rem 0.7rem;
+    border-bottom: 2px dashed var(--au-input-border);
+}
+
+.legal-table th { font-weight: 800; }
+
+@media (max-width: 520px) {
+    .legal-table { font-size: 0.82rem; }
+    .legal-table th, .legal-table td { padding: 0.45rem 0.35rem; }
+}
+
 /* ---------- Handy ---------- */
 @media (max-width: 520px) {
     .auth-logo { font-size: 1rem; }
