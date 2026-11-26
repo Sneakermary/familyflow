@@ -28,9 +28,6 @@ if (isset($_POST['registerBtn'])) {
     $pdo = $db->connect();
 
     $user = new User($pdo);
-    if(empty($errors) && $user->findByEmail($email)){
-        $errors['email'] = 'Diese E-Mail ist bereits registriert!';
-    }
 
     if(!empty($errors)){
         $_SESSION['errors'] = $errors;
@@ -40,16 +37,39 @@ if (isset($_POST['registerBtn'])) {
         exit();
     }
 
-    $pw_hash = password_hash($password, PASSWORD_DEFAULT);
+    // Gibt es die Adresse schon? Die Seite zeigt in JEDEM Fall dieselbe Meldung,
+    // damit niemand herausfinden kann, welche E-Mail-Adressen bei FamilyFlow registriert sind.
+    // Was wirklich los ist, erfaehrt nur die Besitzerin der Adresse per Mail.
+    $existing = $user->findByEmail($email);
 
-    $newUserId = $user->createUser($firstname, $lastname, $email, $pw_hash);
-    $newUser = $user->findById($newUserId);
+    if ($existing) {
+        require_once __DIR__ . '/../src/classes/UserToken.php';
+        $tokens = new UserToken($pdo);
+        $sent = true;
 
-    // Info an die Betreiberin (Adresse steht in mailconfig.php, leer = keine Mail)
-    sendNewUserNotification($newUser);
+        if ($existing->email_verified_at === null) {
+            // Konto noch nicht bestaetigt -> Bestaetigungsmail nochmal (hoechstens alle 2 Minuten)
+            if (!$tokens->wasCreatedRecently($existing->id, 'verify', 120)) {
+                $sent = sendVerificationMail($pdo, $existing);
+            }
+        } elseif (!$tokens->wasCreatedRecently($existing->id, 'reset', 120)) {
+            // Konto bestaetigt -> Hinweis "Du hast schon ein Konto" (hoechstens alle 2 Minuten)
+            $sent = sendAlreadyRegisteredMail($pdo, $existing);
+        }
+    } else {
+        $pw_hash = password_hash($password, PASSWORD_DEFAULT);
 
-    // Bestaetigungsmail mit Link schicken
-    if (sendVerificationMail($pdo, $newUser)) {
+        $newUserId = $user->createUser($firstname, $lastname, $email, $pw_hash);
+        $newUser = $user->findById($newUserId);
+
+        // Info an die Betreiberin (Adresse steht in mailconfig.php, leer = keine Mail)
+        sendNewUserNotification($newUser);
+
+        // Bestaetigungsmail mit Link schicken
+        $sent = sendVerificationMail($pdo, $newUser);
+    }
+
+    if ($sent) {
         $_SESSION['info'] = 'Fast geschafft! Wir haben dir eine E-Mail an ' . htmlspecialchars($email) . ' geschickt. Bitte klicke auf den Link darin, um deine Adresse zu bestätigen.';
     } else {
         $_SESSION['info'] = 'Dein Konto wurde angelegt, aber die Bestätigungsmail konnte gerade nicht verschickt werden. Bitte versuche es später über "Bestätigungsmail erneut senden".';
@@ -60,7 +80,9 @@ if (isset($_POST['registerBtn'])) {
 }
 
 // Ab hier nur noch Anzeige, keine Redirects mehr moeglich
-include_once __DIR__ . '/../src/components/head.php';
+$authTitle = 'Registrieren';
+$authBadge = 'Hallo, liebe Familie!';
+include_once __DIR__ . '/../src/components/auth_head.php';
 
 unset($_SESSION['errors']);
 
@@ -68,25 +90,26 @@ $oldValues = $_SESSION['oldValues'] ?? [];
 unset($_SESSION['oldValues']);
 ?>
 
-<div class="contentcontainer">
-    <form action="" class="frontform" method="POST">
-        <h3>Registrieren</h3>
+        <h1>Konto <em>anlegen</em>.</h1>
+        <p class="auth-intro">Ein paar Angaben, dann könnt ihr gemeinsam loslegen – kostenlos.</p>
 
+    <form action="" method="POST">
         <?php foreach ($errors as $error): ?>
             <div class="flash flashError"><?= htmlspecialchars($error) ?></div>
         <?php endforeach; ?>
 
-        <input type="text" name="firstname" placeholder="Vorname" value="<?= htmlspecialchars($oldValues['firstname'] ?? '') ?>" required>
-        <input type="text" name="lastname" placeholder="Nachname" value="<?= htmlspecialchars($oldValues['lastname'] ?? '') ?>" required>
-        <input type="email" name="email" placeholder="E-Mail" value="<?= htmlspecialchars($oldValues['email'] ?? '') ?>" required>
-        <input type="password" name="pw" placeholder="Passwort" minlength="8" required>
-        <input type="password" name="pwConfirm" placeholder="Passwort bestätigen" required>
+        <div class="auth-row">
+            <input type="text" name="firstname" placeholder="Vorname" autocomplete="given-name" value="<?= htmlspecialchars($oldValues['firstname'] ?? '') ?>" required>
+            <input type="text" name="lastname" placeholder="Nachname" autocomplete="family-name" value="<?= htmlspecialchars($oldValues['lastname'] ?? '') ?>" required>
+        </div>
+        <input type="email" name="email" placeholder="E-Mail" autocomplete="email" value="<?= htmlspecialchars($oldValues['email'] ?? '') ?>" required>
+        <input type="password" name="pw" placeholder="Passwort (mind. 8 Zeichen)" autocomplete="new-password" minlength="8" required>
+        <input type="password" name="pwConfirm" placeholder="Passwort bestätigen" autocomplete="new-password" required>
         <?= csrfField() ?>
         <button type="submit" name="registerBtn">Registrieren</button>
         <p class="formHint">Nach dem Registrieren bekommst du eine E-Mail mit einem Bestätigungslink. Erst nach dem Klick darauf kannst du dich einloggen.</p>
     </form>
-    <p><a href="/index.php">&larr; Zur Startseite</a></p>
-    <p>Schon ein Konto? <a href="/user/UserLogin.php">Hier einloggen</a></p>
-</div>
 
-<?php include_once __DIR__ . '/../src/components/footer.php'; ?>
+    <p class="auth-switch">Schon ein Konto? <a href="/user/UserLogin.php">Hier einloggen</a></p>
+
+<?php include_once __DIR__ . '/../src/components/auth_footer.php'; ?>

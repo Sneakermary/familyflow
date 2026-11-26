@@ -28,7 +28,8 @@ $tokens->deleteForUser($userId, 'verify');
 session_regenerate_id(true);
 unset($_SESSION['fam_id']);
 $_SESSION['uid'] = $userId;
-$_SESSION['info'] = 'Willkommen bei FamilyFlow! Deine E-Mail-Adresse ist bestätigt.';
+$_SESSION['info'] = 'Willkommen bei FamilyFlow! Deine E-Mail-Adresse ist bestätigt. Richte jetzt kurz dein Profil ein.';
 
-header("Location: /family/SelectFamily.php");
+// Neue Mitglieder zuerst zum Profil-Einrichten, danach geht es weiter zur Familie
+header("Location: /user/EditProfile.php?setup=1");
 exit();

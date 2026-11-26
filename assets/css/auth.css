@@ -1,0 +1,294 @@
+/* Login, Registrieren, Passwort vergessen/zuruecksetzen, Bestaetigungsmail.
+   Gleicher Look wie die Startseite (landing.css), aber eigenes Stylesheet,
+   unabhaengig von style.css und den App-Themes.
+   Hell = Standard, dunkel automatisch ueber prefers-color-scheme. */
+:root {
+    color-scheme: light dark;
+
+    --au-cream: #fff6ec;
+    --au-card: #ffffff;
+    --au-text: #352a4a;
+    --au-muted: #6b6080;
+    --au-input-bg: #fffaf4;
+    --au-input-border: #ecdccb;
+    --au-focus: #fdc84b;
+    --au-shadow: 0 22px 50px rgba(53, 42, 74, 0.13);
+    --au-card-back: #f6dcb7;
+
+    --au-red: #e0482b;
+    --au-red-hover: #c73c21;
+    --au-yellow: #fdc84b;
+    --au-pink: #ffd3dc;
+    --au-mint: #cdeee3;
+
+    --au-info-bg: #e3f4ee;
+    --au-info-text: #1d5c4c;
+    --au-error-bg: #ffe4dc;
+    --au-error-text: #9a2d17;
+
+    --au-font: ui-rounded, "SF Pro Rounded", "Nunito", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --au-cream: #1d1729;
+        --au-card: #2e2642;
+        --au-text: #f4eefc;
+        --au-muted: #c2b8d4;
+        --au-input-bg: #241d33;
+        --au-input-border: #4a3f60;
+        --au-shadow: 0 22px 50px rgba(0, 0, 0, 0.45);
+        --au-card-back: #4a3b2c;
+        --au-red: #f0613f;
+        --au-red-hover: #ff7655;
+        --au-info-bg: #1f3d36;
+        --au-info-text: #bdeee0;
+        --au-error-bg: #4a2420;
+        --au-error-text: #ffc9bb;
+    }
+}
+
+* { box-sizing: border-box; }
+
+body.auth {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--au-font);
+    color: var(--au-text);
+    background: var(--au-cream);
+    line-height: 1.5;
+    overflow-x: hidden;
+    position: relative;
+}
+
+.auth a { color: inherit; }
+
+/* Deko-Kreise wie auf der Startseite */
+.auth-blob { position: absolute; border-radius: 50%; z-index: 0; }
+.auth-blob-pink { width: 240px; height: 240px; left: -120px; top: 120px; background: var(--au-pink); }
+.auth-blob-mint { width: 180px; height: 180px; right: -70px; bottom: 90px; background: var(--au-mint); }
+
+/* ---------- Kopfzeile ---------- */
+.auth-header {
+    position: relative;
+    z-index: 1;
+    width: min(1100px, 100% - 2.5rem);
+    margin: 0.9rem auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: var(--au-card);
+    border-radius: 999px;
+    padding: 0.55rem 1.2rem 0.55rem 1rem;
+    box-shadow: 0 6px 20px rgba(53, 42, 74, 0.1);
+}
+
+.auth-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-weight: 800;
+    font-size: 1.15rem;
+    text-decoration: none;
+}
+
+.auth-logo-mark { display: inline-flex; width: 32px; height: 32px; }
+.auth-logo-mark svg { width: 100%; height: 100%; }
+
+.auth-back {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--au-muted) !important;
+}
+
+.auth-back:hover { color: var(--au-red) !important; }
+
+/* ---------- Karte in der Mitte ---------- */
+.auth-main {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1.25rem 3rem;
+}
+
+.auth-card {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    background: var(--au-card);
+    border-radius: 32px;
+    padding: 2.4rem 2rem 2rem;
+    box-shadow: var(--au-shadow);
+}
+
+/* schraege beige Karte dahinter, wie beim Haus auf der Startseite */
+.auth-card::before {
+    content: "";
+    position: absolute;
+    inset: 12px -12px -12px 12px;
+    z-index: -1;
+    background: var(--au-card-back);
+    border-radius: 32px;
+    transform: rotate(2.5deg);
+}
+
+.auth-badge {
+    display: inline-block;
+    background: var(--au-yellow);
+    color: #352a4a;
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 0.35rem 0.8rem;
+    border-radius: 10px;
+    transform: rotate(-3deg);
+    margin-bottom: 1rem;
+}
+
+.auth h1 {
+    margin: 0 0 0.4rem;
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.15;
+}
+
+.auth h1 em { font-style: normal; color: var(--au-red); }
+
+.auth-intro {
+    margin: 0 0 1.4rem;
+    color: var(--au-muted);
+    font-size: 0.95rem;
+}
+
+/* ---------- Formular ---------- */
+.auth form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.auth-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.auth input {
+    width: 100%;
+    font: inherit;
+    font-size: 1rem;
+    color: var(--au-text);
+    background: var(--au-input-bg);
+    border: 2px solid var(--au-input-border);
+    border-radius: 14px;
+    padding: 0.8rem 1rem;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.auth input::placeholder { color: var(--au-muted); opacity: 0.8; }
+
+.auth input:focus {
+    outline: none;
+    border-color: var(--au-focus);
+    box-shadow: 0 0 0 4px rgba(253, 200, 75, 0.3);
+}
+
+.auth button {
+    margin-top: 0.4rem;
+    font: inherit;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #ffffff;
+    background: var(--au-red);
+    border: none;
+    border-radius: 999px;
+    padding: 0.9rem 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(224, 72, 43, 0.3);
+    transition: transform 0.15s, background-color 0.15s;
+}
+
+.auth button:hover { background: var(--au-red-hover); transform: translateY(-2px); }
+
+.auth-forgot {
+    align-self: flex-end;
+    margin-top: -0.2rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--au-muted) !important;
+    text-decoration: none;
+}
+
+.auth-forgot:hover { color: var(--au-red) !important; }
+
+/* ---------- Meldungen ---------- */
+.flash {
+    padding: 0.75rem 1rem;
+    border-radius: 14px;
+    font-size: 0.92rem;
+    line-height: 1.4;
+}
+
+.flash a { font-weight: 700; }
+.flashInfo { background: var(--au-info-bg); color: var(--au-info-text); }
+.flashError { background: var(--au-error-bg); color: var(--au-error-text); }
+
+.formHint {
+    margin: 0.4rem 0 0;
+    font-size: 0.82rem;
+    color: var(--au-muted);
+}
+
+/* ---------- Links unter dem Formular ---------- */
+.auth-switch {
+    margin: 1.6rem 0 0;
+    padding-top: 1.2rem;
+    border-top: 2px dashed var(--au-input-border);
+    text-align: center;
+    font-size: 0.92rem;
+    color: var(--au-muted);
+}
+
+.auth-switch a {
+    font-weight: 700;
+    color: var(--au-red);
+    text-decoration: none;
+}
+
+.auth-switch a:hover { text-decoration: underline; }
+
+/* ---------- Fusszeile ---------- */
+.auth-footer {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 1.3rem;
+    padding: 0 1rem 2rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.auth-footer a { text-decoration: none; color: var(--au-muted); }
+.auth-footer a:hover { color: var(--au-red); }
+
+/* ---------- Handy ---------- */
+@media (max-width: 520px) {
+    .auth-logo { font-size: 1rem; }
+    .auth-logo-mark { width: 28px; height: 28px; }
+    .auth-card { padding: 2rem 1.3rem 1.6rem; border-radius: 26px; }
+    .auth-card::before { border-radius: 26px; inset: 8px -6px -8px 6px; transform: rotate(1.2deg); }
+    .auth h1 { font-size: 1.7rem; }
+    .auth-row { grid-template-columns: 1fr; }
+    .auth-blob-pink { width: 160px; height: 160px; left: -100px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth button, .auth input { transition: none; }
+}

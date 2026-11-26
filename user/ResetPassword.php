@@ -53,22 +53,25 @@ if (isset($_POST['resetBtn'])) {
     }
 }
 
-include_once __DIR__ . '/../src/components/head.php';
+$authTitle = 'Neues Passwort';
+$authBadge = 'Gleich wieder drin!';
+include_once __DIR__ . '/../src/components/auth_head.php';
 ?>
 
-<div class="contentcontainer">
-    <form action="/user/ResetPassword.php" class="frontform" method="POST">
-        <h3>Neues Passwort festlegen</h3>
+        <h1>Neues <em>Passwort</em>.</h1>
+        <p class="auth-intro">Wähle ein neues Passwort mit mindestens 8 Zeichen.</p>
+
+    <form action="/user/ResetPassword.php" method="POST">
         <?php foreach ($errors as $error): ?>
             <div class="flash flashError"><?= htmlspecialchars($error) ?></div>
         <?php endforeach; ?>
-        <input type="password" name="pw" placeholder="Neues Passwort" minlength="8" required>
-        <input type="password" name="pwConfirm" placeholder="Neues Passwort bestätigen" required>
+        <input type="password" name="pw" placeholder="Neues Passwort" autocomplete="new-password" minlength="8" required>
+        <input type="password" name="pwConfirm" placeholder="Neues Passwort bestätigen" autocomplete="new-password" required>
         <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
         <?= csrfField() ?>
         <button type="submit" name="resetBtn">Passwort speichern</button>
     </form>
-    <p><a href="/user/UserLogin.php">&larr; Zurück zum Login</a></p>
-</div>
 
-<?php include_once __DIR__ . '/../src/components/footer.php'; ?>
+    <p class="auth-switch"><a href="/user/UserLogin.php">Zurück zum Login</a></p>
+
+<?php include_once __DIR__ . '/../src/components/auth_footer.php'; ?>

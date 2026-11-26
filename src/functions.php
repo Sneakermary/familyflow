@@ -248,6 +248,35 @@ function sendPasswordResetMail(PDO $pdo, $user) {
     return $sent;
 }
 
+// Jemand will sich mit einer Adresse registrieren, die schon ein bestaetigtes Konto hat.
+// Auf der Seite steht trotzdem dieselbe Meldung wie bei einer neuen Registrierung (sonst koennte
+// jeder ausprobieren, welche Adressen registriert sind). Nur die echte Besitzerin erfaehrt per
+// Mail, dass es das Konto schon gibt - mit Link zum Login und einem Link fuer ein neues Passwort.
+function sendAlreadyRegisteredMail(PDO $pdo, $user) {
+    require_once __DIR__ . '/classes/UserToken.php';
+    require_once __DIR__ . '/classes/Mailer.php';
+
+    $token = (new UserToken($pdo))->create($user->id, 'reset', 60);
+    $mailer = new Mailer();
+    $url = $mailer->url('/user/ResetPassword.php?token=' . $token);
+    $loginUrl = $mailer->url('/user/UserLogin.php');
+
+    [$html, $text] = $mailer->buildButtonMail(
+        $user->firstname,
+        'gerade wollte sich jemand mit deiner E-Mail-Adresse bei FamilyFlow registrieren. Du hast aber schon ein Konto! '
+            . 'Du kannst dich einfach einloggen: ' . $loginUrl . ' - falls du dein Passwort vergessen hast, lege hier ein neues fest:',
+        'Neues Passwort festlegen',
+        $url,
+        'Der Link ist 1 Stunde gültig. Falls du das nicht warst, kannst du diese Mail ignorieren - an deinem Konto ändert sich nichts.'
+    );
+
+    $sent = $mailer->send($user->email, $user->firstname . ' ' . $user->lastname, 'Du hast schon ein FamilyFlow-Konto', $html, $text);
+    if (!$sent) {
+        (new UserToken($pdo))->deleteForUser($user->id, 'reset');
+    }
+    return $sent;
+}
+
 // Info-Mail an die Betreiberin, wenn sich jemand neu registriert hat.
 // Empfaenger = 'admin_email' in mailconfig.php (leer = keine Mail).
 // Fehler hier duerfen die Registrierung nie stoppen, deshalb nur true/false zurueck.

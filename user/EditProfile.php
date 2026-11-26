@@ -14,6 +14,12 @@ $validator = new Validator();
 $me = $user->findById($_SESSION['uid']);
 $errors = [];
 
+// Einrichtungs-Modus direkt nach dem Bestaetigen der E-Mail (?setup=1):
+// Begruessung, "Spaeter"-Link, nach dem Speichern weiter zur Familie statt zum Profil.
+// action="" im Formular behaelt ?setup=1 auch beim Absenden.
+$isSetup = isset($_GET['setup']);
+$nextPage = $isSetup ? '/family/SelectFamily.php' : '/user/Profile.php';
+
 if (isset($_POST['saveProfileBtn'])) {
     if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
         header("Location: /user/EditProfile.php");
@@ -56,7 +62,10 @@ if (isset($_POST['saveProfileBtn'])) {
         if ($avatarFilename !== null) {
             deleteUploadedImage('avatars', $me->avatar);
         }
-        header("Location: /user/Profile.php");
+        if ($isSetup) {
+            $_SESSION['info'] = 'Dein Profil ist fertig! Jetzt erstelle eure Familie oder nimm eine Einladung an.';
+        }
+        header("Location: " . $nextPage);
         exit();
     }
 
@@ -70,21 +79,31 @@ if (isset($_POST['saveProfileBtn'])) {
     $me->birthdate = $birthdateValue;
 }
 
+// Begruessung nach dem Bestaetigen der E-Mail (kommt aus VerifyEmail.php)
+$info = $_SESSION['info'] ?? null;
+unset($_SESSION['info']);
+
 include_once __DIR__ . '/../src/components/head.php';
 include_once __DIR__ . '/../src/components/navbar.php';
 ?>
 
-<!-- Festes Linkziel statt history.back(): EditProfile.php wird ausschliesslich ueber das
-     Bearbeiten-Menue auf Profile.php erreicht, hat also immer genau dasselbe Linkziel. -->
-<a href="/user/Profile.php" class="backLink">&larr;</a>
+<!-- Festes Linkziel statt history.back(): normal kommt man von Profile.php,
+     beim Einrichten nach der Registrierung geht "zurueck" zur Familienauswahl. -->
+<a href="<?= $nextPage ?>" class="backLink">&larr;</a>
 
-<h2>Profil bearbeiten</h2>
-
-<?php foreach ($errors as $error): ?>
-    <p><?= htmlspecialchars($error) ?></p>
-<?php endforeach; ?>
+<h2><?= $isSetup ? 'Profil einrichten' : 'Profil bearbeiten' ?></h2>
 
 <div class="contentcontainer">
+    <?php if ($info): ?>
+        <div class="flash flashInfo"><?= htmlspecialchars($info) ?></div>
+    <?php endif; ?>
+    <?php if ($isSetup): ?>
+        <p class="formHint">Lade ein Profilbild hoch und trag dein Geburtsdatum ein, dann sieht deine Familie deinen Geburtstag im Kalender. Du kannst alles später unter „Mein Profil“ ändern.</p>
+    <?php endif; ?>
+    <?php foreach ($errors as $error): ?>
+        <div class="flash flashError"><?= htmlspecialchars($error) ?></div>
+    <?php endforeach; ?>
+
     <?= avatarHtml($me, 'class="profileAvatar"') ?>
 
     <form action="" method="POST" enctype="multipart/form-data">
@@ -104,8 +123,11 @@ include_once __DIR__ . '/../src/components/navbar.php';
             <input type="date" name="birthdate" value="<?= htmlspecialchars($me->birthdate ?? '') ?>">
         </label>
         <?= csrfField() ?>
-        <button type="submit" name="saveProfileBtn">Speichern</button>
+        <button type="submit" name="saveProfileBtn"><?= $isSetup ? 'Speichern und weiter' : 'Speichern' ?></button>
     </form>
+    <?php if ($isSetup): ?>
+        <p class="formHint skipLink"><a href="/family/SelectFamily.php">Später einrichten &rarr;</a></p>
+    <?php endif; ?>
 </div>
 
 <?php include_once __DIR__ . '/../src/components/footer.php'; ?>

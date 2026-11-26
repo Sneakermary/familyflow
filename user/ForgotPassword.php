@@ -30,18 +30,20 @@ if (isset($_POST['forgotBtn'])) {
     exit();
 }
 
-include_once __DIR__ . '/../src/components/head.php';
+$authTitle = 'Passwort vergessen';
+$authBadge = 'Kein Problem!';
+include_once __DIR__ . '/../src/components/auth_head.php';
 ?>
 
-<div class="contentcontainer">
-    <form action="" class="frontform" method="POST">
-        <h3>Passwort vergessen</h3>
-        <p>Gib deine E-Mail-Adresse ein. Wir schicken dir einen Link, mit dem du ein neues Passwort festlegen kannst.</p>
-        <input type="email" name="email" placeholder="E-Mail" required>
+        <h1>Passwort <em>vergessen</em>?</h1>
+        <p class="auth-intro">Gib deine E-Mail-Adresse ein. Wir schicken dir einen Link, mit dem du ein neues Passwort festlegen kannst.</p>
+
+    <form action="" method="POST">
+        <input type="email" name="email" placeholder="E-Mail" autocomplete="email" required>
         <?= csrfField() ?>
         <button type="submit" name="forgotBtn">Link senden</button>
     </form>
-    <p><a href="/user/UserLogin.php">&larr; Zurück zum Login</a></p>
-</div>
 
-<?php include_once __DIR__ . '/../src/components/footer.php'; ?>
+    <p class="auth-switch">Doch wieder eingefallen? <a href="/user/UserLogin.php">Zurück zum Login</a></p>
+
+<?php include_once __DIR__ . '/../src/components/auth_footer.php'; ?>

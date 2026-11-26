@@ -16,6 +16,10 @@ if (isset($_SESSION['uid'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FamilyFlow</title>
+    <?php if ($themeClass === 'theme-standard'): ?>
+        <!-- Standard-Theme folgt dem Hell/Dunkel-Modus des Geraets (auch Datumsfelder, Auswahllisten) -->
+        <meta name="color-scheme" content="light dark">
+    <?php endif; ?>
     <link href="/assets/css/style.css" rel="stylesheet">
 </head>
 <body class="<?= htmlspecialchars($themeClass) ?>">

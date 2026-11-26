@@ -54,7 +54,9 @@ if (isset($_POST['loginBtn'])) {
 $oldEmail = $_SESSION['oldEmail'] ?? '';
 unset($_SESSION['oldEmail']);
 
-include_once __DIR__ . '/../src/components/head.php';
+$authTitle = 'Login';
+$authBadge = 'Schön, dass du da bist!';
+include_once __DIR__ . '/../src/components/auth_head.php';
 
 unset($_SESSION['errors']);
 
@@ -63,10 +65,10 @@ $info = $_SESSION['info'] ?? null;
 unset($_SESSION['info']);
 
 ?>
-<div class="contentcontainer">
-    <form action="" class="frontform" method="POST">
-        <h3>Login</h3>
+        <h1>Willkommen <em>zurück</em>.</h1>
+        <p class="auth-intro">Melde dich an und schau, was bei euch zu Hause heute ansteht.</p>
 
+    <form action="" method="POST">
         <!-- Meldungen als farbige Box direkt im Formular, damit man sie am Handy nicht uebersieht.
              Texte stammen nur aus unserem eigenen Code (teils mit Link), deshalb ohne htmlspecialchars. -->
         <?php if ($info): ?>
@@ -76,15 +78,14 @@ unset($_SESSION['info']);
             <div class="flash flashError"><?= $error ?></div>
         <?php endforeach; ?>
 
-        <input type="email" name="email" placeholder="E-Mail" value="<?= htmlspecialchars($oldEmail) ?>" required>
-        <input type="password" name="pw" placeholder="Passwort" autocomplete="off" required>
+        <input type="email" name="email" placeholder="E-Mail" autocomplete="email" value="<?= htmlspecialchars($oldEmail) ?>" required>
+        <input type="password" name="pw" placeholder="Passwort" autocomplete="current-password" required>
+        <a href="/user/ForgotPassword.php" class="auth-forgot">Passwort vergessen?</a>
         <?= csrfField() ?>
-        <button type="submit" name="loginBtn">Login</button>
+        <button type="submit" name="loginBtn">Einloggen</button>
         <p class="formHint">Neu registriert? Bitte bestätige zuerst deine E-Mail-Adresse über den Link in der Mail, die wir dir geschickt haben – danach kannst du dich einloggen.</p>
     </form>
-    <p><a href="/user/ForgotPassword.php">Passwort vergessen?</a></p>
-    <p><a href="/index.php">&larr; Zur Startseite</a></p>
-    <p>Noch kein Konto? <a href="/user/UserRegister.php">Hier registrieren</a></p>
-</div>
 
-<?php include_once __DIR__ . '/../src/components/footer.php'; ?>
+    <p class="auth-switch">Noch kein Konto? <a href="/user/UserRegister.php">Jetzt kostenlos registrieren</a></p>
+
+<?php include_once __DIR__ . '/../src/components/auth_footer.php'; ?>

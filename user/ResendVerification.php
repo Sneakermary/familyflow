@@ -31,18 +31,20 @@ if (isset($_POST['resendBtn'])) {
     exit();
 }
 
-include_once __DIR__ . '/../src/components/head.php';
+$authTitle = 'Bestätigungsmail';
+$authBadge = 'Fast geschafft!';
+include_once __DIR__ . '/../src/components/auth_head.php';
 ?>
 
-<div class="contentcontainer">
-    <form action="" class="frontform" method="POST">
-        <h3>Bestätigungsmail erneut senden</h3>
-        <p>Gib die E-Mail-Adresse ein, mit der du dich registriert hast.</p>
-        <input type="email" name="email" placeholder="E-Mail" required>
+        <h1>Mail <em>nochmal</em> senden.</h1>
+        <p class="auth-intro">Gib die E-Mail-Adresse ein, mit der du dich registriert hast. Schau auch im Spam-Ordner nach.</p>
+
+    <form action="" method="POST">
+        <input type="email" name="email" placeholder="E-Mail" autocomplete="email" required>
         <?= csrfField() ?>
         <button type="submit" name="resendBtn">Link senden</button>
     </form>
-    <p><a href="/user/UserLogin.php">&larr; Zurück zum Login</a></p>
-</div>
 
-<?php include_once __DIR__ . '/../src/components/footer.php'; ?>
+    <p class="auth-switch"><a href="/user/UserLogin.php">Zurück zum Login</a></p>
+
+<?php include_once __DIR__ . '/../src/components/auth_footer.php'; ?>

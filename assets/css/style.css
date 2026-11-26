@@ -1105,3 +1105,379 @@ body.theme-velvetaurora {
     opacity: 0.8;
     margin-top: 8px;
 }
+
+/* =====================================================================
+   STANDARD-THEME im Look der Startseite (warm, verspielt)
+   Gilt NUR fuer body.theme-standard - die anderen Themes bleiben, wie sie sind.
+   Hell als Standard, dunkel automatisch ueber prefers-color-scheme.
+   ===================================================================== */
+body.theme-standard {
+    --primary: #e0482b;
+    --primary-dark: #c73c21;
+    --accent: #2f9a83;
+    --bg: #fff6ec;
+    --text: #352a4a;
+    --heading: #352a4a;
+    --border: #ecdccb;
+    --card: #ffffff;
+    --tile: #ffffff;
+    --text-muted: #6b6080;
+    --avatar-bg: #fdc84b;
+    --avatar-text: #352a4a;
+    --navbar-bg: #ffffff;
+    --box-shadow: 0 10px 28px rgba(53, 42, 74, 0.08);
+    --shadow-soft: 0 12px 30px rgba(53, 42, 74, 0.14);
+    --radius: 26px;
+    --radius-small: 14px;
+
+    /* eigene Werte fuer diesen Look */
+    --st-input-bg: #fffaf4;
+    --st-hover: #fff1e0;
+    --st-yellow: #fdc84b;
+    --st-pink: #ffd3dc;
+    --st-mint: #cdeee3;
+    --st-butter: #fde7a6;
+    --st-lilac: #ded8fb;
+    --st-peach: #ffdccf;
+    --st-sky: #d5ecf6;
+    --st-tile-text: #352a4a;
+    --st-info-bg: #e3f4ee;
+    --st-info-text: #1d5c4c;
+    --st-error-bg: #ffe4dc;
+    --st-error-text: #9a2d17;
+
+    font-family: ui-rounded, "SF Pro Rounded", "Nunito", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.theme-standard {
+        --primary: #f0613f;
+        --primary-dark: #ff7655;
+        --accent: #3fb79c;
+        --bg: #1d1729;
+        --text: #f4eefc;
+        --heading: #f4eefc;
+        --border: #4a3f60;
+        --card: #2e2642;
+        --tile: #2e2642;
+        --text-muted: #c2b8d4;
+        --navbar-bg: #2e2642;
+        --box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+        --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.5);
+        --st-input-bg: #241d33;
+        --st-hover: #3a3052;
+        --st-info-bg: #1f3d36;
+        --st-info-text: #bdeee0;
+        --st-error-bg: #4a2420;
+        --st-error-text: #ffc9bb;
+    }
+}
+
+/* Deko-Kreise im Hintergrund, wie auf der Startseite */
+body.theme-standard::before,
+body.theme-standard::after {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+body.theme-standard::before {
+    width: 260px; height: 260px;
+    left: -140px; top: 160px;
+    background: var(--st-pink);
+}
+
+body.theme-standard::after {
+    width: 200px; height: 200px;
+    right: -90px; bottom: 60px;
+    background: var(--st-mint);
+}
+
+/* im Dunkelmodus gedaempft, damit sie nicht blenden */
+@media (prefers-color-scheme: dark) {
+    body.theme-standard::before,
+    body.theme-standard::after { opacity: 0.12; }
+}
+
+/* Ueberschriften kraeftiger */
+.theme-standard h1,
+.theme-standard h2,
+.theme-standard h3 {
+    font-weight: 800;
+    letter-spacing: -0.01em;
+}
+
+.theme-standard a:hover { text-decoration: none; color: var(--primary); }
+
+/* ---------- Navbar: schwebende weisse Leiste mit Smiley-Logo ---------- */
+.theme-standard .navbar {
+    position: sticky;
+    top: 12px;
+    z-index: 30;
+    max-width: 1100px;
+    margin: 12px auto 0;
+    padding: 8px 12px 8px 18px;
+    border-radius: 999px;
+    color: var(--text);
+    box-shadow: 0 6px 20px rgba(53, 42, 74, 0.12);
+}
+
+@media (max-width: 1140px) {
+    .theme-standard .navbar { margin-left: 12px; margin-right: 12px; }
+}
+
+.theme-standard .navbar a,
+.theme-standard .navbarLogo h3,
+.theme-standard .familyName {
+    color: var(--text);
+}
+
+.theme-standard .navbarLogo h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.15rem;
+}
+
+/* Smiley-Logo vor "FamilyFlow" (gleiches SVG wie src/components/logo.php) */
+.theme-standard .navbarLogo h3::before {
+    content: "";
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23fdc84b'/%3E%3Ccircle cx='11.5' cy='13' r='1.8' fill='%23352a4a'/%3E%3Ccircle cx='20.5' cy='13' r='1.8' fill='%23352a4a'/%3E%3Cpath d='M10 18.5q6 5.5 12 0' fill='none' stroke='%23352a4a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.theme-standard .familyName {
+    background: var(--st-hover);
+    padding: 6px 14px;
+    border-radius: 999px;
+}
+
+.theme-standard .avatar {
+    width: 42px;
+    height: 42px;
+    box-shadow: 0 0 0 3px var(--st-yellow);
+}
+
+/* Aufklapp-Menues */
+.theme-standard #menuList,
+.theme-standard #familySwitchList,
+.theme-standard #listMenuList,
+.theme-standard .eventMenu {
+    border-radius: 18px;
+    border: none;
+    padding: 6px;
+}
+
+.theme-standard #menuList { top: 64px; }
+
+.theme-standard #menuList a,
+.theme-standard #familySwitchList a,
+.theme-standard #listMenuList a,
+.theme-standard .eventMenu a {
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.theme-standard #menuList a:hover,
+.theme-standard #familySwitchList a:hover,
+.theme-standard #listMenuList a:hover,
+.theme-standard .eventMenu a:hover {
+    background: var(--st-hover);
+    color: var(--text);
+}
+
+/* ---------- Karten / Formular-Container ---------- */
+.theme-standard .contentcontainer,
+.theme-standard .CreateFamilyContainer,
+.theme-standard main {
+    padding: 28px;
+    border-radius: 28px;
+}
+
+/* ---------- Eingabefelder ---------- */
+.theme-standard input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="file"]),
+.theme-standard textarea,
+.theme-standard select {
+    font-family: inherit;
+    background: var(--st-input-bg);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 11px 14px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.theme-standard input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="file"]):focus,
+.theme-standard textarea:focus,
+.theme-standard select:focus {
+    border-color: var(--st-yellow);
+    box-shadow: 0 0 0 4px rgba(253, 200, 75, 0.3);
+}
+
+.theme-standard #recipeSearchInput { border-radius: 999px; }
+
+/* Beschriftung UEBER dem Feld statt daneben, Feld volle Breite
+   (nur bei <label>, die ein Textfeld/Auswahl enthalten - Checkbox-Labels bleiben nebeneinander) */
+.theme-standard form label:has(> input:not([type="checkbox"]):not([type="radio"]):not([type="color"]), > select, > textarea) {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 0.92rem;
+}
+
+.theme-standard form label > input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+.theme-standard form label > select,
+.theme-standard form label > textarea {
+    width: 100%;
+    font-weight: normal;
+}
+
+/* Datei-Auswahl (Profilbild, Rezeptfoto) */
+.theme-standard input[type="file"] {
+    font-family: inherit;
+    font-size: 0.9rem;
+    padding: 8px;
+    border: 2px dashed var(--border);
+    border-radius: 14px;
+    background: var(--st-input-bg);
+}
+
+.theme-standard input[type="file"]::file-selector-button {
+    font: inherit;
+    font-weight: 700;
+    color: #352a4a;
+    background: var(--st-yellow);
+    border: none;
+    border-radius: 999px;
+    padding: 6px 14px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+/* "Spaeter einrichten" & Co. mittig unter dem Formular */
+.skipLink {
+    text-align: center;
+}
+
+/* ---------- Buttons: rund und rot wie auf der Startseite ---------- */
+.theme-standard button,
+.theme-standard .linkButton {
+    font-family: inherit;
+    font-weight: 700;
+    padding: 12px 22px;
+    border-radius: 999px;
+    box-shadow: 0 8px 20px rgba(224, 72, 43, 0.25);
+    transition: transform 0.15s, background-color 0.15s;
+}
+
+.theme-standard button:hover,
+.theme-standard .linkButton:hover {
+    transform: translateY(-2px);
+    color: #ffffff;
+}
+
+.theme-standard .todayBtn {
+    border-radius: 999px;
+    padding: 3px 12px;
+    color: var(--text);
+    border-color: var(--text);
+}
+
+.theme-standard .todayBtn:hover { background: var(--text); color: var(--bg); }
+
+.theme-standard .backLink { color: var(--text); }
+
+/* Haekchen: gelb statt gruen, mit dunklem Haken */
+.theme-standard input[type="checkbox"]:checked {
+    background: var(--st-yellow);
+    border-color: var(--st-yellow);
+}
+
+.theme-standard input[type="checkbox"]::before { background: #352a4a; }
+
+/* ---------- Kacheln: Pastellfarben, leicht schraeg ---------- */
+.theme-standard .tile {
+    background: var(--st-mint);
+    border-radius: 26px;
+    box-shadow: none;
+    transition: transform 0.2s;
+}
+
+.theme-standard .tiles > .tile:nth-child(6n+1) { background: var(--st-mint); }
+.theme-standard .tiles > .tile:nth-child(6n+2) { background: var(--st-butter); }
+.theme-standard .tiles > .tile:nth-child(6n+3) { background: var(--st-pink); }
+.theme-standard .tiles > .tile:nth-child(6n+4) { background: var(--st-lilac); }
+.theme-standard .tiles > .tile:nth-child(6n+5) { background: var(--st-peach); }
+.theme-standard .tiles > .tile:nth-child(6n+6) { background: var(--st-sky); }
+
+.theme-standard .tiles > .tile:nth-child(odd) { transform: rotate(-0.8deg); }
+.theme-standard .tiles > .tile:nth-child(even) { transform: rotate(0.8deg); }
+.theme-standard .tiles > .tile:hover { transform: rotate(0deg) translateY(-3px); }
+
+/* Text auf den Pastell-Kacheln immer dunkel (auch im Dunkelmodus) */
+.theme-standard .tile .tile_title,
+.theme-standard .tile .tile_subtext,
+.theme-standard .tile .tile_edit,
+.theme-standard .tile a {
+    color: var(--st-tile-text);
+}
+
+.theme-standard .tile .tile_subtext { opacity: 0.8; }
+
+/* Eintraege (Listen-Eintraege, Termine, Aemtli) */
+.theme-standard .member,
+.theme-standard .eventTile,
+.theme-standard .choreTile {
+    border-left: 6px solid var(--st-yellow);
+    border-radius: 18px;
+    box-shadow: var(--box-shadow);
+}
+
+/* ---------- Kalender ---------- */
+.theme-standard .calendarDay {
+    border: 2px solid var(--border);
+    border-radius: 14px;
+}
+
+.theme-standard .calendarDay:hover { background: var(--st-hover); }
+
+/* Leere Felder vor dem 1. / nach dem letzten Tag: ohne Rahmen */
+.theme-standard .calendarDay.empty,
+.theme-standard .calendarDay.empty:hover {
+    border: none;
+    background: transparent;
+}
+
+.theme-standard .calendarDay.calendarDayToday {
+    border-color: var(--primary);
+    background: var(--st-hover);
+}
+
+.theme-standard .calendarEventBar { border-radius: 6px; }
+
+.theme-standard .miniMonth {
+    border: 2px solid var(--border);
+    border-radius: 22px;
+}
+
+.theme-standard .miniMonth.miniMonthCurrent { border-color: var(--primary); }
+
+/* ---------- Benachrichtigungen ---------- */
+.theme-standard .notification { border-bottom: 2px dashed var(--border); }
+.theme-standard .notification.unread { background: var(--st-hover); border-radius: 14px; }
+
+/* ---------- Meldungen ---------- */
+.theme-standard .flash { border: none; border-radius: 14px; }
+.theme-standard .flashInfo { background: var(--st-info-bg); color: var(--st-info-text); }
+.theme-standard .flashError { background: var(--st-error-bg); color: var(--st-error-text); }
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-standard .tile,
+    .theme-standard button,
+    .theme-standard .linkButton { transition: none; }
+}
