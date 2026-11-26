@@ -5,6 +5,7 @@ uploads/recipes/*
 uploads/avatars/*
 !uploads/avatars/.gitkeep
 src/config/mailconfig.php
+src/config/impressum.php
 storage/mails/*
 !storage/mails/.gitkeep
 !storage/mails/index.html

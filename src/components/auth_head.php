@@ -6,8 +6,10 @@
 // Vor dem Einbinden setzen:
 //   $authTitle = 'Login';                      -> Titel im Browser-Tab
 //   $authBadge = 'Schön, dass du wieder da bist!';  -> gelbes Schildchen ueber der Ueberschrift
+//   $authWide = true;                         -> breite Karte fuer laengere Texte (Impressum, Datenschutz)
 $logoSvg = require __DIR__ . '/logo.php';
 $authTitle = $authTitle ?? 'FamilyFlow';
+$authWide = $authWide ?? false;
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -29,7 +31,7 @@ $authTitle = $authTitle ?? 'FamilyFlow';
 </header>
 
 <main class="auth-main">
-    <div class="auth-card">
+    <div class="auth-card<?= $authWide ? ' auth-card-wide' : '' ?>">
         <?php if (!empty($authBadge)): ?>
             <span class="auth-badge"><?= htmlspecialchars($authBadge) ?></span>
         <?php endif; ?>

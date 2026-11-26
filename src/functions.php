@@ -305,6 +305,15 @@ function sendNewUserNotification($user) {
     return $mailer->send($to, 'FamilyFlow', 'Neue Registrierung: ' . $name, $html, $text);
 }
 
+// Meldung fuer die Login-Sperre, z.B. "... in 5 Minuten wieder versuchen."
+// Mit Link zu "Passwort vergessen" (Text stammt nur aus unserem Code, deshalb HTML erlaubt).
+function lockMessage($seconds) {
+    $minutes = max(1, (int) ceil($seconds / 60));
+    $when = $minutes === 1 ? 'einer Minute' : $minutes . ' Minuten';
+    return 'Zu viele fehlgeschlagene Anmeldeversuche. Aus Sicherheitsgründen kannst du es erst in '
+        . $when . ' wieder versuchen. <a href="/user/ForgotPassword.php">Passwort vergessen?</a>';
+}
+
 // Ist die eingeloggte Person die Betreiberin der App? (z.B. fuer die Feedback-Uebersicht)
 // Verglichen wird mit 'admin_email' aus mailconfig.php - so steht keine private
 // Adresse im Code. Leere Einstellung = niemand ist Betreiberin.

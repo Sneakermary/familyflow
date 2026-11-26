@@ -14,17 +14,34 @@ if (isset($_POST['loginBtn'])) {
     require_once __DIR__ . '/../src/classes/Database.php';
     require_once __DIR__ . '/../src/classes/User.php';
 
+    require_once __DIR__ . '/../src/classes/LoginThrottle.php';
+
     $email = trim($_POST['email'] ?? '');
     $pw = $_POST['pw'] ?? '';
 
     $db = new Database;
     $pdo = $db->connect();
 
+    // Login-Sperre nach zu vielen Fehlversuchen (Regeln siehe LoginThrottle.php).
+    // Waehrend der Sperre wird das Passwort gar nicht erst geprueft.
+    $throttle = new LoginThrottle($pdo);
+    $ip = LoginThrottle::clientIp();
+    $lockedSeconds = $throttle->secondsLocked($email, $ip);
+    if ($lockedSeconds > 0) {
+        $_SESSION['errors'] = ['login' => lockMessage($lockedSeconds)];
+        $_SESSION['oldEmail'] = $email;
+        header("Location: /user/UserLogin.php");
+        exit();
+    }
+
     $user = new User($pdo);
 
     $found = $user->findByEmail($email);
 
     if ($found && password_verify($pw, $found->pw_hash)) {
+        // Richtiges Passwort: bisherige Fehlversuche vergessen
+        $throttle->clear($email, $ip);
+
         // E-Mail noch nicht bestaetigt -> nicht einloggen. Die Meldung kommt erst NACH der
         // Passwortpruefung, damit niemand so herausfinden kann, welche Adressen registriert sind.
         require_once __DIR__ . '/../src/classes/Mailer.php';
@@ -43,7 +60,13 @@ if (isset($_POST['loginBtn'])) {
         exit();
     }
     else {
-       $_SESSION['errors'] = ['login' => 'E-Mail oder Passwort ist falsch!'];
+       // Fehlversuch merken - auch fuer Adressen ohne Konto, sonst wuerde die Sperre verraten,
+       // welche Adressen registriert sind. Ist die Grenze jetzt erreicht, gleich die Sperre melden.
+       $throttle->recordFailure($email, $ip);
+       $lockedSeconds = $throttle->secondsLocked($email, $ip);
+       $_SESSION['errors'] = ['login' => $lockedSeconds > 0
+           ? lockMessage($lockedSeconds)
+           : 'E-Mail oder Passwort ist falsch!'];
        $_SESSION['oldEmail'] = $email;
        header("Location: /user/UserLogin.php");
        exit();

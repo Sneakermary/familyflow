@@ -278,6 +278,33 @@ body.auth {
 .auth-footer a { text-decoration: none; color: var(--au-muted); }
 .auth-footer a:hover { color: var(--au-red); }
 
+/* ---------- Breite Karte fuer Rechtstexte (Impressum, Datenschutz) ---------- */
+.auth-card-wide { max-width: 760px; }
+/* lange Texte oben beginnen statt senkrecht zentriert */
+.auth-main:has(.auth-card-wide) { align-items: flex-start; }
+.auth-card-wide::before { transform: rotate(1deg); }
+
+.legal h2 {
+    margin: 1.6rem 0 0.4rem;
+    font-size: 1.1rem;
+    font-weight: 800;
+}
+
+.legal p,
+.legal li {
+    margin: 0 0 0.6rem;
+    font-size: 0.95rem;
+    color: var(--au-text);
+}
+
+.legal a {
+    color: var(--au-red);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.legal a:hover { text-decoration: underline; }
+
 /* ---------- Handy ---------- */
 @media (max-width: 520px) {
     .auth-logo { font-size: 1rem; }

@@ -44,6 +44,7 @@ mkdir -p "$WORK/files"
 cp -a "$APP_DIR/uploads" "$WORK/files/"
 mkdir -p "$WORK/files/config" "$WORK/files/server"
 cp -a "$APP_DIR"/src/config/dbconfig.php "$APP_DIR"/src/config/mailconfig.php "$WORK/files/config/"
+cp -a "$APP_DIR"/src/config/impressum.php "$WORK/files/config/" 2>/dev/null || true
 cp -a /etc/apache2/conf-available/familyflow-security.conf "$WORK/files/server/" 2>/dev/null || true
 cp -a /etc/php/*/apache2/conf.d/99-familyflow.ini "$WORK/files/server/" 2>/dev/null || true
 
