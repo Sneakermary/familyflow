@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/Recipe.php';
+require_once __DIR__ . '/../src/functions.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
 
@@ -53,7 +54,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
 
 <div class="contentcontainer">
     <?php if ($r->photo): ?>
-        <img src="/uploads/recipes/<?= htmlspecialchars($r->photo) ?>" alt="<?= htmlspecialchars($r->title) ?>" class="recipePhoto">
+        <img src="<?= htmlspecialchars(imageUrl('recipe', $r->photo)) ?>" alt="<?= htmlspecialchars($r->title) ?>" class="recipePhoto">
     <?php endif; ?>
 
     <?php if ($r->ingredients): ?>

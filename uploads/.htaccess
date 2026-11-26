@@ -1,0 +1,4 @@
+# Hochgeladene Bilder NICHT direkt ausliefern - nur ueber /image.php (prueft Login + Berechtigung).
+# Am Pi wirkt diese Datei nicht (AllowOverride None) - dort steht die Sperre in
+# /etc/apache2/conf-available/familyflow-security.conf
+Require all denied

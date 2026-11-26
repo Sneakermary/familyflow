@@ -147,7 +147,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
         </label>
 
         <?php if ($r->photo): ?>
-            <img src="/uploads/recipes/<?= htmlspecialchars($r->photo) ?>" alt="Aktuelles Foto" class="recipePhotoPreview">
+            <img src="<?= htmlspecialchars(imageUrl('recipe', $r->photo)) ?>" alt="Aktuelles Foto" class="recipePhotoPreview">
             <label><input type="checkbox" name="removePhoto"> Foto entfernen</label>
         <?php endif; ?>
         <label>Foto <?= $r->photo ? 'ersetzen' : 'hinzufügen' ?> (optional):

@@ -4,11 +4,17 @@ function initials($firstname, $lastname) {
     return mb_strtoupper(mb_substr($firstname, 0, 1) . mb_substr($lastname, 0, 1));
 }
 
+// Adresse eines hochgeladenen Bildes. Bilder laufen ueber image.php, das prueft,
+// ob die eingeloggte Person das Bild sehen darf ($type: 'recipe' oder 'avatar').
+function imageUrl($type, $filename) {
+    return '/image.php?type=' . urlencode($type) . '&file=' . urlencode($filename);
+}
+
 // Avatar-HTML: Foto falls hochgeladen, sonst Initialen-Kreis als Fallback.
 // $attributes wird roh in den Tag eingesetzt (z.B. 'id="menuBtn" class="avatar"').
 function avatarHtml($user, $attributes = 'class="avatar"') {
     if (!empty($user->avatar)) {
-        return '<img src="/uploads/avatars/' . htmlspecialchars($user->avatar) . '" alt="" ' . $attributes . '>';
+        return '<img src="' . htmlspecialchars(imageUrl('avatar', $user->avatar)) . '" alt="" ' . $attributes . '>';
     }
     return '<span ' . $attributes . '>' . htmlspecialchars(initials($user->firstname, $user->lastname)) . '</span>';
 }
