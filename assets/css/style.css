@@ -1845,6 +1845,91 @@ body.theme-standard::after {
 
 .chatPlaceholderIcon { font-size: 3rem; }
 
+/* ---------- Emoji-Auswahl ---------- */
+.chatMain { position: relative; }
+
+.chatEmojiPicker {
+    position: absolute;
+    left: 12px;
+    bottom: 70px;
+    z-index: 20;
+    width: 340px;
+    max-width: calc(100% - 24px);
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: var(--shadow-soft);
+    border: 2px solid var(--border);
+    padding: 8px;
+}
+
+.chatEmojiTabs {
+    display: flex;
+    gap: 2px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--border);
+}
+
+.chatPage button.chatEmojiTab,
+.chatPage button.chatEmoji {
+    background: transparent;
+    color: var(--text);
+    box-shadow: none;
+    transform: none;
+    padding: 0;
+    border-radius: 10px;
+    font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+    line-height: 1;
+}
+
+.chatPage button.chatEmojiTab {
+    flex: 1;
+    height: 34px;
+    font-size: 1.15rem;
+    opacity: 0.55;
+}
+
+.chatPage button.chatEmojiTab.active {
+    opacity: 1;
+    background: var(--st-hover, var(--bg));
+}
+
+.chatEmojiTitle {
+    margin: 6px 4px 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+}
+
+.chatEmojiGrid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 2px;
+    max-height: 210px;
+    overflow-y: auto;
+}
+
+.chatPage button.chatEmoji {
+    height: 38px;
+    font-size: 1.45rem;
+}
+
+.chatPage button.chatEmoji:hover,
+.chatPage button.chatEmojiTab:hover {
+    background: var(--st-hover, var(--bg));
+    color: var(--text);
+}
+
+.chatEmojiEmpty {
+    grid-column: 1 / -1;
+    margin: 12px 4px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.chatPage button.chatIconBtn.active { background: var(--st-hover, var(--bg)); }
+
 /* ---------- Handy: entweder Liste oder Chat ---------- */
 @media (max-width: 760px) {
     .chatPage {
@@ -1857,6 +1942,8 @@ body.theme-standard::after {
     .chatPage:not(.chatOpen) .chatMain { display: none; }
     .chatBack { display: inline-block; }
     .chatMsg { max-width: 85%; }
+    .chatEmojiPicker { left: 8px; right: 8px; width: auto; max-width: none; }
+    .chatEmojiGrid { grid-template-columns: repeat(7, 1fr); }
 }
 
 /* Navbar am Handy kompakter, damit Sprechblase, Glocke und Profilbild in eine Zeile passen */
@@ -1870,4 +1957,97 @@ body.theme-standard::after {
     /* Standard-Design: nur das Smiley-Logo, ohne Schriftzug "FamilyFlow" */
     .theme-standard .navbarLogo h3 { font-size: 0; gap: 0; }
     .theme-standard .familyName { padding: 5px 10px; }
+}
+
+/* =====================================================================
+   POP-UPS (live.js): neue Nachrichten/Benachrichtigungen oben rechts
+   ===================================================================== */
+.liveToasts {
+    position: fixed;
+    top: 84px;
+    right: 16px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 340px;
+    max-width: calc(100vw - 32px);
+    pointer-events: none;
+}
+
+.liveToast {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 10px 12px 12px;
+    background: var(--card);
+    color: var(--text);
+    border-radius: 18px;
+    box-shadow: var(--shadow-soft);
+    border: 2px solid var(--border);
+    border-left: 6px solid var(--primary);
+    text-decoration: none;
+    animation: liveToastIn 0.25s ease-out;
+}
+
+a.liveToast:hover { text-decoration: none; color: var(--text); transform: translateY(-1px); }
+
+.liveToast.leaving {
+    opacity: 0;
+    transform: translateX(30px);
+    transition: opacity 0.25s, transform 0.25s;
+}
+
+.liveToastIcon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--st-hover, var(--bg));
+    font-size: 1.15rem;
+}
+
+.liveToastBody {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    font-size: 0.92rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.liveToastBody strong { font-size: 0.95rem; }
+
+.liveToast button.liveToastClose {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    line-height: 1;
+    box-shadow: none;
+    transform: none;
+}
+
+.liveToast button.liveToastClose:hover { background: var(--st-hover, var(--bg)); color: var(--text); }
+
+@keyframes liveToastIn {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@media (max-width: 480px) {
+    .liveToasts { top: 76px; left: 8px; right: 8px; width: auto; max-width: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .liveToast { animation: none; }
+    .liveToast.leaving { transition: none; }
 }

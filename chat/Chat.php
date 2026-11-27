@@ -274,12 +274,15 @@ include_once __DIR__ . '/../src/components/navbar.php';
             <form method="POST" class="chatInput" id="chatForm">
                 <?= csrfField() ?>
                 <button type="button" class="chatIconBtn" title="Bilder senden – kommt bald" disabled>+</button>
-                <button type="button" class="chatIconBtn" id="chatEmojiBtn" title="Emoji – kommt bald" disabled>😊</button>
+                <button type="button" class="chatIconBtn" id="chatEmojiBtn" title="Emoji einfügen" aria-label="Emoji einfügen" aria-expanded="false" aria-controls="chatEmojiPicker">😊</button>
                 <textarea name="body" id="chatBody" rows="1" maxlength="<?= Chat::MAX_LENGTH ?>" placeholder="Gib eine Nachricht ein" required></textarea>
                 <button type="submit" name="sendBtn" class="chatSendBtn" aria-label="Senden">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>
                 </button>
             </form>
+
+            <!-- Emoji-Auswahl: wird von chat.js beim ersten Oeffnen befuellt -->
+            <div class="chatEmojiPicker hidden" id="chatEmojiPicker" role="dialog" aria-label="Emoji auswählen"></div>
 
         <?php else: ?>
             <div class="chatPlaceholder">

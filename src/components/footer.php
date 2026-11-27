@@ -8,6 +8,7 @@
 <script src="<?= asset('/assets/js/choreForm.js') ?>"></script>
 <script src="<?= asset('/assets/js/eventMenu.js') ?>"></script>
 <script src="<?= asset('/assets/js/recipeSearch.js') ?>"></script>
+<script src="<?= asset('/assets/js/live.js') ?>"></script>
 
 </body>
 </html>

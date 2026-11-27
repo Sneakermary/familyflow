@@ -196,3 +196,146 @@
 
     scrollToBottom();
 })();
+
+// ---------- Emoji-Auswahl (😊-Knopf im Eingabefeld) ----------
+// Keine fremde Bibliothek: die Emojis kommen aus der Schrift des Geraets.
+// "Zuletzt benutzt" wird nur im Browser (localStorage) gespeichert.
+(function () {
+    const btn = document.getElementById('chatEmojiBtn');
+    const picker = document.getElementById('chatEmojiPicker');
+    const input = document.getElementById('chatBody');
+    if (!btn || !picker || !input) {
+        return;
+    }
+
+    const RECENT_KEY = 'ffChatEmojiRecent';
+    const categories = [
+        { icon: '🕘', name: 'Zuletzt benutzt', emojis: [] },
+        { icon: '😊', name: 'Smileys', emojis: '😀 😃 😄 😁 😆 😅 😂 🤣 😊 😇 🙂 😉 😌 😍 🥰 😘 😋 😛 😜 🤪 😎 🤩 🥳 😏 😒 😞 😔 😟 😕 🙁 😣 😖 😫 😩 🥺 😢 😭 😤 😠 😡 🤯 😳 😱 😨 😰 🤗 🤔 🤭 🤫 😶 😐 😑 😬 🙄 😯 😴 🤤 😪 🤒 🤕 🤧 🥱 😷'.split(' ') },
+        { icon: '❤️', name: 'Herzen & Gesten', emojis: '❤️ 🧡 💛 💚 💙 💜 🤎 🖤 🤍 💕 💞 💓 💗 💖 💘 💝 👍 👎 👌 ✌️ 🤞 🤟 🤙 👋 👏 🙌 👐 🤲 🙏 💪 ✊ 👊 🫶 ☝️ 👉 👈 👆 👇 ✋'.split(' ') },
+        { icon: '👨‍👩‍👧', name: 'Familie & Menschen', emojis: '👶 🧒 👦 👧 🧑 👨 👩 🧓 👴 👵 👪 👨‍👩‍👧 👨‍👩‍👦 👨‍👩‍👧‍👦 👩‍👧 👨‍👦 💑 👫 🤰 🧑‍🍳 🧑‍🏫 🧑‍💻 🧑‍🔧 🏃 🚶 🧘 🛌'.split(' ') },
+        { icon: '🍕', name: 'Essen', emojis: '🍎 🍐 🍊 🍋 🍌 🍉 🍇 🍓 🍒 🥝 🍅 🥕 🌽 🥦 🥒 🥔 🍞 🥐 🧀 🥚 🍳 🥞 🥓 🍗 🍔 🍟 🍕 🌭 🥪 🌮 🍝 🍜 🍲 🍛 🍣 🥗 🍰 🎂 🧁 🍪 🍫 🍬 🍦 ☕ 🍵 🥛 🧃 🍺 🍷'.split(' ') },
+        { icon: '🎉', name: 'Alltag & Feiern', emojis: '🎉 🎊 🎁 🎈 🎂 🎄 🎃 🐣 ⭐ ✨ 🔥 💯 ✅ ❌ ❗ ❓ 📅 ⏰ 🕐 🏠 🏫 🏥 🚗 🚌 🚲 ✈️ 🛒 🧺 🧹 🧽 🧼 🛁 🍽️ 📚 ✏️ 📝 💼 💻 📱 📞 💡 🔑 💰 ⚽ 🏀 🎮 🎵 📷 🎨'.split(' ') },
+        { icon: '🐶', name: 'Tiere & Natur', emojis: '🐶 🐱 🐭 🐹 🐰 🦊 🐻 🐼 🐨 🐯 🦁 🐮 🐷 🐸 🐵 🐔 🐧 🐦 🐤 🦄 🐝 🦋 🐞 🐢 🐠 🐬 🐳 🌸 🌼 🌻 🌹 🌷 🌱 🌳 🍀 🍁 ☀️ 🌤️ ⛅ 🌧️ ⛈️ ❄️ ☃️ 🌈 🌙 ⭐'.split(' ') },
+    ];
+    let built = false;
+    let current = 1;
+
+    function loadRecent() {
+        try {
+            return JSON.parse(localStorage.getItem(RECENT_KEY)) || [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveRecent(emoji) {
+        const list = [emoji].concat(loadRecent().filter(e => e !== emoji)).slice(0, 24);
+        try {
+            localStorage.setItem(RECENT_KEY, JSON.stringify(list));
+        } catch (e) { /* privater Modus o.ae. -> egal */ }
+    }
+
+    // Emoji an der Cursor-Position einfuegen (auch mitten im Text)
+    function insert(emoji) {
+        const start = input.selectionStart ?? input.value.length;
+        const end = input.selectionEnd ?? input.value.length;
+        input.setRangeText(emoji, start, end, 'end');
+        input.dispatchEvent(new Event('input')); // Eingabefeld waechst mit
+        // Am PC zurueck ins Eingabefeld; am Handy nicht, sonst klappt die Tastatur
+        // auf und verdeckt das Emoji-Fenster
+        if (!window.matchMedia('(pointer: coarse)').matches) {
+            input.focus();
+        }
+        saveRecent(emoji);
+    }
+
+    function showCategory(index) {
+        current = index;
+        categories[0].emojis = loadRecent();
+        picker.querySelectorAll('.chatEmojiTab').forEach((tab, i) => tab.classList.toggle('active', i === index));
+
+        const grid = picker.querySelector('.chatEmojiGrid');
+        grid.textContent = '';
+        const list = categories[index].emojis;
+        if (list.length === 0) {
+            const empty = document.createElement('p');
+            empty.className = 'chatEmojiEmpty';
+            empty.textContent = 'Noch keine – wähle ein Emoji aus den anderen Reitern.';
+            grid.appendChild(empty);
+            return;
+        }
+        list.forEach(function (emoji) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'chatEmoji';
+            b.textContent = emoji;
+            b.setAttribute('aria-label', emoji);
+            b.addEventListener('click', () => insert(emoji));
+            grid.appendChild(b);
+        });
+        picker.querySelector('.chatEmojiTitle').textContent = categories[index].name;
+    }
+
+    function build() {
+        const tabs = document.createElement('div');
+        tabs.className = 'chatEmojiTabs';
+        categories.forEach(function (cat, i) {
+            const t = document.createElement('button');
+            t.type = 'button';
+            t.className = 'chatEmojiTab';
+            t.textContent = cat.icon;
+            t.title = cat.name;
+            t.setAttribute('aria-label', cat.name);
+            t.addEventListener('click', () => showCategory(i));
+            tabs.appendChild(t);
+        });
+        const title = document.createElement('p');
+        title.className = 'chatEmojiTitle';
+        const grid = document.createElement('div');
+        grid.className = 'chatEmojiGrid';
+        picker.append(tabs, title, grid);
+        built = true;
+    }
+
+    function open() {
+        if (!built) {
+            build();
+        }
+        // Gibt es schon "Zuletzt benutzt", dort starten, sonst bei den Smileys
+        showCategory(loadRecent().length ? 0 : current);
+        picker.classList.remove('hidden');
+        btn.setAttribute('aria-expanded', 'true');
+        btn.classList.add('active');
+    }
+
+    function close() {
+        picker.classList.add('hidden');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.classList.remove('active');
+    }
+
+    btn.addEventListener('click', function (event) {
+        event.stopPropagation();
+        picker.classList.contains('hidden') ? open() : close();
+    });
+
+    // Klick daneben oder Escape schliesst das Fenster
+    document.addEventListener('click', function (event) {
+        if (!picker.classList.contains('hidden') && !picker.contains(event.target) && event.target !== btn) {
+            close();
+        }
+    });
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !picker.classList.contains('hidden')) {
+            close();
+            input.focus();
+        }
+    });
+
+    // Nach dem Senden schliessen
+    const form = document.getElementById('chatForm');
+    if (form) {
+        form.addEventListener('submit', close);
+    }
+})();

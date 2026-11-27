@@ -214,6 +214,29 @@ class Chat {
         $stmt->execute([$convId, $convId, $userId]);
     }
 
+    // Neue, ungelesene Nachrichten von ANDEREN in meinen Chats mit id > $afterId
+    // (fuer die Pop-ups), aelteste zuerst - mit Absender und Chat-Infos
+    public function newMessagesSince($userId, $afterId, $limit = 10) {
+        $stmt = $this->pdo->prepare("SELECT m.id, m.conversation_id, m.sender_id, m.body,
+                u.firstname, u.lastname, c.type, c.name
+            FROM messages m
+            JOIN conversation_members cm ON cm.conversation_id = m.conversation_id AND cm.user_id = ?
+            JOIN conversations c ON c.id = m.conversation_id
+            JOIN users u ON u.id = m.sender_id
+            WHERE m.id > ? AND m.sender_id <> ? AND m.id > cm.last_read_message_id
+            ORDER BY m.id LIMIT " . (int) $limit);
+        $stmt->execute([$userId, (int) $afterId, $userId]);
+        return $stmt->fetchAll();
+    }
+
+    // Hoechste Nachrichten-id in meinen Chats (Startpunkt fuer die Pop-ups)
+    public function latestMessageId($userId) {
+        $stmt = $this->pdo->prepare("SELECT COALESCE(MAX(m.id), 0) FROM messages m
+            JOIN conversation_members cm ON cm.conversation_id = m.conversation_id AND cm.user_id = ?");
+        $stmt->execute([$userId]);
+        return (int) $stmt->fetchColumn();
+    }
+
     // Anzahl aller ungelesenen Nachrichten (Zaehler an der Sprechblase in der Navbar)
     public function unreadTotal($userId) {
         $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM messages m

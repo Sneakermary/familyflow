@@ -26,6 +26,21 @@ class Notification {
         return (int) $stmt->fetchColumn();
     }
 
+    // Neue, ungelesene Benachrichtigungen mit id > $afterId (fuer die Pop-ups), aelteste zuerst
+    public function newSince($userId, $afterId, $limit = 10) {
+        $stmt = $this->pdo->prepare("SELECT id, message, link FROM notifications
+            WHERE user_id = ? AND id > ? AND is_read = 0 ORDER BY id LIMIT " . (int) $limit);
+        $stmt->execute([$userId, (int) $afterId]);
+        return $stmt->fetchAll();
+    }
+
+    // Hoechste id der eigenen Benachrichtigungen (Startpunkt fuer die Pop-ups)
+    public function latestId($userId) {
+        $stmt = $this->pdo->prepare("SELECT COALESCE(MAX(id), 0) FROM notifications WHERE user_id = ?");
+        $stmt->execute([$userId]);
+        return (int) $stmt->fetchColumn();
+    }
+
     // Alle Benachrichtigungen einer Person als gelesen markieren
     public function markAllAsReadForUser($userId) {
         $stmt = $this->pdo->prepare("UPDATE notifications SET is_read = 1 WHERE user_id = ?");

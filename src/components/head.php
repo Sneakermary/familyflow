@@ -23,4 +23,4 @@ if (isset($_SESSION['uid'])) {
     <?php endif; ?>
     <link href="<?= asset('/assets/css/style.css') ?>" rel="stylesheet">
 </head>
-<body class="<?= htmlspecialchars($themeClass) ?>">
+<body class="<?= htmlspecialchars($themeClass) ?>"<?= isset($_SESSION['uid']) ? ' data-uid="' . (int) $_SESSION['uid'] . '"' : '' ?>>
