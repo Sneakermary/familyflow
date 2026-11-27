@@ -877,6 +877,13 @@ textarea {
     margin-left: 0;
 }
 
+/* Gleicher Abstand Sprechblase -> Glocke wie Glocke -> Profilbild:
+   Glocke -> Profilbild = 8px Innenabstand + 16px Rand = 24px.
+   Sprechblase -> Glocke = 8px + Rand + 8px (Innenabstand der Glocke) -> Rand 8px */
+.chatLink {
+    margin-right: 8px;
+}
+
 .bellBadge {
     position: absolute;
     top: -2px;
@@ -1797,6 +1804,8 @@ body.theme-standard::after {
 @media (max-width: 480px) {
     .navbar { flex-wrap: nowrap; gap: 6px; padding-left: 12px; padding-right: 12px; }
     .bellLink { margin-right: 2px; padding: 4px; }
+    /* Handy: Glocke -> Profilbild = 4px + 2px; Sprechblase -> Glocke gleich gross halten */
+    .chatLink { margin-right: -2px; }
     .familyName { font-size: 0.85rem; }
     .familySwitch { min-width: 0; }
     /* Standard-Design: nur das Smiley-Logo, ohne Schriftzug "FamilyFlow" */
