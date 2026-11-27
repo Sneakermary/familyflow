@@ -47,10 +47,11 @@ include __DIR__ . '/src/components/auth_head.php';
     <p><strong>Zweck:</strong> Bereitstellung der App. <strong>Rechtsgrundlage:</strong> Vertrag bzw. Nutzungsverhältnis (Art. 6 Abs. 1 lit. b DSGVO).</p>
 
     <h2>4. Inhalte in der App</h2>
-    <p>Gespeichert werden die Inhalte, die du und deine Familie anlegen: <strong>Familien und Einladungen, Termine, Listen, Rezepte (mit Fotos), Aufgaben, Notizen und Spitznamen zu Familienmitgliedern sowie Benachrichtigungen</strong>.</p>
+    <p>Gespeichert werden die Inhalte, die du und deine Familie anlegen: <strong>Familien und Einladungen, Termine, Listen, Rezepte (mit Fotos), Aufgaben, Notizen und Spitznamen zu Familienmitgliedern, Chat-Nachrichten sowie Benachrichtigungen</strong>.</p>
     <ul>
         <li>Sichtbar sind diese Inhalte nur für Mitglieder deiner Familie – und nur für die, mit denen du sie teilst. Als „privat“ markierte Inhalte sieht nur ihre Erstellerin bzw. ihr Ersteller.</li>
         <li>Bei hochgeladenen Fotos entfernen wir automatisch Standort (GPS) und Kameradaten.</li>
+        <li><strong>Chat:</strong> Nachrichten schreiben kannst du allen, mit denen du in einer Familie bist. Eine Nachricht sehen nur die Personen, die in diesem Chat bzw. dieser Gruppe sind. Die Nachrichten werden verschlüsselt übertragen (HTTPS), auf dem Server aber nicht Ende-zu-Ende-verschlüsselt gespeichert.</li>
         <li>Bitte trag zu anderen Personen nur ein, was für den Familienalltag nötig ist, und möglichst keine besonders sensiblen Daten wie Gesundheitsangaben.</li>
     </ul>
     <p><strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. b DSGVO.</p>
@@ -81,7 +82,7 @@ include __DIR__ . '/src/components/auth_head.php';
     <h2>8. Wie lange wir Daten speichern</h2>
     <table class="legal-table">
         <tr><th>Daten</th><th>Speicherdauer</th></tr>
-        <tr><td>Konto und Inhalte</td><td>bis du dein Konto löschst bzw. die Löschung verlangst</td></tr>
+        <tr><td>Konto und Inhalte (inkl. Chat-Nachrichten)</td><td>bis du dein Konto löschst bzw. die Löschung verlangst</td></tr>
         <tr><td>Server-Logs</td><td>höchstens 15 Tage</td></tr>
         <tr><td>Fehlgeschlagene Anmeldeversuche</td><td>24 Stunden</td></tr>
         <tr><td>Links in E-Mails</td><td>1 Stunde (Passwort) bzw. 24 Stunden (Bestätigung)</td></tr>
