@@ -4,6 +4,14 @@ function initials($firstname, $lastname) {
     return mb_strtoupper(mb_substr($firstname, 0, 1) . mb_substr($lastname, 0, 1));
 }
 
+// Adresse einer CSS-/JS-Datei mit Versionsnummer (= Aenderungsdatum der Datei),
+// z.B. /assets/css/style.css?v=1764240000. Aendert sich die Datei, aendert sich die Adresse -
+// Browser und Cloudflare laden dann automatisch die neue Version statt der zwischengespeicherten.
+function asset($path) {
+    $file = __DIR__ . '/..' . $path;
+    return $path . (is_file($file) ? '?v=' . filemtime($file) : '');
+}
+
 // Adresse eines hochgeladenen Bildes. Bilder laufen ueber image.php, das prueft,
 // ob die eingeloggte Person das Bild sehen darf ($type: 'recipe' oder 'avatar').
 function imageUrl($type, $filename) {

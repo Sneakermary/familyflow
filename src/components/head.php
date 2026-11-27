@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../functions.php';
 $themeClass = 'theme-standard';
 if (isset($_SESSION['uid'])) {
     require_once __DIR__ . '/../classes/Database.php';
@@ -20,6 +21,6 @@ if (isset($_SESSION['uid'])) {
         <!-- Standard-Theme folgt dem Hell/Dunkel-Modus des Geraets (auch Datumsfelder, Auswahllisten) -->
         <meta name="color-scheme" content="light dark">
     <?php endif; ?>
-    <link href="/assets/css/style.css" rel="stylesheet">
+    <link href="<?= asset('/assets/css/style.css') ?>" rel="stylesheet">
 </head>
 <body class="<?= htmlspecialchars($themeClass) ?>">

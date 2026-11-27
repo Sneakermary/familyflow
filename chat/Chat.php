@@ -221,5 +221,5 @@ include_once __DIR__ . '/../src/components/navbar.php';
     </div>
 </section>
 
-<script src="/assets/js/chat.js"></script>
+<script src="<?= asset('/assets/js/chat.js') ?>"></script>
 <?php include_once __DIR__ . '/../src/components/footer.php'; ?>

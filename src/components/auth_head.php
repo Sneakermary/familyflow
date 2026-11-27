@@ -8,6 +8,7 @@
 //   $authBadge = 'Schön, dass du wieder da bist!';  -> gelbes Schildchen ueber der Ueberschrift
 //   $authWide = true;                         -> breite Karte fuer laengere Texte (Impressum, Datenschutz)
 $logoSvg = require __DIR__ . '/logo.php';
+require_once __DIR__ . '/../functions.php';
 $authTitle = $authTitle ?? 'FamilyFlow';
 $authWide = $authWide ?? false;
 ?>
@@ -18,7 +19,7 @@ $authWide = $authWide ?? false;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
     <title><?= htmlspecialchars($authTitle) ?> – FamilyFlow</title>
-    <link rel="stylesheet" href="/assets/css/auth.css">
+    <link rel="stylesheet" href="<?= asset('/assets/css/auth.css') ?>">
 </head>
 <body class="auth">
 

@@ -4,6 +4,7 @@
 // (style.css, Themes) die Startseite nicht beeinflussen.
 // Hell als Standard, dunkel automatisch, wenn das Geraet auf Dunkelmodus steht.
 require_once __DIR__ . '/src/components/session.php';
+require_once __DIR__ . '/src/functions.php';
 
 $loggedIn = isset($_SESSION['uid']);
 $startLink = $loggedIn ? '/family/SelectFamily.php' : '/user/UserRegister.php';
@@ -57,7 +58,7 @@ $steps = [
     <meta name="color-scheme" content="light dark">
     <title>FamilyFlow – Zuhause läuft's einfach gemeinsam besser</title>
     <meta name="description" content="Mit FamilyFlow haben alle Termine, Einkäufe und Aufgaben im Blick – ganz entspannt und für jeden verständlich.">
-    <link rel="stylesheet" href="/assets/css/landing.css">
+    <link rel="stylesheet" href="<?= asset('/assets/css/landing.css') ?>">
 </head>
 <body class="lp">
 
