@@ -10,7 +10,8 @@ require_once __DIR__ . '/src/components/session.php';
 require_once __DIR__ . '/src/classes/Database.php';
 require_once __DIR__ . '/src/classes/Recipe.php';
 
-function notFound() {
+function notFound()
+{
     http_response_code(404);
     exit();
 }
@@ -64,7 +65,7 @@ if (!$allowed) {
     notFound();
 }
 
-$path = __DIR__ . '/uploads/' . $folders[$type] . '/' . basename($file);
+$path = '/uploads/' . $folders[$type] . '/' . basename($file);
 if (!is_file($path)) {
     notFound();
 }
