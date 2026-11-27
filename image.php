@@ -65,7 +65,7 @@ if (!$allowed) {
     notFound();
 }
 
-$path = '/uploads/' . $folders[$type] . '/' . basename($file);
+$path = __DIR__ . '/uploads/' . $folders[$type] . '/' . basename($file);
 if (!is_file($path)) {
     notFound();
 }
