@@ -1566,6 +1566,65 @@ body.theme-standard::after {
 
 .chatNewBtn:hover { background: var(--text); color: var(--card); text-decoration: none; }
 
+/* Ausgeblendete Eintraege (Suche) wirklich ausblenden - sonst gewinnt display:flex von .chatListItem */
+.chatPage .hidden { display: none !important; }
+
+/* Lupe: gleicher runder Knopf wie das Plus */
+.chatPage button.chatSearchBtn {
+    display: inline-grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    padding: 0;
+    border-radius: 50%;
+    border: 2px solid var(--text);
+    background: transparent;
+    color: var(--text);
+    box-shadow: none;
+    transform: none;
+}
+
+.chatPage button.chatSearchBtn:hover,
+.chatPage button.chatSearchBtn.active { background: var(--text); color: var(--card); }
+
+.chatSearchBox {
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--border);
+}
+
+.chatSearchBox input {
+    width: 100%;
+    border-radius: 999px;
+}
+
+.chatSearchLabel {
+    margin: 0;
+    padding: 12px 14px 4px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+}
+
+/* Kontakt-Treffer sehen aus wie Chat-Eintraege (sind aber Buttons) */
+.chatPage form.chatSearchContacts { gap: 0; }
+
+.chatPage button.chatSearchContact {
+    width: 100%;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    font: inherit;
+    border-radius: 0;
+    padding: 12px 14px;
+    box-shadow: none;
+    transform: none;
+}
+
+.chatPage button.chatSearchContact:hover { background: var(--st-hover, var(--bg)); color: var(--text); }
+
 .chatList {
     flex: 1;
     overflow-y: auto;

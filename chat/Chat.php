@@ -6,6 +6,7 @@
 //   /chat/Chat.php?tab=...&new=1         "Neuer Chat" bzw. "Neue Gruppe"
 require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/Chat.php';
+require_once __DIR__ . '/../src/classes/Nickname.php';
 require_once __DIR__ . '/../src/functions.php';
 
 require_once __DIR__ . '/../src/components/guard.php';
@@ -53,8 +54,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // ---------- Daten fuer die Anzeige ----------
+// Eigene Spitznamen (privat: nur ich sehe, wie ich jemanden genannt habe)
+$nicknames = (new Nickname($pdo))->getNicknamesForOwner($uid);
+
+// Anzeigename einer Person: Spitzname, sonst "Vorname Nachname" ($short: nur Vorname)
+function chatName($person, $nicknames, $short = false) {
+    if (isset($nicknames[$person->id]) && $nicknames[$person->id] !== '') {
+        return $nicknames[$person->id];
+    }
+    return $short ? $person->firstname : $person->firstname . ' ' . $person->lastname;
+}
+
+// Suchtext fuer die Lupe: Spitzname + echter Name (klein geschrieben)
+function searchText($person, $nicknames) {
+    return mb_strtolower(($nicknames[$person->id] ?? '') . ' ' . $person->firstname . ' ' . $person->lastname);
+}
+
 $conversations = $chat->conversationsForUser($uid, $tab);
 $contacts = $chat->contactsForUser($uid);
+
+// Titel und Suchtext pro Chat: Direkt-Chat -> (Spitz-)Name der Person, Gruppe -> Name + Mitglieder
+$hasDirectWith = [];
+foreach ($conversations as $conv) {
+    if ($conv->type === 'direct' && $conv->other) {
+        $conv->title = chatName($conv->other, $nicknames);
+        $conv->search = searchText($conv->other, $nicknames);
+        $hasDirectWith[$conv->other->id] = true;
+    } else {
+        $conv->search = mb_strtolower($conv->title);
+        foreach ($chat->members($conv->id) as $m) {
+            if ($m->id != $uid) {
+                $conv->search .= ' ' . searchText($m, $nicknames);
+            }
+        }
+    }
+}
 
 $current = $convId ? $chat->getConversation($convId, $uid) : null;
 $messages = [];
@@ -62,6 +96,9 @@ $members = [];
 if ($current) {
     $messages = $chat->messages($current->id, $uid);
     $members = $chat->members($current->id);
+    if ($current->type === 'direct' && $current->other) {
+        $current->title = chatName($current->other, $nicknames);
+    }
     // Geoeffnet = gelesen (vor der Navbar, damit der Zaehler gleich stimmt)
     $chat->markRead($current->id, $uid);
     $tab = $current->type;
@@ -84,13 +121,20 @@ include_once __DIR__ . '/../src/components/navbar.php';
         <div class="chatTabs">
             <a href="/chat/Chat.php?tab=direct" class="chatTab <?= $tab === 'direct' ? 'active' : '' ?>">Chats</a>
             <a href="/chat/Chat.php?tab=group" class="chatTab <?= $tab === 'group' ? 'active' : '' ?>">Gruppen</a>
+            <button type="button" class="chatSearchBtn" id="chatSearchBtn" title="Suchen" aria-label="Suchen" aria-expanded="false">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            </button>
             <a href="/chat/Chat.php?tab=<?= $tab ?>&amp;new=1" class="chatNewBtn"
                title="<?= $tab === 'group' ? 'Neue Gruppe' : 'Neuer Chat' ?>" aria-label="<?= $tab === 'group' ? 'Neue Gruppe' : 'Neuer Chat' ?>">+</a>
         </div>
 
-        <div class="chatList">
+        <div class="chatSearchBox hidden" id="chatSearchBox">
+            <input type="search" id="chatSearch" placeholder="<?= $tab === 'group' ? 'Gruppe oder Person suchen' : 'Name oder Spitzname suchen' ?>" autocomplete="off" aria-label="Suchen">
+        </div>
+
+        <div class="chatList" id="chatList">
             <?php if (empty($conversations)): ?>
-                <p class="chatEmpty">
+                <p class="chatEmpty" id="chatListEmpty">
                     <?= $tab === 'group' ? 'Noch keine Gruppen.' : 'Noch keine Chats.' ?><br>
                     Tippe auf <strong>+</strong>, um <?= $tab === 'group' ? 'eine Gruppe zu erstellen' : 'einen Chat zu starten' ?>.
                 </p>
@@ -98,7 +142,8 @@ include_once __DIR__ . '/../src/components/navbar.php';
 
             <?php foreach ($conversations as $conv): ?>
                 <a href="/chat/Chat.php?tab=<?= $tab ?>&amp;c=<?= $conv->id ?>"
-                   class="chatListItem <?= $current && $current->id == $conv->id ? 'active' : '' ?>">
+                   class="chatListItem <?= $current && $current->id == $conv->id ? 'active' : '' ?>"
+                   data-search="<?= htmlspecialchars($conv->search) ?>">
                     <?php if ($conv->type === 'direct' && $conv->other): ?>
                         <?= avatarHtml($conv->other, 'class="chatAvatar"') ?>
                     <?php else: ?>
@@ -119,6 +164,30 @@ include_once __DIR__ . '/../src/components/navbar.php';
                     <?php endif; ?>
                 </a>
             <?php endforeach; ?>
+
+            <?php if ($tab === 'direct'): ?>
+                <!-- Kontakte, mit denen es noch keinen Chat gibt - erscheinen nur beim Suchen -->
+                <form method="POST" class="chatSearchContacts hidden" id="chatSearchContacts">
+                    <?= csrfField() ?>
+                    <p class="chatSearchLabel">Neuen Chat starten</p>
+                    <?php foreach ($contacts as $contact): ?>
+                        <?php if (!isset($hasDirectWith[$contact->id])): ?>
+                            <button type="submit" name="startDirect" value="<?= $contact->id ?>" class="chatListItem chatSearchContact"
+                                    data-search="<?= htmlspecialchars(searchText($contact, $nicknames)) ?>">
+                                <?= avatarHtml($contact, 'class="chatAvatar"') ?>
+                                <span class="chatListText">
+                                    <span class="chatListName"><?= htmlspecialchars(chatName($contact, $nicknames)) ?></span>
+                                    <?php if (isset($nicknames[$contact->id])): ?>
+                                        <span class="chatListPreview"><?= htmlspecialchars($contact->firstname . ' ' . $contact->lastname) ?></span>
+                                    <?php endif; ?>
+                                </span>
+                            </button>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </form>
+            <?php endif; ?>
+
+            <p class="chatEmpty hidden" id="chatNoResults">Keine Treffer.</p>
         </div>
     </aside>
 
@@ -143,7 +212,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
                         <?php foreach ($contacts as $contact): ?>
                             <button type="submit" name="startDirect" value="<?= $contact->id ?>" class="chatContact">
                                 <?= avatarHtml($contact, 'class="chatAvatar"') ?>
-                                <span><?= htmlspecialchars($contact->firstname . ' ' . $contact->lastname) ?></span>
+                                <span><?= htmlspecialchars(chatName($contact, $nicknames)) ?></span>
                             </button>
                         <?php endforeach; ?>
                     </form>
@@ -159,7 +228,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
                                 <input type="checkbox" name="members[]" value="<?= $contact->id ?>"
                                     <?= in_array((string) $contact->id, $_POST['members'] ?? [], true) ? 'checked' : '' ?>>
                                 <?= avatarHtml($contact, 'class="chatAvatar"') ?>
-                                <span><?= htmlspecialchars($contact->firstname . ' ' . $contact->lastname) ?></span>
+                                <span><?= htmlspecialchars(chatName($contact, $nicknames)) ?></span>
                             </label>
                         <?php endforeach; ?>
                         <button type="submit" name="createGroupBtn">Gruppe erstellen</button>
@@ -178,7 +247,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
                 <span class="chatHeaderText">
                     <strong><?= htmlspecialchars($current->title) ?></strong>
                     <?php if ($current->type === 'group'): ?>
-                        <small><?= htmlspecialchars(implode(', ', array_map(fn($m) => $m->firstname, $members))) ?></small>
+                        <small><?= htmlspecialchars(implode(', ', array_map(fn($m) => $m->id == $uid ? 'Du' : chatName($m, $nicknames, true), $members))) ?></small>
                     <?php endif; ?>
                 </span>
             </div>
@@ -194,7 +263,7 @@ include_once __DIR__ . '/../src/components/navbar.php';
                 <?php foreach ($messages as $m): ?>
                     <div class="chatMsg <?= $m->sender_id == $uid ? 'mine' : 'theirs' ?>">
                         <?php if ($current->type === 'group' && $m->sender_id != $uid): ?>
-                            <span class="chatMsgSender"><?= htmlspecialchars($m->firstname) ?></span>
+                            <span class="chatMsgSender"><?= htmlspecialchars(chatName((object) ['id' => $m->sender_id, 'firstname' => $m->firstname, 'lastname' => $m->lastname], $nicknames, true)) ?></span>
                         <?php endif; ?>
                         <span class="chatBubble"><?= htmlspecialchars($m->body) ?></span>
                         <span class="chatMsgTime"><?= chatTime($m->created_at) ?></span>

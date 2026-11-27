@@ -6,6 +6,7 @@
 require_once __DIR__ . '/../src/components/session.php';
 require_once __DIR__ . '/../src/classes/Database.php';
 require_once __DIR__ . '/../src/classes/Chat.php';
+require_once __DIR__ . '/../src/classes/Nickname.php';
 require_once __DIR__ . '/../src/functions.php';
 
 header('Content-Type: application/json; charset=utf-8');
@@ -32,7 +33,10 @@ if ($action === 'send') {
 // Session wird ab hier nicht mehr gebraucht -> freigeben (sonst warten parallele Anfragen)
 session_write_close();
 
-$chat = new Chat((new Database)->connect());
+$pdo = (new Database)->connect();
+$chat = new Chat($pdo);
+// Eigene Spitznamen: in Gruppen steht ueber fremden Nachrichten der Spitzname, sonst der Vorname
+$nicknames = (new Nickname($pdo))->getNicknamesForOwner($uid);
 
 if (!$chat->isMember($convId, $uid)) {
     reply(404, ['error' => 'not_found']);
@@ -40,11 +44,12 @@ if (!$chat->isMember($convId, $uid)) {
 
 // Nachricht in das Format fuer chat.js bringen (Text bleibt Text - chat.js setzt ihn mit textContent ein)
 function format($m) {
+    global $nicknames;
     $ts = strtotime($m->created_at);
     return [
         'id' => (int) $m->id,
         'sender_id' => (int) $m->sender_id,
-        'firstname' => $m->firstname,
+        'firstname' => ($nicknames[$m->sender_id] ?? '') !== '' ? $nicknames[$m->sender_id] : $m->firstname,
         'body' => $m->body,
         'time' => date('Y-m-d', $ts) === date('Y-m-d') ? date('H:i', $ts) : date('d.m. H:i', $ts),
     ];

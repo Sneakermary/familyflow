@@ -1,3 +1,71 @@
+// ---------- Suche (Lupe): filtert die Liste nach Spitzname und echtem Name ----------
+(function () {
+    const btn = document.getElementById('chatSearchBtn');
+    const box = document.getElementById('chatSearchBox');
+    const input = document.getElementById('chatSearch');
+    if (!btn || !box || !input) {
+        return;
+    }
+    const list = document.getElementById('chatList');
+    const contacts = document.getElementById('chatSearchContacts');
+    const noResults = document.getElementById('chatNoResults');
+    const listEmpty = document.getElementById('chatListEmpty');
+
+    // klein schreiben + Akzente weg (é -> e), damit "rene" auch "René" findet
+    function norm(text) {
+        return text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    }
+
+    function filter() {
+        const query = norm(input.value.trim());
+        let hits = 0;
+
+        // bestehende Chats: ausblenden, was nicht passt
+        list.querySelectorAll('a.chatListItem').forEach(function (item) {
+            const match = query === '' || norm(item.dataset.search || '').includes(query);
+            item.classList.toggle('hidden', !match);
+            if (match) hits++;
+        });
+
+        // Kontakte ohne Chat: nur zeigen, wenn gesucht wird
+        if (contacts) {
+            let contactHits = 0;
+            contacts.querySelectorAll('.chatSearchContact').forEach(function (item) {
+                const match = query !== '' && norm(item.dataset.search || '').includes(query);
+                item.classList.toggle('hidden', !match);
+                if (match) contactHits++;
+            });
+            contacts.classList.toggle('hidden', contactHits === 0);
+            hits += contactHits;
+        }
+
+        if (listEmpty) listEmpty.classList.toggle('hidden', query !== '');
+        noResults.classList.toggle('hidden', query === '' || hits > 0);
+    }
+
+    // Lupe: Suchfeld auf-/zuklappen
+    btn.addEventListener('click', function () {
+        const open = box.classList.toggle('hidden') === false;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.classList.toggle('active', open);
+        if (open) {
+            input.focus();
+        } else {
+            input.value = '';
+            filter();
+        }
+    });
+
+    input.addEventListener('input', filter);
+
+    // Escape: Suche leeren und schliessen
+    input.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            btn.click();
+        }
+    });
+})();
+
 // Chat: Senden ohne Neuladen der Seite + alle 4 Sekunden neue Nachrichten holen.
 // Laeuft nur, wenn ein Chat geoeffnet ist (#chatMessages vorhanden).
 // Nachrichten werden IMMER mit textContent eingesetzt - so kann niemand HTML/JavaScript einschleusen.
